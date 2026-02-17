@@ -53,6 +53,10 @@ import Produtos from './pages/Produtos';
 import NotasFiscais from './pages/NotasFiscais';
 import BancoVirtual from './pages/BancoVirtual';
 import IAExecutora from './pages/IAExecutora';
+import Fornecedores from './pages/Fornecedores';
+import Categorias from './pages/Categorias';
+import ContasPagar from './pages/ContasPagar';
+import Checklists from './pages/Checklists';
 import __Layout from './Layout.jsx';
 
 
@@ -63,6 +67,10 @@ export const PAGES = {
     "NotasFiscais": NotasFiscais,
     "BancoVirtual": BancoVirtual,
     "IAExecutora": IAExecutora,
+    "Fornecedores": Fornecedores,
+    "Categorias": Categorias,
+    "ContasPagar": ContasPagar,
+    "Checklists": Checklists,
 }
 
 export const pagesConfig = {
