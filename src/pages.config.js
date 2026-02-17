@@ -59,6 +59,7 @@ import ContasPagar from './pages/ContasPagar';
 import Checklists from './pages/Checklists';
 import Estoque from './pages/Estoque';
 import Movimentacoes from './pages/Movimentacoes';
+import Vendas from './pages/Vendas';
 import __Layout from './Layout.jsx';
 
 
@@ -75,6 +76,7 @@ export const PAGES = {
     "Checklists": Checklists,
     "Estoque": Estoque,
     "Movimentacoes": Movimentacoes,
+    "Vendas": Vendas,
 }
 
 export const pagesConfig = {
