@@ -33,7 +33,8 @@ import {
   Bell,
   Landmark,
   Vault,
-  ShoppingBag
+  ShoppingBag,
+  Shield
 } from 'lucide-react';
 
 const menuGroups = [
