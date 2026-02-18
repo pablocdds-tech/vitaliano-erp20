@@ -72,6 +72,9 @@ import PDVMobile from './pages/PDVMobile';
 import Empresas from './pages/Empresas';
 import Fornecedores from './pages/Fornecedores';
 import Categorias from './pages/Categorias';
+import BancoVirtual from './pages/BancoVirtual';
+import ContasBancarias from './pages/ContasBancarias';
+import Cofres from './pages/Cofres';
 import __Layout from './Layout.jsx';
 
 
@@ -101,6 +104,9 @@ export const PAGES = {
     "Empresas": Empresas,
     "Fornecedores": Fornecedores,
     "Categorias": Categorias,
+    "BancoVirtual": BancoVirtual,
+    "ContasBancarias": ContasBancarias,
+    "Cofres": Cofres,
 }
 
 export const pagesConfig = {
