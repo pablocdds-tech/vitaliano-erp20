@@ -190,6 +190,9 @@ Retorne:
         breadcrumbs={[{ label: 'Dashboard', href: 'Dashboard' }, { label: 'IA Executora' }]}
       />
 
+      {/* Análise Financeira IA */}
+      <AnaliseFinanceiraIA />
+
       {/* Catálogo */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {acoesCatalogo.map((acao) => (
