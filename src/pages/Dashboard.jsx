@@ -40,8 +40,29 @@ import {
 } from 'recharts';
 
 export default function Dashboard() {
+  // Buscar empresa do usuário (para alertas)
+  const [empresa_id, setEmpresa_id] = useState(null);
+
+  useEffect(() => {
+    // Recuperar empresa_id do contexto do usuário
+    async function getEmpresaId() {
+      try {
+        const user = await base44.auth.me();
+        // Assumindo que empresa_id está salvo no usuário
+        setEmpresa_id(user.empresa_id);
+      } catch {
+        // Usar primeira empresa disponível como fallback
+        const empresas = await base44.entities.Empresa.list();
+        if (empresas.length > 0) {
+          setEmpresa_id(empresas[0].id);
+        }
+      }
+    }
+    getEmpresaId();
+  }, []);
+
   // Query para dados do dashboard
-  const { data: vendas = [], isLoading: loadingVendas } = useQuery({
+   const { data: vendas = [], isLoading: loadingVendas } = useQuery({
     queryKey: ['vendas-dashboard'],
     queryFn: () => base44.entities.Venda.list('-data', 30)
   });
