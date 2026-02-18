@@ -144,22 +144,20 @@ export default function Sidebar({ collapsed, onToggle }) {
       <nav className="p-3 h-[calc(100vh-64px)] overflow-y-auto scrollbar-thin">
         {menuGroups.map((group) => (
           <div key={group.label} className="mb-4">
-            {!collapsed && (
-              <button
-                onClick={() => toggleGroup(group.label)}
-                className="w-full flex items-center justify-between px-2 py-1.5 text-xs font-semibold text-slate-400 uppercase tracking-wider hover:text-slate-600 dark:hover:text-slate-300"
-              >
-                {group.label}
-                <ChevronDown className={cn(
-                  'w-3.5 h-3.5 transition-transform',
-                  expandedGroups[group.label] ? 'rotate-180' : ''
-                )} />
-              </button>
-            )}
+            <button
+              onClick={() => toggleGroup(group.label)}
+              className="w-full flex items-center justify-between px-2 py-1.5 text-xs font-semibold text-slate-400 uppercase tracking-wider hover:text-slate-600 dark:hover:text-slate-300"
+            >
+              {group.label}
+              <ChevronDown className={cn(
+                'w-3.5 h-3.5 transition-transform',
+                expandedGroups[group.label] ? 'rotate-180' : ''
+              )} />
+            </button>
             
             <div className={cn(
               'space-y-0.5 mt-1',
-              !collapsed && expandedGroups[group.label] && 'hidden'
+              expandedGroups[group.label] && 'hidden'
             )}>
               {group.items.map((item) => (
                 <Link
@@ -176,9 +174,7 @@ export default function Sidebar({ collapsed, onToggle }) {
                     'w-5 h-5 flex-shrink-0',
                     isActive(item.href) ? '' : 'group-hover:scale-110 transition-transform'
                   )} />
-                  {!collapsed && (
-                    <span className="text-sm font-medium truncate">{item.label}</span>
-                  )}
+                  <span className="text-sm font-medium truncate">{item.label}</span>
                   {isActive(item.href) && (
                     <div className="absolute left-0 w-1 h-6 bg-emerald-500 rounded-r-full" />
                   )}
