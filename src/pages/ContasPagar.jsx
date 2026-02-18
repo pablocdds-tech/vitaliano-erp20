@@ -95,8 +95,9 @@ export default function ContasPagar() {
 
   const createMutation = useMutation({
     mutationFn: async (form) => {
+      const empresa = await getEmpresaAtiva();
       const base = {
-        empresa_id: form.empresa_id,
+        empresa_id: empresa.id,
         loja_id: form.loja_id,
         fornecedor_id: form.fornecedor_id || null,
         categoria_dre_id: form.categoria_dre_id || null,
