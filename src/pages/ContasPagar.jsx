@@ -174,16 +174,7 @@ export default function ContasPagar() {
     }
   });
 
-  const handlePay = (conta) => {
-    updateMutation.mutate({
-      id: conta.id,
-      data: {
-        status: 'pago',
-        data_pagamento: format(new Date(), 'yyyy-MM-dd'),
-        valor_pago: conta.valor_original,
-      }
-    });
-  };
+  // Removido: handlePay simples. Substituído por modal de registro de pagamento.
 
   const handleEdit = (item) => {
     setEditingItem(item);
