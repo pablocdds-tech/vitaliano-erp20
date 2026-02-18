@@ -11,7 +11,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Landmark, Upload, Loader2, CheckCircle2, EyeOff, Link2 } from 'lucide-react';
+import { Landmark, Upload, Loader2, CheckCircle2, EyeOff, Link2, Sparkles } from 'lucide-react';
+import SugestaoIAConciliacao from '@/components/conciliacao/SugestaoIAConciliacao';
 import { format, startOfMonth, endOfMonth } from 'date-fns';
 import { toast } from 'sonner';
 
