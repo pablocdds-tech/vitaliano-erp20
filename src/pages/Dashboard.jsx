@@ -55,6 +55,11 @@ export default function Dashboard() {
     queryFn: () => base44.entities.ContaReceber.filter({ status: 'pendente' }, 'data_vencimento', 10)
   });
 
+  const { data: contasBancarias = [] } = useQuery({ queryKey: ['contas-bancarias'], queryFn: () => base44.entities.ContaBancaria.list('nome') });
+  const { data: transacoesBanco = [] } = useQuery({ queryKey: ['transacoes-banco'], queryFn: () => base44.entities.TransacaoBancaria.list('-data', 1000) });
+  const { data: cofres = [] } = useQuery({ queryKey: ['cofres'], queryFn: () => base44.entities.Cofre.list('nome') });
+  const { data: movsCofre = [] } = useQuery({ queryKey: ['movs-cofre'], queryFn: () => base44.entities.MovimentacaoCofre.list('-data', 500) });
+
   const { data: estoqueAlerta = [], isLoading: loadingEstoque } = useQuery({
     queryKey: ['estoque-alerta'],
     queryFn: async () => {
