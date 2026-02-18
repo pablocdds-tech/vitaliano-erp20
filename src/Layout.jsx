@@ -52,6 +52,7 @@ export default function Layout({ children, currentPageName }) {
       
       <Sidebar collapsed={collapsed} onToggle={toggleSidebar} />
       <TopBar collapsed={collapsed} onToggle={toggleSidebar} />
+      <MobileBottomNav currentPage={currentPageName} onMenuClick={toggleSidebar} />
       
       <main className={cn(
         'pt-16 min-h-screen transition-all duration-300',
