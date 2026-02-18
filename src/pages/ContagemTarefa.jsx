@@ -107,6 +107,43 @@ export default function ContagemTarefa() {
   const preenchidos = itens.filter(i => i.quantidade_contada !== '' && i.quantidade_contada !== null).length;
   const pct = itens.length > 0 ? Math.round((preenchidos / itens.length) * 100) : 0;
 
+  // Tela de boas-vindas antes de iniciar
+  if (!iniciado) return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 to-slate-100 px-4">
+      <div className="max-w-sm w-full bg-white rounded-2xl shadow-lg p-8 text-center space-y-5">
+        <div className="w-16 h-16 rounded-full bg-indigo-100 flex items-center justify-center mx-auto">
+          <ClipboardList className="w-8 h-8 text-indigo-600" />
+        </div>
+        <div>
+          <h1 className="text-2xl font-bold text-slate-800">Contagem de Estoque</h1>
+          <p className="text-slate-500 mt-1">Olá, <strong>{tarefa?.responsavel_nome}</strong>!</p>
+        </div>
+        <div className="bg-slate-50 rounded-xl p-4 text-left space-y-2">
+          {tarefa?.grupo && (
+            <div className="flex justify-between text-sm">
+              <span className="text-slate-500">Grupo</span>
+              <span className="font-medium text-slate-700">{tarefa.grupo}</span>
+            </div>
+          )}
+          <div className="flex justify-between text-sm">
+            <span className="text-slate-500">Itens para contar</span>
+            <span className="font-bold text-indigo-600">{itens.length} itens</span>
+          </div>
+        </div>
+        <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 text-left">
+          ⚠️ Conte fisicamente cada item. Não consulte o sistema — registre o que você ver na prateleira.
+        </p>
+        <Button
+          className="w-full h-12 text-base gap-2 bg-indigo-600 hover:bg-indigo-700"
+          onClick={() => setIniciado(true)}
+        >
+          <Play className="w-5 h-5" />
+          Iniciar Contagem
+        </Button>
+      </div>
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Header */}
