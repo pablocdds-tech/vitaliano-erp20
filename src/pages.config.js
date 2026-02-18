@@ -74,6 +74,7 @@ import TemplatesContagem from './pages/TemplatesContagem';
 import Vendas from './pages/Vendas';
 import Onboarding from './pages/Onboarding';
 import AdminSaaS from './pages/AdminSaaS';
+import PDVMobile from './pages/PDVMobile';
 import __Layout from './Layout.jsx';
 
 
@@ -105,6 +106,7 @@ export const PAGES = {
     "Vendas": Vendas,
     "Onboarding": Onboarding,
     "AdminSaaS": AdminSaaS,
+    "PDVMobile": PDVMobile,
 }
 
 export const pagesConfig = {
