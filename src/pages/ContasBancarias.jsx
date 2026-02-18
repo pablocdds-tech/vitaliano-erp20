@@ -23,8 +23,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { CreditCard, Plus, Pencil, Trash2 } from 'lucide-react';
+import { CreditCard, Plus, Pencil, Trash2, Wallet } from 'lucide-react';
 import { toast } from 'sonner';
+import { formatMoney } from '@/components/ui-custom/MoneyDisplay';
+import KPICard from '@/components/ui-custom/KPICard';
 
 export default function ContasBancarias() {
   const queryClient = useQueryClient();
@@ -96,6 +98,8 @@ export default function ContasBancarias() {
     setEditingItem(null);
   };
 
+  const totalSaldoAtual = contas.reduce((sum, c) => sum + calcularSaldoAtual(c.id), 0);
+
   const handleEdit = (item) => {
     setEditingItem(item);
     setFormData({
@@ -160,13 +164,18 @@ export default function ContasBancarias() {
         title="Contas Bancárias"
         subtitle="Gerencie suas contas bancárias"
         icon={CreditCard}
-        breadcrumbs={[{ label: 'Dashboard', href: 'Dashboard' }, { label: 'Financeiro' }, { label: 'Contas Bancárias' }]}
+        breadcrumbs={[{ label: 'Dashboard', href: 'Dashboard' }, { label: 'Contas Bancárias' }]}
         actions={
-          <Button onClick={() => { resetForm(); setModalOpen(true); }} className="gap-2">
+          <Button onClick={() => { resetForm(); setModalOpen(true); }} className="gap-2 w-full sm:w-auto">
             <Plus className="w-4 h-4" /> Nova
           </Button>
         }
       />
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <KPICard title="Saldo Total Atual" value={formatMoney(totalSaldoAtual)} icon={Wallet} variant="success" subtitle={`${contas.length} contas`} />
+        <KPICard title="Contas Ativas" value={contas.filter(c => c.status === 'ativo').length} icon={CreditCard} variant="info" />
+      </div>
 
       {contas.length === 0 && !isLoading ? (
         <EmptyState icon={CreditCard} title="Nenhuma conta" description="Cadastre suas contas bancárias." actionLabel="Criar" onAction={() => setModalOpen(true)} />
@@ -178,7 +187,7 @@ export default function ContasBancarias() {
       )}
 
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-lg w-[95vw] sm:w-full max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editingItem ? 'Editar' : 'Nova Conta'}</DialogTitle>
           </DialogHeader>
