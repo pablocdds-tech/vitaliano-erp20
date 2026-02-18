@@ -12,6 +12,7 @@ import {
   Bot, Sparkles, FileText, Package, CreditCard,
   CheckCircle2, Clock, AlertCircle, Loader2, Zap, Brain, History, XCircle
 } from 'lucide-react';
+import AnaliseFinanceiraIA from '@/components/ia/AnaliseFinanceiraIA';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 
