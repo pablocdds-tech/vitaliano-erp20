@@ -39,6 +39,9 @@ import {
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
+import { processarEntrada } from '@/components/services/estoqueService';
+import { criarContasPagarNF } from '@/components/services/financeiroService';
+import { getEmpresaAtiva } from '@/components/services/tenantService';
 
 export default function NotasFiscais() {
   const queryClient = useQueryClient();
@@ -183,104 +186,36 @@ export default function NotasFiscais() {
 
   const handleLancar = async (nota) => {
     try {
-      // 1. Atualizar status da nota
-      await updateMutation.mutateAsync({
-        id: nota.id,
-        data: { status: 'lancada' }
-      });
+      // 1. Obter empresa ativa para garantir multi-tenant
+      const empresa = await getEmpresaAtiva();
 
-      // 2. Processar itens da nota e atualizar estoque
-      if (nota.itens && nota.itens.length > 0) {
+      // 2. Atualizar status da nota
+      await updateMutation.mutateAsync({ id: nota.id, data: { status: 'lancada' } });
+
+      // 3. Processar entradas de estoque via estoqueService (CMP + movimentação)
+      if (nota.itens?.length > 0) {
         for (const item of nota.itens) {
-          if (!item.produto_id) continue;
-
-          // Buscar estoque atual
-          const estoquesExistentes = await base44.entities.Estoque.filter({
-            loja_id: nota.loja_id,
-            produto_id: item.produto_id
-          });
-
-          const estoqueAtual = estoquesExistentes[0];
-          const quantidadeAnterior = estoqueAtual?.quantidade || 0;
-          const custoMedioAnterior = estoqueAtual?.custo_medio || 0;
-          const quantidadeNova = quantidadeAnterior + item.quantidade;
-
-          // Calcular novo custo médio ponderado
-          const custoTotalAnterior = quantidadeAnterior * custoMedioAnterior;
-          const custoTotalNovo = item.quantidade * item.valor_unitario;
-          const custoMedioNovo = quantidadeNova > 0 
-            ? (custoTotalAnterior + custoTotalNovo) / quantidadeNova 
-            : item.valor_unitario;
-
-          // Atualizar ou criar estoque
-          if (estoqueAtual) {
-            await base44.entities.Estoque.update(estoqueAtual.id, {
-              quantidade: quantidadeNova,
-              custo_medio: custoMedioNovo,
-              ultima_entrada: new Date().toISOString()
-            });
-          } else {
-            await base44.entities.Estoque.create({
-              loja_id: nota.loja_id,
-              produto_id: item.produto_id,
-              quantidade: item.quantidade,
-              custo_medio: item.valor_unitario,
-              ultima_entrada: new Date().toISOString()
-            });
-          }
-
-          // Criar movimentação de estoque
-          await base44.entities.MovimentacaoEstoque.create({
+          if (!item.produto_id || !item.quantidade) continue;
+          await processarEntrada({
+            empresa_id: empresa.id,
             loja_id: nota.loja_id,
             produto_id: item.produto_id,
-            tipo: 'entrada',
             quantidade: item.quantidade,
-            quantidade_anterior: quantidadeAnterior,
-            quantidade_posterior: quantidadeNova,
-            custo_unitario: item.valor_unitario,
-            custo_total: item.valor_total,
+            custo_unitario: item.valor_unitario || 0,
             documento_tipo: 'nota_fiscal',
             documento_id: nota.id,
-            observacao: `Entrada via NF ${nota.numero}/${nota.serie}`
+            observacao: `Entrada via NF ${nota.numero}/${nota.serie || '1'}`,
           });
         }
       }
 
-      // 3. Criar conta a pagar (se houver parcelas)
-      if (nota.parcelas && nota.parcelas.length > 0) {
-        for (const parcela of nota.parcelas) {
-          await base44.entities.ContaPagar.create({
-            loja_id: nota.loja_id,
-            fornecedor_id: nota.fornecedor_id,
-            descricao: `NF ${nota.numero}/${nota.serie} - Parcela ${parcela.numero}`,
-            documento_tipo: 'nota_fiscal',
-            documento_numero: nota.numero,
-            documento_id: nota.id,
-            data_emissao: nota.data_emissao,
-            data_vencimento: parcela.vencimento,
-            valor_original: parcela.valor,
-            forma_pagamento: 'boleto',
-            status: 'pendente',
-            parcela_atual: parcela.numero,
-            total_parcelas: nota.parcelas.length
-          });
-        }
-      } else if (nota.valor_total > 0) {
-        // Criar conta única se não houver parcelas
-        await base44.entities.ContaPagar.create({
-          loja_id: nota.loja_id,
-          fornecedor_id: nota.fornecedor_id,
-          descricao: `NF ${nota.numero}/${nota.serie}`,
-          documento_tipo: 'nota_fiscal',
-          documento_numero: nota.numero,
-          documento_id: nota.id,
-          data_emissao: nota.data_emissao,
-          data_vencimento: nota.data_entrada || nota.data_emissao,
-          valor_original: nota.valor_total,
-          forma_pagamento: 'boleto',
-          status: 'pendente'
-        });
-      }
+      // 4. Gerar contas a pagar via financeiroService
+      await criarContasPagarNF({
+        empresa_id: empresa.id,
+        loja_id: nota.loja_id,
+        fornecedor_id: nota.fornecedor_id,
+        nota,
+      });
 
       toast.success('Nota lançada! Estoque e financeiro atualizados.');
     } catch (error) {

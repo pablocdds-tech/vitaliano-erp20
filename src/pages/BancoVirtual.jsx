@@ -40,6 +40,8 @@ import {
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
+import { criarOperacaoBancoVirtual, aprovarOperacaoBancoVirtual, rejeitarOperacaoBancoVirtual } from '@/components/services/financeiroService';
+import { getEmpresaAtiva } from '@/components/services/tenantService';
 
 export default function BancoVirtual() {
   const queryClient = useQueryClient();
@@ -64,46 +66,34 @@ export default function BancoVirtual() {
 
   const createMutation = useMutation({
     mutationFn: async (data) => {
-      // Criar movimentação
-      const mov = await base44.entities.BancoVirtual.create(data);
-      
-      // Atualizar saldos das lojas
-      if (data.loja_origem_id) {
-        const lojaOrigem = lojas.find(l => l.id === data.loja_origem_id);
-        if (lojaOrigem) {
-          await base44.entities.Loja.update(data.loja_origem_id, {
-            saldo_banco_virtual: (lojaOrigem.saldo_banco_virtual || 0) - data.valor
-          });
-        }
-      }
-      
-      if (data.loja_destino_id) {
-        const lojaDestino = lojas.find(l => l.id === data.loja_destino_id);
-        if (lojaDestino) {
-          await base44.entities.Loja.update(data.loja_destino_id, {
-            saldo_banco_virtual: (lojaDestino.saldo_banco_virtual || 0) + data.valor
-          });
-        }
-      }
-      
-      return mov;
+      // Delega criação e validação de saldo ao financeiroService
+      const empresa = await getEmpresaAtiva();
+      return criarOperacaoBancoVirtual({ ...data, empresa_id: empresa.id, lojas });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['banco-virtual'] });
       queryClient.invalidateQueries({ queryKey: ['lojas'] });
       setModalOpen(false);
       resetForm();
-      toast.success('Operação realizada com sucesso!');
+      toast.success('Operação criada! Aguardando aprovação.');
     },
-    onError: () => toast.error('Erro ao realizar operação')
+    onError: (err) => toast.error(err.message || 'Erro ao criar operação')
   });
 
   const approveMutation = useMutation({
-    mutationFn: ({ id, status }) => base44.entities.BancoVirtual.update(id, { status }),
+    mutationFn: async ({ movimentacao, acao }) => {
+      if (acao === 'aprovar') {
+        // Delega aprovação + efetivação de saldos ao financeiroService
+        return aprovarOperacaoBancoVirtual(movimentacao, lojas);
+      }
+      return rejeitarOperacaoBancoVirtual(movimentacao.id);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['banco-virtual'] });
+      queryClient.invalidateQueries({ queryKey: ['lojas'] });
       toast.success('Operação atualizada!');
-    }
+    },
+    onError: (err) => toast.error(err.message || 'Erro ao processar operação')
   });
 
   const resetForm = () => {
@@ -327,12 +317,12 @@ export default function BancoVirtual() {
             { 
               label: 'Aprovar', 
               icon: CheckCircle2, 
-              onClick: () => approveMutation.mutate({ id: row.id, status: 'aprovado' }) 
+              onClick: () => approveMutation.mutate({ movimentacao: row, acao: 'aprovar' }) 
             },
             { 
               label: 'Rejeitar', 
               icon: XCircle, 
-              onClick: () => approveMutation.mutate({ id: row.id, status: 'rejeitado' }),
+              onClick: () => approveMutation.mutate({ movimentacao: row, acao: 'rejeitar' }),
               destructive: true 
             }
           ] : []}

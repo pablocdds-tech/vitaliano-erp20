@@ -35,6 +35,8 @@ import {
 } from 'lucide-react';
 import { format, startOfMonth, endOfMonth } from 'date-fns';
 import { toast } from 'sonner';
+import { importarVendas } from '@/components/services/vendasService';
+import { getEmpresaAtiva } from '@/components/services/tenantService';
 
 const canaisConfig = {
   balcao: { label: 'Balcão', color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30' },
@@ -65,13 +67,9 @@ export default function Vendas() {
   });
 
   const importMutation = useMutation({
-    mutationFn: async (vendasData) => {
-      const results = [];
-      for (const venda of vendasData) {
-        const result = await base44.entities.Venda.create(venda);
-        results.push(result);
-      }
-      return results;
+    mutationFn: async ({ vendasData, empresa_id, loja_id }) => {
+      // Delega toda a lógica de importação + contas a receber ao vendasService
+      return importarVendas(vendasData, { empresa_id, loja_id });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['vendas'] });
@@ -144,23 +142,15 @@ IMPORTANTE:
       setProcessing(false);
 
       if (result?.vendas && result.vendas.length > 0) {
-        // 3. Adicionar loja_id a todas as vendas
-        const loja = lojas[0]; // Usa a primeira loja disponível
-        const vendasComLoja = result.vendas.map(v => ({
-          ...v,
-          loja_id: loja?.id
-        }));
+        // 3. Obter contexto de tenant
+        const empresa = await getEmpresaAtiva();
+        const loja = lojas[0]; // Em produção: seleção explícita pelo usuário
 
-        // 4. Importar vendas
-        await importMutation.mutateAsync(vendasComLoja);
-        
-        // 5. Registrar ação na IA
-        await base44.entities.AcaoIA.create({
-          tipo_acao: 'processar_vendas',
-          descricao: `Importação de ${result.vendas.length} vendas via arquivo`,
-          status: 'concluida',
-          entrada: { file_url },
-          saida: { total_vendas: result.vendas.length }
+        // 4. Importar via vendasService (cria vendas + contas a receber + rastreabilidade)
+        await importMutation.mutateAsync({
+          vendasData: result.vendas,
+          empresa_id: empresa.id,
+          loja_id: loja?.id,
         });
       } else {
         toast.error('Nenhuma venda encontrada no arquivo');

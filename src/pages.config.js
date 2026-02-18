@@ -47,35 +47,35 @@
  *
  * The mainPage value must match a key in the PAGES object exactly.
  */
-import Dashboard from './pages/Dashboard';
-import Lojas from './pages/Lojas';
-import Produtos from './pages/Produtos';
-import NotasFiscais from './pages/NotasFiscais';
 import BancoVirtual from './pages/BancoVirtual';
-import IAExecutora from './pages/IAExecutora';
-import Fornecedores from './pages/Fornecedores';
 import Categorias from './pages/Categorias';
-import ContasPagar from './pages/ContasPagar';
 import Checklists from './pages/Checklists';
+import ContasPagar from './pages/ContasPagar';
+import Dashboard from './pages/Dashboard';
 import Estoque from './pages/Estoque';
+import Fornecedores from './pages/Fornecedores';
+import IAExecutora from './pages/IAExecutora';
+import Lojas from './pages/Lojas';
 import Movimentacoes from './pages/Movimentacoes';
+import NotasFiscais from './pages/NotasFiscais';
+import Produtos from './pages/Produtos';
 import Vendas from './pages/Vendas';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
-    "Dashboard": Dashboard,
-    "Lojas": Lojas,
-    "Produtos": Produtos,
-    "NotasFiscais": NotasFiscais,
     "BancoVirtual": BancoVirtual,
-    "IAExecutora": IAExecutora,
-    "Fornecedores": Fornecedores,
     "Categorias": Categorias,
-    "ContasPagar": ContasPagar,
     "Checklists": Checklists,
+    "ContasPagar": ContasPagar,
+    "Dashboard": Dashboard,
     "Estoque": Estoque,
+    "Fornecedores": Fornecedores,
+    "IAExecutora": IAExecutora,
+    "Lojas": Lojas,
     "Movimentacoes": Movimentacoes,
+    "NotasFiscais": NotasFiscais,
+    "Produtos": Produtos,
     "Vendas": Vendas,
 }
 
