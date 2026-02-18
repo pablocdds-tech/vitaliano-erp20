@@ -25,26 +25,53 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { CreditCard, Plus, Pencil, CheckCircle2, Trash2, Clock, AlertTriangle, Wallet } from 'lucide-react';
-import { format, differenceInDays, isAfter } from 'date-fns';
+import { CreditCard, Plus, Pencil, CheckCircle2, Trash2, Clock, AlertTriangle, Wallet, Layers } from 'lucide-react';
+import { format, differenceInDays, isAfter, addMonths } from 'date-fns';
 import { toast } from 'sonner';
+
+const FORMAS = ['boleto', 'pix', 'transferencia', 'dinheiro', 'cartao', 'cheque'];
+const TIPO_CREDOR = ['fornecedor', 'banco', 'servico', 'aluguel', 'outro'];
+
+function gerarParcelas(valor, numParcelas, primeiroVencimento, intervalo = 'mensal') {
+  const parcelas = [];
+  const vlrParcela = parseFloat((valor / numParcelas).toFixed(2));
+  let diff = valor - vlrParcela * numParcelas; // ajuste de centavos
+  for (let i = 0; i < numParcelas; i++) {
+    const venc = addMonths(new Date(primeiroVencimento + 'T12:00:00'), i);
+    parcelas.push({
+      numero: i + 1,
+      vencimento: format(venc, 'yyyy-MM-dd'),
+      valor: i === numParcelas - 1 ? parseFloat((vlrParcela + diff).toFixed(2)) : vlrParcela,
+    });
+  }
+  return parcelas;
+}
 
 export default function ContasPagar() {
   const queryClient = useQueryClient();
   const [modalOpen, setModalOpen] = useState(false);
-  const [payModal, setPayModal] = useState(null);
   const [editingItem, setEditingItem] = useState(null);
-  const [formData, setFormData] = useState({
+
+  const emptyForm = {
     descricao: '',
+    credor_nome: '',
+    credor_tipo: 'fornecedor',
     fornecedor_id: '',
+    loja_id: '',
+    categoria_dre_id: '',
     documento_numero: '',
-    data_emissao: '',
+    data_emissao: format(new Date(), 'yyyy-MM-dd'),
     data_vencimento: '',
-    valor_original: 0,
+    valor_original: '',
     forma_pagamento: 'boleto',
     observacoes: '',
-    status: 'pendente'
-  });
+    // parcelamento
+    parcelar: false,
+    num_parcelas: 2,
+    primeiro_vencimento: '',
+  };
+
+  const [formData, setFormData] = useState(emptyForm);
 
   const { data: contas = [], isLoading } = useQuery({
     queryKey: ['contas-pagar'],
@@ -61,14 +88,56 @@ export default function ContasPagar() {
     queryFn: () => base44.entities.Fornecedor.list()
   });
 
+  const { data: categoriasDRE = [] } = useQuery({
+    queryKey: ['categorias-dre'],
+    queryFn: () => base44.entities.CategoriaDRE.list()
+  });
+
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.ContaPagar.create(data),
+    mutationFn: async (form) => {
+      const base = {
+        empresa_id: form.empresa_id,
+        loja_id: form.loja_id,
+        fornecedor_id: form.fornecedor_id || null,
+        categoria_dre_id: form.categoria_dre_id || null,
+        descricao: form.descricao,
+        credor_nome: form.credor_nome || null,
+        credor_tipo: form.credor_tipo || null,
+        documento_numero: form.documento_numero || null,
+        data_emissao: form.data_emissao || null,
+        forma_pagamento: form.forma_pagamento,
+        observacoes: form.observacoes || null,
+        status: 'pendente',
+      };
+
+      if (form.parcelar && form.num_parcelas > 1) {
+        const parcelas = gerarParcelas(parseFloat(form.valor_original), form.num_parcelas, form.primeiro_vencimento);
+        for (const p of parcelas) {
+          await base44.entities.ContaPagar.create({
+            ...base,
+            data_vencimento: p.vencimento,
+            valor_original: p.valor,
+            parcela_atual: p.numero,
+            total_parcelas: form.num_parcelas,
+          });
+        }
+      } else {
+        await base44.entities.ContaPagar.create({
+          ...base,
+          data_vencimento: form.data_vencimento,
+          valor_original: parseFloat(form.valor_original),
+          parcela_atual: 1,
+          total_parcelas: 1,
+        });
+      }
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['contas-pagar'] });
       setModalOpen(false);
-      resetForm();
-      toast.success('Conta cadastrada!');
-    }
+      setFormData(emptyForm);
+      toast.success('Conta(s) cadastrada(s)!');
+    },
+    onError: (e) => toast.error('Erro: ' + e.message),
   });
 
   const updateMutation = useMutation({
@@ -76,10 +145,11 @@ export default function ContasPagar() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['contas-pagar'] });
       setModalOpen(false);
-      setPayModal(null);
-      resetForm();
+      setEditingItem(null);
+      setFormData(emptyForm);
       toast.success('Conta atualizada!');
-    }
+    },
+    onError: (e) => toast.error('Erro: ' + e.message),
   });
 
   const deleteMutation = useMutation({
@@ -90,137 +160,130 @@ export default function ContasPagar() {
     }
   });
 
-  const resetForm = () => {
-    setFormData({
-      descricao: '',
-      fornecedor_id: '',
-      documento_numero: '',
-      data_emissao: '',
-      data_vencimento: '',
-      valor_original: 0,
-      forma_pagamento: 'boleto',
-      observacoes: '',
-      status: 'pendente'
-    });
-    setEditingItem(null);
-  };
-
-  const handleEdit = (item) => {
-    setEditingItem(item);
-    setFormData({
-      descricao: item.descricao || '',
-      fornecedor_id: item.fornecedor_id || '',
-      documento_numero: item.documento_numero || '',
-      data_emissao: item.data_emissao || '',
-      data_vencimento: item.data_vencimento || '',
-      valor_original: item.valor_original || 0,
-      forma_pagamento: item.forma_pagamento || 'boleto',
-      observacoes: item.observacoes || '',
-      status: item.status || 'pendente'
-    });
-    setModalOpen(true);
-  };
-
   const handlePay = (conta) => {
     updateMutation.mutate({
       id: conta.id,
       data: {
         status: 'pago',
         data_pagamento: format(new Date(), 'yyyy-MM-dd'),
-        valor_pago: conta.valor_original
+        valor_pago: conta.valor_original,
       }
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleEdit = (item) => {
+    setEditingItem(item);
+    setFormData({
+      ...emptyForm,
+      descricao: item.descricao || '',
+      credor_nome: item.credor_nome || '',
+      credor_tipo: item.credor_tipo || 'fornecedor',
+      fornecedor_id: item.fornecedor_id || '',
+      loja_id: item.loja_id || '',
+      categoria_dre_id: item.categoria_dre_id || '',
+      documento_numero: item.documento_numero || '',
+      data_emissao: item.data_emissao || '',
+      data_vencimento: item.data_vencimento || '',
+      valor_original: item.valor_original || '',
+      forma_pagamento: item.forma_pagamento || 'boleto',
+      observacoes: item.observacoes || '',
+      parcelar: false,
+    });
+    setModalOpen(true);
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const loja = lojas[0];
-    const data = { ...formData, loja_id: loja?.id };
-    
+    if (!formData.loja_id) { toast.error('Selecione a loja/CD'); return; }
+    if (!formData.valor_original || parseFloat(formData.valor_original) <= 0) { toast.error('Informe o valor'); return; }
+    if (formData.parcelar && !formData.primeiro_vencimento) { toast.error('Informe o primeiro vencimento'); return; }
+    if (!formData.parcelar && !formData.data_vencimento) { toast.error('Informe o vencimento'); return; }
+
     if (editingItem) {
-      updateMutation.mutate({ id: editingItem.id, data });
+      updateMutation.mutate({
+        id: editingItem.id,
+        data: {
+          descricao: formData.descricao,
+          credor_nome: formData.credor_nome,
+          credor_tipo: formData.credor_tipo,
+          fornecedor_id: formData.fornecedor_id || null,
+          loja_id: formData.loja_id,
+          categoria_dre_id: formData.categoria_dre_id || null,
+          data_vencimento: formData.data_vencimento,
+          valor_original: parseFloat(formData.valor_original),
+          forma_pagamento: formData.forma_pagamento,
+          observacoes: formData.observacoes,
+        }
+      });
     } else {
-      createMutation.mutate(data);
+      createMutation.mutate(formData);
     }
   };
 
-  // Cálculos
   const hoje = new Date();
   const pendentes = contas.filter(c => c.status === 'pendente');
-  const vencidas = pendentes.filter(c => isAfter(hoje, new Date(c.data_vencimento)));
-  const vencendoHoje = pendentes.filter(c => {
-    const diff = differenceInDays(new Date(c.data_vencimento), hoje);
+  const vencidas = pendentes.filter(c => c.data_vencimento && isAfter(hoje, new Date(c.data_vencimento + 'T23:59:59')));
+  const vencendoLogo = pendentes.filter(c => {
+    if (!c.data_vencimento) return false;
+    const diff = differenceInDays(new Date(c.data_vencimento + 'T12:00:00'), hoje);
     return diff >= 0 && diff <= 7;
   });
-  
-  const totalPendente = pendentes.reduce((sum, c) => sum + (c.valor_original || 0), 0);
-  const totalVencido = vencidas.reduce((sum, c) => sum + (c.valor_original || 0), 0);
+  const totalPendente = pendentes.reduce((s, c) => s + (c.valor_original || 0), 0);
+  const totalVencido = vencidas.reduce((s, c) => s + (c.valor_original || 0), 0);
 
-  const getFornecedor = (id) => fornecedores.find(f => f.id === id);
+  const getCredorLabel = (row) => {
+    if (row.fornecedor_id) {
+      const f = fornecedores.find(f => f.id === row.fornecedor_id);
+      if (f) return f.nome_fantasia || f.razao_social;
+    }
+    return row.credor_nome || '-';
+  };
+
+  const catsDespesa = categoriasDRE.filter(c => ['custo','despesa_fixa','despesa_variavel'].includes(c.tipo));
 
   const columns = [
     {
       key: 'descricao',
-      label: 'Descrição',
+      label: 'Descrição / Credor',
       sortable: true,
       render: (value, row) => {
-        const forn = getFornecedor(row.fornecedor_id);
-        const vencida = row.status === 'pendente' && isAfter(hoje, new Date(row.data_vencimento));
+        const vencida = row.status === 'pendente' && row.data_vencimento && isAfter(hoje, new Date(row.data_vencimento + 'T23:59:59'));
         return (
           <div className="flex items-center gap-3">
-            <div className={`p-2 rounded-lg ${
-              vencida ? 'bg-red-100 dark:bg-red-900/30' : 
-              row.status === 'pago' ? 'bg-emerald-100 dark:bg-emerald-900/30' : 
-              'bg-amber-100 dark:bg-amber-900/30'
-            }`}>
-              {vencida ? (
-                <AlertTriangle className="w-4 h-4 text-red-600" />
-              ) : row.status === 'pago' ? (
-                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-              ) : (
-                <Clock className="w-4 h-4 text-amber-600" />
-              )}
+            <div className={`p-2 rounded-lg ${vencida ? 'bg-red-100' : row.status === 'pago' ? 'bg-emerald-100' : 'bg-amber-100'}`}>
+              {vencida ? <AlertTriangle className="w-4 h-4 text-red-600" /> : row.status === 'pago' ? <CheckCircle2 className="w-4 h-4 text-emerald-600" /> : <Clock className="w-4 h-4 text-amber-600" />}
             </div>
             <div>
               <p className="font-medium text-slate-800 dark:text-white">{value}</p>
-              <p className="text-xs text-slate-500">{forn?.nome_fantasia || forn?.razao_social || '-'}</p>
+              <p className="text-xs text-slate-500">{getCredorLabel(row)}</p>
+              {row.total_parcelas > 1 && (
+                <p className="text-xs text-indigo-500">{row.parcela_atual}/{row.total_parcelas} parcelas</p>
+              )}
             </div>
           </div>
         );
       }
     },
     {
+      key: 'loja_id',
+      label: 'Loja',
+      render: (v) => lojas.find(l => l.id === v)?.nome || '-'
+    },
+    {
       key: 'data_vencimento',
       label: 'Vencimento',
       sortable: true,
       render: (value, row) => {
-        const vencida = row.status === 'pendente' && isAfter(hoje, new Date(value));
-        return (
-          <span className={vencida ? 'text-red-600 font-medium' : ''}>
-            {value ? format(new Date(value), 'dd/MM/yyyy') : '-'}
-          </span>
-        );
+        const vencida = row.status === 'pendente' && value && isAfter(hoje, new Date(value + 'T23:59:59'));
+        return <span className={vencida ? 'text-red-600 font-medium' : ''}>{value ? format(new Date(value + 'T12:00:00'), 'dd/MM/yyyy') : '-'}</span>;
       }
     },
+    { key: 'valor_original', label: 'Valor', sortable: true, render: (v) => <MoneyDisplay value={v || 0} size="sm" /> },
+    { key: 'forma_pagamento', label: 'Forma', render: (v) => <span className="text-sm capitalize">{v?.replace(/_/g, ' ')}</span> },
     {
-      key: 'valor_original',
-      label: 'Valor',
-      sortable: true,
-      render: (value) => <MoneyDisplay value={value || 0} size="sm" />
-    },
-    {
-      key: 'forma_pagamento',
-      label: 'Forma',
-      render: (value) => (
-        <span className="text-sm capitalize">{value?.replace(/_/g, ' ')}</span>
-      )
-    },
-    {
-      key: 'status',
-      label: 'Status',
-      sortable: true,
+      key: 'status', label: 'Status', sortable: true,
       render: (value, row) => {
-        const vencida = value === 'pendente' && isAfter(hoje, new Date(row.data_vencimento));
+        const vencida = value === 'pendente' && row.data_vencimento && isAfter(hoje, new Date(row.data_vencimento + 'T23:59:59'));
         return <StatusBadge status={vencida ? 'vencido' : value} />;
       }
     }
@@ -230,59 +293,26 @@ export default function ContasPagar() {
     <div className="space-y-6">
       <PageHeader
         title="Contas a Pagar"
-        subtitle="Gerencie suas despesas e pagamentos"
+        subtitle="Gerencie despesas, boletos e parcelamentos"
         icon={CreditCard}
-        breadcrumbs={[
-          { label: 'Dashboard', href: 'Dashboard' },
-          { label: 'Contas a Pagar' }
-        ]}
+        breadcrumbs={[{ label: 'Dashboard', href: 'Dashboard' }, { label: 'Contas a Pagar' }]}
         actions={
-          <Button onClick={() => { resetForm(); setModalOpen(true); }} className="gap-2">
+          <Button onClick={() => { setFormData(emptyForm); setEditingItem(null); setModalOpen(true); }} className="gap-2">
             <Plus className="w-4 h-4" />
             Nova Conta
           </Button>
         }
       />
 
-      {/* KPIs */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <KPICard
-          title="Total Pendente"
-          value={formatMoney(totalPendente)}
-          icon={Wallet}
-          variant="warning"
-          subtitle={`${pendentes.length} contas`}
-        />
-        <KPICard
-          title="Vencidas"
-          value={formatMoney(totalVencido)}
-          icon={AlertTriangle}
-          variant="danger"
-          subtitle={`${vencidas.length} contas`}
-        />
-        <KPICard
-          title="Vence em 7 dias"
-          value={vencendoHoje.length}
-          icon={Clock}
-          variant="info"
-          subtitle="contas próximas"
-        />
-        <KPICard
-          title="Pagas este mês"
-          value={contas.filter(c => c.status === 'pago').length}
-          icon={CheckCircle2}
-          variant="success"
-        />
+        <KPICard title="Total Pendente" value={formatMoney(totalPendente)} icon={Wallet} variant="warning" subtitle={`${pendentes.length} contas`} />
+        <KPICard title="Vencidas" value={formatMoney(totalVencido)} icon={AlertTriangle} variant="danger" subtitle={`${vencidas.length} contas`} />
+        <KPICard title="Vence em 7 dias" value={vencendoLogo.length} icon={Clock} variant="info" subtitle="contas próximas" />
+        <KPICard title="Pagas" value={contas.filter(c => c.status === 'pago').length} icon={CheckCircle2} variant="success" />
       </div>
 
       {contas.length === 0 && !isLoading ? (
-        <EmptyState
-          icon={CreditCard}
-          title="Nenhuma conta cadastrada"
-          description="Cadastre suas contas a pagar."
-          actionLabel="Nova Conta"
-          onAction={() => setModalOpen(true)}
-        />
+        <EmptyState icon={CreditCard} title="Nenhuma conta cadastrada" description="Cadastre suas contas a pagar." actionLabel="Nova Conta" onAction={() => setModalOpen(true)} />
       ) : (
         <DataTable
           columns={columns}
@@ -292,119 +322,171 @@ export default function ContasPagar() {
           emptyIcon={CreditCard}
           emptyTitle="Nenhuma conta encontrada"
           rowActions={(row) => [
-            ...(row.status === 'pendente' ? [
-              { label: 'Pagar', icon: CheckCircle2, onClick: () => handlePay(row) }
-            ] : []),
+            ...(row.status === 'pendente' ? [{ label: 'Marcar Pago', icon: CheckCircle2, onClick: () => handlePay(row) }] : []),
             { label: 'Editar', icon: Pencil, onClick: () => handleEdit(row) },
             { label: 'Excluir', icon: Trash2, onClick: () => deleteMutation.mutate(row.id), destructive: true }
           ]}
         />
       )}
 
-      {/* Modal de Cadastro */}
-      <Dialog open={modalOpen} onOpenChange={setModalOpen}>
-        <DialogContent className="max-w-lg">
+      {/* Modal */}
+      <Dialog open={modalOpen} onOpenChange={(v) => { setModalOpen(v); if (!v) { setEditingItem(null); setFormData(emptyForm); } }}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editingItem ? 'Editar Conta' : 'Nova Conta a Pagar'}</DialogTitle>
           </DialogHeader>
-          
+
           <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Descrição */}
             <div className="space-y-2">
               <Label>Descrição *</Label>
-              <Input
-                value={formData.descricao}
-                onChange={(e) => setFormData({ ...formData, descricao: e.target.value })}
-                placeholder="Ex: Aluguel Janeiro"
-                required
-              />
+              <Input value={formData.descricao} onChange={e => setFormData({ ...formData, descricao: e.target.value })} placeholder="Ex: Aluguel fevereiro, Boleto fornecedor..." required />
             </div>
 
-            <div className="space-y-2">
-              <Label>Fornecedor</Label>
-              <Select 
-                value={formData.fornecedor_id} 
-                onValueChange={(v) => setFormData({ ...formData, fornecedor_id: v })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {fornecedores.map((f) => (
-                    <SelectItem key={f.id} value={f.id}>
-                      {f.nome_fantasia || f.razao_social}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
+            {/* Credor */}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Data Emissão</Label>
-                <Input
-                  type="date"
-                  value={formData.data_emissao}
-                  onChange={(e) => setFormData({ ...formData, data_emissao: e.target.value })}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Data Vencimento *</Label>
-                <Input
-                  type="date"
-                  value={formData.data_vencimento}
-                  onChange={(e) => setFormData({ ...formData, data_vencimento: e.target.value })}
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Valor (R$) *</Label>
-                <Input
-                  type="number"
-                  value={formData.valor_original}
-                  onChange={(e) => setFormData({ ...formData, valor_original: parseFloat(e.target.value) || 0 })}
-                  min="0.01"
-                  step="0.01"
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Forma de Pagamento</Label>
-                <Select 
-                  value={formData.forma_pagamento} 
-                  onValueChange={(v) => setFormData({ ...formData, forma_pagamento: v })}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
+                <Label>Tipo de Credor</Label>
+                <Select value={formData.credor_tipo} onValueChange={v => setFormData({ ...formData, credor_tipo: v })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="boleto">Boleto</SelectItem>
-                    <SelectItem value="pix">PIX</SelectItem>
-                    <SelectItem value="transferencia">Transferência</SelectItem>
-                    <SelectItem value="dinheiro">Dinheiro</SelectItem>
-                    <SelectItem value="cartao">Cartão</SelectItem>
+                    {TIPO_CREDOR.map(t => <SelectItem key={t} value={t} className="capitalize">{t}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>Nome do Credor</Label>
+                <Input value={formData.credor_nome} onChange={e => setFormData({ ...formData, credor_nome: e.target.value })} placeholder="Banco Itaú, Fornecedor X..." />
+              </div>
+            </div>
+
+            {/* Fornecedor (opcional) */}
+            {formData.credor_tipo === 'fornecedor' && (
+              <div className="space-y-2">
+                <Label>Fornecedor cadastrado (opcional)</Label>
+                <Select value={formData.fornecedor_id || '__none__'} onValueChange={v => setFormData({ ...formData, fornecedor_id: v === '__none__' ? '' : v })}>
+                  <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="__none__">— Nenhum —</SelectItem>
+                    {fornecedores.map(f => <SelectItem key={f.id} value={f.id}>{f.nome_fantasia || f.razao_social}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            {/* Loja + Categoria */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Loja / CD *</Label>
+                <Select value={formData.loja_id || '__none__'} onValueChange={v => setFormData({ ...formData, loja_id: v === '__none__' ? '' : v })}>
+                  <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="__none__">Selecione...</SelectItem>
+                    {lojas.map(l => <SelectItem key={l.id} value={l.id}>{l.nome}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>Categoria DRE</Label>
+                <Select value={formData.categoria_dre_id || '__none__'} onValueChange={v => setFormData({ ...formData, categoria_dre_id: v === '__none__' ? '' : v })}>
+                  <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="__none__">— Nenhuma —</SelectItem>
+                    {catsDespesa.map(c => <SelectItem key={c.id} value={c.id}>{c.nome}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
             </div>
 
+            {/* Datas */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Data Emissão</Label>
+                <Input type="date" value={formData.data_emissao} onChange={e => setFormData({ ...formData, data_emissao: e.target.value })} />
+              </div>
+              <div className="space-y-2">
+                <Label>N° Documento</Label>
+                <Input value={formData.documento_numero} onChange={e => setFormData({ ...formData, documento_numero: e.target.value })} placeholder="NF-001, Fatura..." />
+              </div>
+            </div>
+
+            {/* Valor + Forma */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Valor Total (R$) *</Label>
+                <Input type="number" value={formData.valor_original} onChange={e => setFormData({ ...formData, valor_original: e.target.value })} min="0.01" step="0.01" required />
+              </div>
+              <div className="space-y-2">
+                <Label>Forma de Pagamento</Label>
+                <Select value={formData.forma_pagamento} onValueChange={v => setFormData({ ...formData, forma_pagamento: v })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {FORMAS.map(f => <SelectItem key={f} value={f} className="capitalize">{f.replace(/_/g, ' ')}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {/* Parcelamento */}
+            {!editingItem && (
+              <div className="border rounded-lg p-4 space-y-3 bg-slate-50 dark:bg-slate-800/50">
+                <div className="flex items-center gap-3">
+                  <input
+                    type="checkbox"
+                    id="parcelar"
+                    checked={formData.parcelar}
+                    onChange={e => setFormData({ ...formData, parcelar: e.target.checked })}
+                    className="w-4 h-4 rounded"
+                  />
+                  <label htmlFor="parcelar" className="text-sm font-medium flex items-center gap-2 cursor-pointer">
+                    <Layers className="w-4 h-4 text-indigo-500" />
+                    Parcelar em múltiplos boletos
+                  </label>
+                </div>
+
+                {formData.parcelar && (
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>Número de Parcelas</Label>
+                      <Input type="number" min="2" max="48" value={formData.num_parcelas} onChange={e => setFormData({ ...formData, num_parcelas: parseInt(e.target.value) || 2 })} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>1º Vencimento *</Label>
+                      <Input type="date" value={formData.primeiro_vencimento} onChange={e => setFormData({ ...formData, primeiro_vencimento: e.target.value })} />
+                    </div>
+                    {formData.valor_original && formData.num_parcelas >= 2 && (
+                      <div className="col-span-2 text-xs text-slate-500 bg-white dark:bg-slate-900 rounded p-2 border">
+                        <strong>{formData.num_parcelas}x</strong> de aproximadamente <strong>{formatMoney(parseFloat(formData.valor_original) / formData.num_parcelas)}</strong> — mensal
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {!formData.parcelar && (
+                  <div className="space-y-2">
+                    <Label>Data de Vencimento *</Label>
+                    <Input type="date" value={formData.data_vencimento} onChange={e => setFormData({ ...formData, data_vencimento: e.target.value })} />
+                  </div>
+                )}
+              </div>
+            )}
+
+            {editingItem && (
+              <div className="space-y-2">
+                <Label>Data de Vencimento *</Label>
+                <Input type="date" value={formData.data_vencimento} onChange={e => setFormData({ ...formData, data_vencimento: e.target.value })} required />
+              </div>
+            )}
+
             <div className="space-y-2">
               <Label>Observações</Label>
-              <Textarea
-                value={formData.observacoes}
-                onChange={(e) => setFormData({ ...formData, observacoes: e.target.value })}
-                rows={2}
-              />
+              <Textarea value={formData.observacoes} onChange={e => setFormData({ ...formData, observacoes: e.target.value })} rows={2} />
             </div>
 
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setModalOpen(false)}>
-                Cancelar
-              </Button>
+              <Button type="button" variant="outline" onClick={() => setModalOpen(false)}>Cancelar</Button>
               <Button type="submit" disabled={createMutation.isPending || updateMutation.isPending}>
-                {editingItem ? 'Salvar' : 'Cadastrar'}
+                {editingItem ? 'Salvar' : formData.parcelar ? `Gerar ${formData.num_parcelas} Parcelas` : 'Cadastrar'}
               </Button>
             </DialogFooter>
           </form>
