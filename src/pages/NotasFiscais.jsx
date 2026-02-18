@@ -196,6 +196,7 @@ export default function NotasFiscais() {
     itens: [],
     // parcelamento para CP gerada
     num_parcelas: 1, primeiro_vencimento: format(new Date(), 'yyyy-MM-dd'),
+    forma_pagamento: 'boleto',
   };
   const [formData, setFormData] = useState(emptyForm);
 
