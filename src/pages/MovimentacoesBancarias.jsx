@@ -254,8 +254,20 @@ export default function MovimentacoesBancarias() {
                 <p className="text-sm font-medium">{conciliarModal.descricao}</p>
                 <p className="text-xs text-slate-500">{conciliarModal.data} • <span className={conciliarModal.valor >= 0 ? 'text-emerald-600' : 'text-red-600'}>{formatMoney(conciliarModal.valor)}</span></p>
               </div>
+
+              {/* Sugestão da IA */}
+              <SugestaoIAConciliacao
+                transacao={conciliarModal}
+                contasReceber={contasReceber}
+                contasPagar={contasPagar}
+                onConfirmar={({ tipo, id }) => {
+                  setConciliarForm({ tipo, id });
+                }}
+                onIgnorar={() => {}}
+              />
+
               <div className="space-y-1">
-                <Label>Conciliar com</Label>
+                <Label>Conciliar manualmente</Label>
                 <Select value={conciliarForm.tipo} onValueChange={v => setConciliarForm({ tipo: v, id: '' })}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
