@@ -52,6 +52,8 @@ import BancoVirtual from './pages/BancoVirtual';
 import Categorias from './pages/Categorias';
 import Checklists from './pages/Checklists';
 import Cofres from './pages/Cofres';
+import ContagemTarefa from './pages/ContagemTarefa';
+import Contagens from './pages/Contagens';
 import ContasBancarias from './pages/ContasBancarias';
 import ContasPagar from './pages/ContasPagar';
 import ContasReceber from './pages/ContasReceber';
@@ -67,10 +69,8 @@ import NotasFiscais from './pages/NotasFiscais';
 import PedidosInternos from './pages/PedidosInternos';
 import Produtos from './pages/Produtos';
 import Relatorios from './pages/Relatorios';
-import Vendas from './pages/Vendas';
 import TemplatesContagem from './pages/TemplatesContagem';
-import Contagens from './pages/Contagens';
-import ContagemTarefa from './pages/ContagemTarefa';
+import Vendas from './pages/Vendas';
 import __Layout from './Layout.jsx';
 
 
@@ -80,6 +80,8 @@ export const PAGES = {
     "Categorias": Categorias,
     "Checklists": Checklists,
     "Cofres": Cofres,
+    "ContagemTarefa": ContagemTarefa,
+    "Contagens": Contagens,
     "ContasBancarias": ContasBancarias,
     "ContasPagar": ContasPagar,
     "ContasReceber": ContasReceber,
@@ -95,10 +97,8 @@ export const PAGES = {
     "PedidosInternos": PedidosInternos,
     "Produtos": Produtos,
     "Relatorios": Relatorios,
-    "Vendas": Vendas,
     "TemplatesContagem": TemplatesContagem,
-    "Contagens": Contagens,
-    "ContagemTarefa": ContagemTarefa,
+    "Vendas": Vendas,
 }
 
 export const pagesConfig = {

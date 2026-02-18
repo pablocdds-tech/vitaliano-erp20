@@ -3,9 +3,14 @@ import { cn } from '@/lib/utils';
 import Sidebar from './components/sidebar/Sidebar';
 import TopBar from './components/sidebar/TopBar';
 
-export default function Layout({ children }) {
+export default function Layout({ children, currentPageName }) {
   const [collapsed, setCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+
+  // Página pública do funcionário: sem sidebar/topbar
+  if (currentPageName === 'ContagemTarefa') {
+    return <>{children}</>;
+  }
 
   useEffect(() => {
     const checkMobile = () => {
