@@ -72,6 +72,7 @@ const menuGroups = [
     items: [
       { icon: CreditCard, label: 'Contas a Pagar', href: 'ContasPagar' },
       { icon: Wallet, label: 'Contas a Receber', href: 'ContasReceber' },
+
       { icon: PiggyBank, label: 'Banco Virtual', href: 'BancoVirtual' },
       { icon: FileBarChart, label: 'DRE Gerencial', href: 'DRE' }
     ]
