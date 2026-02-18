@@ -601,7 +601,11 @@ export default function NotasFiscais() {
 
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setModalOpen(false)}>Cancelar</Button>
-              <Button type="submit" disabled={createMutation.isPending || !formData.loja_id}>
+              <Button
+                type="button"
+                disabled={createMutation.isPending || !formData.loja_id || formData.loja_id === '__none__'}
+                onClick={() => createMutation.mutate(formData)}
+              >
                 {createMutation.isPending ? 'Salvando...' : 'Cadastrar NF'}
               </Button>
             </DialogFooter>
