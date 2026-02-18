@@ -24,14 +24,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { DollarSign, Plus, Pencil, Trash2 } from 'lucide-react';
+import { DollarSign, Plus, Pencil, Trash2, CreditCard } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
+import RegistrarRecebimentoModal from '@/components/contas/RegistrarRecebimentoModal';
 
 export default function ContasReceber() {
   const queryClient = useQueryClient();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
+  const [recebimentoModal, setRecebimentoModal] = useState(null);
   const [formData, setFormData] = useState({
     cliente_nome: '',
     descricao: '',
@@ -48,6 +50,21 @@ export default function ContasReceber() {
   const { data: contas = [], isLoading } = useQuery({
     queryKey: ['contasReceber'],
     queryFn: () => base44.entities.ContaReceber.list('-data_vencimento', 50)
+  });
+
+  const { data: contasBancarias = [] } = useQuery({
+    queryKey: ['contas-bancarias'],
+    queryFn: () => base44.entities.ContaBancaria.filter({ status: 'ativo' })
+  });
+
+  const { data: cofres = [] } = useQuery({
+    queryKey: ['cofres'],
+    queryFn: () => base44.entities.Cofre.filter({ status: 'ativo' })
+  });
+
+  const { data: lojas = [] } = useQuery({
+    queryKey: ['lojas'],
+    queryFn: () => base44.entities.Loja.list()
   });
 
   const createMutation = useMutation({
@@ -169,10 +186,21 @@ export default function ContasReceber() {
         <EmptyState icon={DollarSign} title="Sem contas" description="Registre suas receitas." actionLabel="Criar" onAction={() => setModalOpen(true)} />
       ) : (
         <DataTable columns={columns} data={contas} loading={isLoading} searchPlaceholder="Buscar..." rowActions={(row) => [
+          ...(['pendente', 'parcial', 'vencido'].includes(row.status) ? [{ label: 'Registrar Recebimento', icon: CreditCard, onClick: () => setRecebimentoModal(row) }] : []),
           { label: 'Editar', icon: Pencil, onClick: () => handleEdit(row) },
           { label: 'Excluir', icon: Trash2, onClick: () => deleteMutation.mutate(row.id), destructive: true }
         ]} />
       )}
+
+      {/* Modal de Recebimento */}
+      <RegistrarRecebimentoModal
+        open={!!recebimentoModal}
+        onClose={() => setRecebimentoModal(null)}
+        conta={recebimentoModal}
+        contasBancarias={contasBancarias}
+        cofres={cofres}
+        lojas={lojas}
+      />
 
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
         <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
