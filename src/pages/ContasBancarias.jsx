@@ -2,127 +2,286 @@ import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import PageHeader from '@/components/ui-custom/PageHeader';
-import EmptyState from '@/components/ui-custom/EmptyState';
+import DataTable from '@/components/ui-custom/DataTable';
 import StatusBadge from '@/components/ui-custom/StatusBadge';
-import { formatMoney } from '@/components/ui-custom/MoneyDisplay';
+import MoneyDisplay from '@/components/ui-custom/MoneyDisplay';
+import EmptyState from '@/components/ui-custom/EmptyState';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Card, CardContent } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Landmark, Plus, Pencil, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
-const EMPTY = { nome: '', banco: '', agencia: '', conta: '', loja_id: '', tipo: 'corrente', saldo_inicial: 0, status: 'ativo' };
-
 export default function ContasBancarias() {
-  const qc = useQueryClient();
-  const [open, setOpen] = useState(false);
-  const [editId, setEditId] = useState(null);
-  const [form, setForm] = useState(EMPTY);
+  const queryClient = useQueryClient();
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editingItem, setEditingItem] = useState(null);
+  const [formData, setFormData] = useState({
+    nome: '',
+    banco: '',
+    agencia: '',
+    conta: '',
+    loja_id: '',
+    tipo: 'corrente',
+    saldo_inicial: '0',
+    status: 'ativo'
+  });
 
-  const { data: contas = [], isLoading } = useQuery({ queryKey: ['contas-bancarias'], queryFn: () => base44.entities.ContaBancaria.list('nome') });
-  const { data: transacoes = [] } = useQuery({ queryKey: ['transacoes-banco'], queryFn: () => base44.entities.TransacaoBancaria.list('-data', 1000) });
-  const { data: lojas = [] } = useQuery({ queryKey: ['lojas'], queryFn: () => base44.entities.Loja.list() });
+  const { data: contas = [], isLoading } = useQuery({
+    queryKey: ['contas-bancarias'],
+    queryFn: () => base44.entities.ContaBancaria.list('nome')
+  });
 
-  const getSaldo = (contaId) => {
+  const { data: transacoes = [] } = useQuery({
+    queryKey: ['transacoes-banco'],
+    queryFn: () => base44.entities.TransacaoBancaria.list('-data', 1000)
+  });
+
+  const { data: lojas = [] } = useQuery({
+    queryKey: ['lojas'],
+    queryFn: () => base44.entities.Loja.list()
+  });
+
+  const createMutation = useMutation({
+    mutationFn: (data) => base44.entities.ContaBancaria.create(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['contas-bancarias'] });
+      setModalOpen(false);
+      resetForm();
+      toast.success('Conta bancária criada!');
+    },
+    onError: () => toast.error('Erro ao criar conta')
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }) => base44.entities.ContaBancaria.update(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['contas-bancarias'] });
+      setModalOpen(false);
+      resetForm();
+      toast.success('Conta atualizada!');
+    },
+    onError: () => toast.error('Erro ao atualizar')
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id) => base44.entities.ContaBancaria.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['contas-bancarias'] });
+      toast.success('Conta excluída!');
+    }
+  });
+
+  const resetForm = () => {
+    setFormData({
+      nome: '',
+      banco: '',
+      agencia: '',
+      conta: '',
+      loja_id: '',
+      tipo: 'corrente',
+      saldo_inicial: '0',
+      status: 'ativo'
+    });
+    setEditingItem(null);
+  };
+
+  const handleEdit = (item) => {
+    setEditingItem(item);
+    setFormData({
+      nome: item.nome || '',
+      banco: item.banco || '',
+      agencia: item.agencia || '',
+      conta: item.conta || '',
+      loja_id: item.loja_id || '',
+      tipo: item.tipo || 'corrente',
+      saldo_inicial: item.saldo_inicial || '0',
+      status: item.status || 'ativo'
+    });
+    setModalOpen(true);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const data = {
+      nome: formData.nome,
+      banco: formData.banco,
+      agencia: formData.agencia,
+      conta: formData.conta,
+      loja_id: formData.loja_id || null,
+      tipo: formData.tipo,
+      saldo_inicial: parseFloat(formData.saldo_inicial),
+      status: formData.status
+    };
+
+    if (editingItem) {
+      updateMutation.mutate({ id: editingItem.id, data });
+    } else {
+      createMutation.mutate(data);
+    }
+  };
+
+  const getSaldoBanco = (contaId) => {
     const saldoInicial = contas.find(c => c.id === contaId)?.saldo_inicial || 0;
     const movs = transacoes.filter(t => t.conta_bancaria_id === contaId && t.status !== 'ignorado');
     return saldoInicial + movs.reduce((s, t) => s + (t.valor || 0), 0);
   };
 
-  const create = useMutation({ mutationFn: d => base44.entities.ContaBancaria.create(d), onSuccess: () => { qc.invalidateQueries({ queryKey: ['contas-bancarias'] }); close(); toast.success('Conta criada!'); } });
-  const update = useMutation({ mutationFn: ({ id, d }) => base44.entities.ContaBancaria.update(id, d), onSuccess: () => { qc.invalidateQueries({ queryKey: ['contas-bancarias'] }); close(); toast.success('Atualizada!'); } });
-  const del = useMutation({ mutationFn: id => base44.entities.ContaBancaria.delete(id), onSuccess: () => { qc.invalidateQueries({ queryKey: ['contas-bancarias'] }); toast.success('Removida!'); } });
-
-  const close = () => { setForm(EMPTY); setEditId(null); setOpen(false); };
-
-  const handleEdit = (c) => { setForm({ nome: c.nome, banco: c.banco, agencia: c.agencia || '', conta: c.conta || '', loja_id: c.loja_id || '', tipo: c.tipo, saldo_inicial: c.saldo_inicial || 0, status: c.status }); setEditId(c.id); setOpen(true); };
-
-  const handleSubmit = (e) => { e.preventDefault(); editId ? update.mutate({ id: editId, d: form }) : create.mutate(form); };
-
-  const getLoja = id => lojas.find(l => l.id === id);
-  const totalBancos = contas.reduce((s, c) => s + getSaldo(c.id), 0);
+  const columns = [
+    {
+      key: 'nome',
+      label: 'Conta',
+      sortable: true,
+      render: (value, row) => (
+        <div>
+          <p className="font-medium text-slate-800 dark:text-white">{value}</p>
+          <p className="text-xs text-slate-500">{row.banco} • {row.tipo.replace('_', ' ')}</p>
+        </div>
+      )
+    },
+    {
+      key: 'agencia',
+      label: 'Agência / Conta',
+      render: (value, row) => <span className="text-sm">{value} / {row.conta}</span>
+    },
+    {
+      key: 'loja_id',
+      label: 'Loja',
+      render: (v) => lojas.find(l => l.id === v)?.nome || 'Geral'
+    },
+    {
+      key: 'id',
+      label: 'Saldo',
+      render: (id) => <MoneyDisplay value={getSaldoBanco(id)} colorize size="sm" />
+    },
+    {
+      key: 'status',
+      label: 'Status',
+      render: (v) => <StatusBadge status={v} />
+    }
+  ];
 
   return (
     <div className="space-y-6">
       <PageHeader
         title="Contas Bancárias"
-        subtitle="Cadastre contas bancárias e visualize saldos consolidados"
+        subtitle="Gerencie suas contas e saldos bancários"
         icon={Landmark}
-        breadcrumbs={[{ label: 'Dashboard', href: 'Dashboard' }, { label: 'Contas Bancárias' }]}
-        actions={<Button className="gap-2" onClick={() => { setForm(EMPTY); setEditId(null); setOpen(true); }}><Plus className="w-4 h-4" />Nova Conta</Button>}
+        breadcrumbs={[
+          { label: 'Dashboard', href: 'Dashboard' },
+          { label: 'Contas Bancárias' }
+        ]}
+        actions={
+          <Button onClick={() => { resetForm(); setModalOpen(true); }} className="gap-2">
+            <Plus className="w-4 h-4" />
+            Nova Conta
+          </Button>
+        }
       />
 
-      {/* Saldo total */}
-      <Card className="bg-gradient-to-r from-slate-800 to-slate-900 text-white border-0">
-        <CardContent className="pt-5 pb-4">
-          <p className="text-sm text-slate-300">Total em Bancos</p>
-          <p className="text-3xl font-bold mt-1">{formatMoney(totalBancos)}</p>
-          <p className="text-xs text-slate-400 mt-1">Saldo inicial + transações importadas (não ignoradas)</p>
-        </CardContent>
-      </Card>
-
       {contas.length === 0 && !isLoading ? (
-        <EmptyState icon={Landmark} title="Nenhuma conta cadastrada" description="Cadastre suas contas bancárias para importar OFX e conciliar." actionLabel="Nova Conta" onAction={() => setOpen(true)} />
+        <EmptyState icon={Landmark} title="Nenhuma conta cadastrada" description="Cadastre suas contas bancárias." actionLabel="Nova Conta" onAction={() => setModalOpen(true)} />
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {contas.map(c => {
-            const saldo = getSaldo(c.id);
-            const pendentes = transacoes.filter(t => t.conta_bancaria_id === c.id && t.status === 'pendente').length;
-            return (
-              <Card key={c.id} className="hover:shadow-md transition-shadow">
-                <CardContent className="pt-4">
-                  <div className="flex justify-between items-start mb-3">
-                    <div>
-                      <p className="font-semibold text-slate-800 dark:text-white">{c.nome}</p>
-                      <p className="text-xs text-slate-500">{c.banco} {c.agencia ? `• Ag. ${c.agencia}` : ''} {c.conta ? `• CC ${c.conta}` : ''}</p>
-                      {c.loja_id && <p className="text-xs text-slate-400">{getLoja(c.loja_id)?.nome}</p>}
-                    </div>
-                    <StatusBadge status={c.status} />
-                  </div>
-                  <p className="text-xs text-slate-400">Saldo estimado</p>
-                  <p className={`text-2xl font-bold ${saldo < 0 ? 'text-red-600' : 'text-emerald-600'}`}>{formatMoney(saldo)}</p>
-                  {pendentes > 0 && <p className="text-xs text-amber-600 mt-1">⚠️ {pendentes} transações pendentes de conciliação</p>}
-                  <div className="flex gap-2 mt-3">
-                    <Button variant="outline" size="sm" className="gap-1 flex-1" onClick={() => handleEdit(c)}><Pencil className="w-3.5 h-3.5" />Editar</Button>
-                    <Button variant="ghost" size="sm" className="text-red-500" onClick={() => { if (confirm('Excluir?')) del.mutate(c.id); }}><Trash2 className="w-3.5 h-3.5" /></Button>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
+        <DataTable
+          columns={columns}
+          data={contas}
+          loading={isLoading}
+          searchPlaceholder="Buscar contas..."
+          rowActions={(row) => [
+            { label: 'Editar', icon: Pencil, onClick: () => handleEdit(row) },
+            { label: 'Excluir', icon: Trash2, onClick: () => deleteMutation.mutate(row.id), destructive: true }
+          ]}
+        />
       )}
 
-      {/* Modal */}
-      <Dialog open={open} onOpenChange={close}>
-        <DialogContent className="max-w-md">
-          <DialogHeader><DialogTitle>{editId ? 'Editar' : 'Nova'} Conta Bancária</DialogTitle></DialogHeader>
-          <form onSubmit={handleSubmit} className="space-y-3">
-            <div className="space-y-1"><Label>Nome / Apelido *</Label><Input value={form.nome} onChange={e => setForm({ ...form, nome: e.target.value })} placeholder="Ex: Bradesco PJ Principal" required /></div>
-            <div className="space-y-1"><Label>Banco *</Label><Input value={form.banco} onChange={e => setForm({ ...form, banco: e.target.value })} placeholder="Ex: Bradesco, Itaú..." required /></div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1"><Label>Agência</Label><Input value={form.agencia} onChange={e => setForm({ ...form, agencia: e.target.value })} /></div>
-              <div className="space-y-1"><Label>Conta</Label><Input value={form.conta} onChange={e => setForm({ ...form, conta: e.target.value })} /></div>
+      <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>{editingItem ? 'Editar Conta' : 'Nova Conta Bancária'}</DialogTitle>
+          </DialogHeader>
+          
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label>Nome da Conta *</Label>
+              <Input value={formData.nome} onChange={e => setFormData({ ...formData, nome: e.target.value })} placeholder="Conta Corrente Principal" required />
             </div>
-            <div className="space-y-1"><Label>Tipo</Label>
-              <Select value={form.tipo} onValueChange={v => setForm({ ...form, tipo: v })}>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Banco *</Label>
+                <Input value={formData.banco} onChange={e => setFormData({ ...formData, banco: e.target.value })} placeholder="Itaú" required />
+              </div>
+              <div className="space-y-2">
+                <Label>Tipo</Label>
+                <Select value={formData.tipo} onValueChange={v => setFormData({ ...formData, tipo: v })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="corrente">Corrente</SelectItem>
+                    <SelectItem value="poupanca">Poupança</SelectItem>
+                    <SelectItem value="investimento">Investimento</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Agência</Label>
+                <Input value={formData.agencia} onChange={e => setFormData({ ...formData, agencia: e.target.value })} placeholder="0001" />
+              </div>
+              <div className="space-y-2">
+                <Label>Conta</Label>
+                <Input value={formData.conta} onChange={e => setFormData({ ...formData, conta: e.target.value })} placeholder="123456" />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Loja</Label>
+                <Select value={formData.loja_id || '__none__'} onValueChange={v => setFormData({ ...formData, loja_id: v === '__none__' ? '' : v })}>
+                  <SelectTrigger><SelectValue placeholder="Geral" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="__none__">Geral</SelectItem>
+                    {lojas.map(l => <SelectItem key={l.id} value={l.id}>{l.nome}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>Saldo Inicial (R$)</Label>
+                <Input type="number" value={formData.saldo_inicial} onChange={e => setFormData({ ...formData, saldo_inicial: e.target.value })} step="0.01" />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Status</Label>
+              <Select value={formData.status} onValueChange={v => setFormData({ ...formData, status: v })}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent><SelectItem value="corrente">Corrente</SelectItem><SelectItem value="poupanca">Poupança</SelectItem><SelectItem value="investimento">Investimento</SelectItem></SelectContent>
+                <SelectContent>
+                  <SelectItem value="ativo">Ativo</SelectItem>
+                  <SelectItem value="inativo">Inativo</SelectItem>
+                </SelectContent>
               </Select>
             </div>
-            <div className="space-y-1"><Label>Loja</Label>
-              <Select value={form.loja_id} onValueChange={v => setForm({ ...form, loja_id: v })}>
-                <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
-                <SelectContent>{lojas.map(l => <SelectItem key={l.id} value={l.id}>{l.nome}</SelectItem>)}</SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1"><Label>Saldo Inicial (R$)</Label><Input type="number" step="0.01" value={form.saldo_inicial} onChange={e => setForm({ ...form, saldo_inicial: parseFloat(e.target.value) || 0 })} /></div>
+
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={close}>Cancelar</Button>
-              <Button type="submit">Salvar</Button>
+              <Button type="button" variant="outline" onClick={() => setModalOpen(false)}>Cancelar</Button>
+              <Button type="submit" disabled={createMutation.isPending || updateMutation.isPending}>
+                {editingItem ? 'Salvar' : 'Cadastrar'}
+              </Button>
             </DialogFooter>
           </form>
         </DialogContent>
