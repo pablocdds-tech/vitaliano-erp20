@@ -71,6 +71,7 @@ import Produtos from './pages/Produtos';
 import Relatorios from './pages/Relatorios';
 import TemplatesContagem from './pages/TemplatesContagem';
 import Vendas from './pages/Vendas';
+import Producao from './pages/Producao';
 import __Layout from './Layout.jsx';
 
 
@@ -99,6 +100,7 @@ export const PAGES = {
     "Relatorios": Relatorios,
     "TemplatesContagem": TemplatesContagem,
     "Vendas": Vendas,
+    "Producao": Producao,
 }
 
 export const pagesConfig = {
