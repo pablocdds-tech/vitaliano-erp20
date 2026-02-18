@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import Sidebar from './components/sidebar/Sidebar';
 import TopBar from './components/sidebar/TopBar';
+import MobileInstallBanner from './components/mobile/MobileInstallBanner';
 
 export default function Layout({ children, currentPageName }) {
   const [collapsed, setCollapsed] = useState(false);
