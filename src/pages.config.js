@@ -79,6 +79,8 @@ import ContasReceber from './pages/ContasReceber';
 import Notificacoes from './pages/Notificacoes';
 import Usuarios from './pages/Usuarios';
 import Configuracoes from './pages/Configuracoes';
+import FichasTecnicas from './pages/FichasTecnicas';
+import Manutencao from './pages/Manutencao';
 import __Layout from './Layout.jsx';
 
 
@@ -115,6 +117,8 @@ export const PAGES = {
     "Notificacoes": Notificacoes,
     "Usuarios": Usuarios,
     "Configuracoes": Configuracoes,
+    "FichasTecnicas": FichasTecnicas,
+    "Manutencao": Manutencao,
 }
 
 export const pagesConfig = {
