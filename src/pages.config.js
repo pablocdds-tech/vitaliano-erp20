@@ -47,78 +47,78 @@
  *
  * The mainPage value must match a key in the PAGES object exactly.
  */
+import AdminSaaS from './pages/AdminSaaS';
 import AuditoriaDodia from './pages/AuditoriaDodia';
+import BancoVirtual from './pages/BancoVirtual';
+import Categorias from './pages/Categorias';
 import Checklists from './pages/Checklists';
+import Cofres from './pages/Cofres';
+import Configuracoes from './pages/Configuracoes';
 import ContagemTarefa from './pages/ContagemTarefa';
 import Contagens from './pages/Contagens';
+import ContasBancarias from './pages/ContasBancarias';
 import ContasPagar from './pages/ContasPagar';
+import ContasReceber from './pages/ContasReceber';
 import DRE from './pages/DRE';
 import Dashboard from './pages/Dashboard';
+import Empresas from './pages/Empresas';
 import Estoque from './pages/Estoque';
+import FichasTecnicas from './pages/FichasTecnicas';
+import Fornecedores from './pages/Fornecedores';
 import IAExecutora from './pages/IAExecutora';
 import Lojas from './pages/Lojas';
+import Manutencao from './pages/Manutencao';
 import Movimentacoes from './pages/Movimentacoes';
 import MovimentacoesBancarias from './pages/MovimentacoesBancarias';
 import NotasFiscais from './pages/NotasFiscais';
+import Notificacoes from './pages/Notificacoes';
+import Onboarding from './pages/Onboarding';
+import PDVMobile from './pages/PDVMobile';
 import PedidosInternos from './pages/PedidosInternos';
 import Producao from './pages/Producao';
 import Produtos from './pages/Produtos';
 import Relatorios from './pages/Relatorios';
 import TemplatesContagem from './pages/TemplatesContagem';
-import Vendas from './pages/Vendas';
-import Onboarding from './pages/Onboarding';
-import AdminSaaS from './pages/AdminSaaS';
-import PDVMobile from './pages/PDVMobile';
-import Empresas from './pages/Empresas';
-import Fornecedores from './pages/Fornecedores';
-import Categorias from './pages/Categorias';
-import BancoVirtual from './pages/BancoVirtual';
-import ContasBancarias from './pages/ContasBancarias';
-import Cofres from './pages/Cofres';
-import ContasReceber from './pages/ContasReceber';
-import Notificacoes from './pages/Notificacoes';
 import Usuarios from './pages/Usuarios';
-import Configuracoes from './pages/Configuracoes';
-import FichasTecnicas from './pages/FichasTecnicas';
-import Manutencao from './pages/Manutencao';
+import Vendas from './pages/Vendas';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
+    "AdminSaaS": AdminSaaS,
     "AuditoriaDodia": AuditoriaDodia,
+    "BancoVirtual": BancoVirtual,
+    "Categorias": Categorias,
     "Checklists": Checklists,
+    "Cofres": Cofres,
+    "Configuracoes": Configuracoes,
     "ContagemTarefa": ContagemTarefa,
     "Contagens": Contagens,
+    "ContasBancarias": ContasBancarias,
     "ContasPagar": ContasPagar,
+    "ContasReceber": ContasReceber,
     "DRE": DRE,
     "Dashboard": Dashboard,
+    "Empresas": Empresas,
     "Estoque": Estoque,
+    "FichasTecnicas": FichasTecnicas,
+    "Fornecedores": Fornecedores,
     "IAExecutora": IAExecutora,
     "Lojas": Lojas,
+    "Manutencao": Manutencao,
     "Movimentacoes": Movimentacoes,
     "MovimentacoesBancarias": MovimentacoesBancarias,
     "NotasFiscais": NotasFiscais,
+    "Notificacoes": Notificacoes,
+    "Onboarding": Onboarding,
+    "PDVMobile": PDVMobile,
     "PedidosInternos": PedidosInternos,
     "Producao": Producao,
     "Produtos": Produtos,
     "Relatorios": Relatorios,
     "TemplatesContagem": TemplatesContagem,
-    "Vendas": Vendas,
-    "Onboarding": Onboarding,
-    "AdminSaaS": AdminSaaS,
-    "PDVMobile": PDVMobile,
-    "Empresas": Empresas,
-    "Fornecedores": Fornecedores,
-    "Categorias": Categorias,
-    "BancoVirtual": BancoVirtual,
-    "ContasBancarias": ContasBancarias,
-    "Cofres": Cofres,
-    "ContasReceber": ContasReceber,
-    "Notificacoes": Notificacoes,
     "Usuarios": Usuarios,
-    "Configuracoes": Configuracoes,
-    "FichasTecnicas": FichasTecnicas,
-    "Manutencao": Manutencao,
+    "Vendas": Vendas,
 }
 
 export const pagesConfig = {

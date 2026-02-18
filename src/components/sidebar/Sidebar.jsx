@@ -134,11 +134,11 @@ export default function Sidebar({ collapsed, onToggle }) {
 
   return (
     <aside className={cn(
-      'fixed left-0 top-0 h-full bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 z-40 transition-all duration-300',
-      collapsed ? 'w-[70px]' : 'w-[260px]'
+      'fixed left-0 top-0 h-full w-[260px] bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 z-40 transition-transform duration-300 lg:transform-none',
+      collapsed && window.innerWidth < 1024 ? '-translate-x-full' : 'translate-x-0'
     )}>
       <div className="h-16 flex items-center justify-between px-4 border-b border-slate-200 dark:border-slate-800">
-        <Logo size="sm" showText={!collapsed} />
+        <Logo size="sm" showText={true} />
       </div>
 
       <nav className="p-3 h-[calc(100vh-64px)] overflow-y-auto scrollbar-thin">

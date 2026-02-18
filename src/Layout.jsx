@@ -32,7 +32,7 @@ export default function Layout({ children, currentPageName }) {
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
       <style>{`
         :root {
-          --sidebar-width: ${collapsed ? '70px' : '260px'};
+          --sidebar-width: ${collapsed ? '0px' : '260px'};
         }
         
         .scrollbar-thin::-webkit-scrollbar {
@@ -48,6 +48,15 @@ export default function Layout({ children, currentPageName }) {
         .dark .scrollbar-thin::-webkit-scrollbar-thumb {
           background: #475569;
         }
+        
+        @media (max-width: 1023px) {
+          aside {
+            transform: translateX(-100%);
+          }
+          aside.open {
+            transform: translateX(0);
+          }
+        }
       `}</style>
       
       <Sidebar collapsed={collapsed} onToggle={toggleSidebar} />
@@ -55,10 +64,10 @@ export default function Layout({ children, currentPageName }) {
       <MobileBottomNav currentPage={currentPageName} onMenuClick={toggleSidebar} />
       
       <main className={cn(
-        'pt-16 min-h-screen transition-all duration-300',
-        collapsed ? 'lg:pl-[70px]' : 'lg:pl-[260px]'
+        'pt-16 min-h-screen transition-all duration-300 w-full overflow-x-hidden',
+        'lg:pl-[260px]'
       )}>
-        <div className="p-4 lg:p-6 pb-24 lg:pb-6">
+        <div className="px-3 py-4 sm:px-4 sm:py-6 lg:px-6 pb-24 lg:pb-6 w-full">
           {children}
         </div>
       </main>
