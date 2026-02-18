@@ -215,7 +215,7 @@ export default function PDVMobile() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col max-w-lg mx-auto">
+    <div className="min-h-screen bg-slate-50 flex flex-col w-full">
       {/* TOPO FIXO */}
       <div className="sticky top-0 z-30 bg-white border-b border-slate-200 shadow-sm">
         {/* Header */}
@@ -373,7 +373,7 @@ export default function PDVMobile() {
       </div>
 
       {/* RODAPÉ FIXO */}
-      <div className="fixed bottom-0 left-0 right-0 max-w-lg mx-auto bg-white border-t border-slate-200 shadow-[0_-4px_24px_rgba(0,0,0,0.08)] px-4 py-4 z-20">
+      <div className="fixed bottom-0 left-0 right-0 w-full lg:max-w-lg lg:mx-auto bg-white border-t border-slate-200 shadow-[0_-4px_24px_rgba(0,0,0,0.08)] px-4 py-4 z-40">
         {/* Total */}
         <div className="flex items-center justify-between mb-3">
           <div>
