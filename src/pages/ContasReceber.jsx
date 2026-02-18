@@ -24,10 +24,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { DollarSign, Plus, Pencil, Trash2, CreditCard } from 'lucide-react';
+import { DollarSign, Plus, Pencil, Trash2, CreditCard, TrendingUp, Clock, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { format } from 'date-fns';
+import { format, differenceInDays, isAfter } from 'date-fns';
 import RegistrarRecebimentoModal from '@/components/contas/RegistrarRecebimentoModal';
+import KPICard from '@/components/ui-custom/KPICard';
+import { formatMoney } from '@/components/ui-custom/MoneyDisplay';
 
 export default function ContasReceber() {
   const queryClient = useQueryClient();
@@ -132,6 +134,8 @@ export default function ContasReceber() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!formData.valor_original || parseFloat(formData.valor_original) <= 0) { toast.error('Informe o valor'); return; }
+    if (!formData.data_vencimento) { toast.error('Informe a data de vencimento'); return; }
     const data = {
       ...formData,
       valor_original: parseFloat(formData.valor_original),
@@ -144,27 +148,56 @@ export default function ContasReceber() {
     }
   };
 
+  const hoje = new Date();
+  const pendentes = contas.filter(c => c.status === 'pendente');
+  const recebidos = contas.filter(c => c.status === 'recebido');
+  const vencidos = pendentes.filter(c => c.data_vencimento && isAfter(hoje, new Date(c.data_vencimento + 'T23:59:59')));
+  const totalPendente = pendentes.reduce((s, c) => s + (c.valor_original || 0), 0);
+  const totalRecebido = recebidos.reduce((s, c) => s + (c.valor_recebido || c.valor_original || 0), 0);
+
   const columns = [
     {
-      key: 'cliente_nome',
-      label: 'Cliente',
+      key: 'descricao',
+      label: 'Descrição / Cliente',
       sortable: true,
-      render: (value, row) => (
-        <div>
-          <p className="font-medium text-slate-800 dark:text-white">{value || row.descricao}</p>
-          <p className="text-xs text-slate-500">Vencimento: {format(new Date(row.data_vencimento), 'dd/MM/yyyy')}</p>
-        </div>
-      )
+      render: (value, row) => {
+        const vencida = row.status === 'pendente' && row.data_vencimento && isAfter(hoje, new Date(row.data_vencimento + 'T23:59:59'));
+        return (
+          <div className="flex items-center gap-3">
+            <div className={`p-2 rounded-lg ${vencida ? 'bg-red-100' : row.status === 'recebido' ? 'bg-emerald-100' : 'bg-amber-100'}`}>
+              {vencida ? <AlertTriangle className="w-4 h-4 text-red-600" /> : row.status === 'recebido' ? <CheckCircle2 className="w-4 h-4 text-emerald-600" /> : <Clock className="w-4 h-4 text-amber-600" />}
+            </div>
+            <div>
+              <p className="font-medium text-slate-800 dark:text-white">{value}</p>
+              <p className="text-xs text-slate-500">{row.cliente_nome || '-'}</p>
+            </div>
+          </div>
+        );
+      }
+    },
+    {
+      key: 'data_vencimento',
+      label: 'Vencimento',
+      sortable: true,
+      render: (value, row) => {
+        const vencida = row.status === 'pendente' && value && isAfter(hoje, new Date(value + 'T23:59:59'));
+        return <span className={vencida ? 'text-red-600 font-medium' : ''}>{value ? format(new Date(value + 'T12:00:00'), 'dd/MM/yyyy') : '-'}</span>;
+      }
     },
     {
       key: 'valor_original',
       label: 'Valor',
+      sortable: true,
       render: (v) => <MoneyDisplay value={v} size="sm" colorize />
     },
     {
       key: 'status',
       label: 'Status',
-      render: (v) => <StatusBadge status={v} size="sm" />
+      sortable: true,
+      render: (value, row) => {
+        const vencida = value === 'pendente' && row.data_vencimento && isAfter(hoje, new Date(row.data_vencimento + 'T23:59:59'));
+        return <StatusBadge status={vencida ? 'vencido' : value} />;
+      }
     }
   ];
 
@@ -174,13 +207,20 @@ export default function ContasReceber() {
         title="Contas a Receber"
         subtitle="Gerencie suas receitas pendentes"
         icon={DollarSign}
-        breadcrumbs={[{ label: 'Dashboard', href: 'Dashboard' }, { label: 'Financeiro' }, { label: 'Contas a Receber' }]}
+        breadcrumbs={[{ label: 'Dashboard', href: 'Dashboard' }, { label: 'Contas a Receber' }]}
         actions={
-          <Button onClick={() => { resetForm(); setModalOpen(true); }} className="gap-2">
+          <Button onClick={() => { resetForm(); setModalOpen(true); }} className="gap-2 w-full sm:w-auto">
             <Plus className="w-4 h-4" /> Nova
           </Button>
         }
       />
+
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <KPICard title="Total Pendente" value={formatMoney(totalPendente)} icon={TrendingUp} variant="warning" subtitle={`${pendentes.length} contas`} />
+        <KPICard title="Vencidas" value={vencidos.length} icon={AlertTriangle} variant="danger" subtitle={formatMoney(vencidos.reduce((s, c) => s + (c.valor_original || 0), 0))} />
+        <KPICard title="Recebidas" value={formatMoney(totalRecebido)} icon={CheckCircle2} variant="success" subtitle={`${recebidos.length} contas`} />
+        <KPICard title="Em Atraso" value={`${vencidos.length}`} icon={AlertTriangle} variant="danger" />
+      </div>
 
       {contas.length === 0 && !isLoading ? (
         <EmptyState icon={DollarSign} title="Sem contas" description="Registre suas receitas." actionLabel="Criar" onAction={() => setModalOpen(true)} />
@@ -203,7 +243,7 @@ export default function ContasReceber() {
       />
 
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
-        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto w-[95vw] sm:w-full">
           <DialogHeader>
             <DialogTitle>{editingItem ? 'Editar' : 'Nova Conta a Receber'}</DialogTitle>
           </DialogHeader>
