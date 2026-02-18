@@ -79,7 +79,7 @@ const menuGroups = [
   {
     label: 'Vendas',
     items: [
-      { icon: TrendingUp, label: 'Vendas', href: 'Vendas' },
+      { icon: TrendingUp, label: 'Fechamento de Caixa', href: 'Vendas' },
       { icon: BarChart3, label: 'Relatórios', href: 'Relatorios' }
     ]
   },
