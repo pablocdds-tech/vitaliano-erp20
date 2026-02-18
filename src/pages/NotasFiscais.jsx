@@ -514,16 +514,14 @@ export default function NotasFiscais() {
 
             {/* Itens da Nota */}
             <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <Label className="text-base font-semibold">Itens da Nota</Label>
-                <Button type="button" variant="outline" size="sm" onClick={addItem} className="gap-1">
-                  <Plus className="w-3.5 h-3.5" /> Adicionar Item
-                </Button>
-              </div>
+              <Label className="text-base font-semibold">Itens da Nota</Label>
 
               {formData.itens.length === 0 ? (
                 <div className="border-2 border-dashed border-slate-200 rounded-lg p-6 text-center">
-                  <p className="text-sm text-slate-400">Nenhum item adicionado. Clique em "Adicionar Item" ou importe via XML.</p>
+                  <p className="text-sm text-slate-400 mb-3">Nenhum item adicionado. Clique em "Adicionar Item" ou importe via XML.</p>
+                  <Button type="button" variant="outline" size="sm" onClick={addItem} className="gap-1 mx-auto">
+                    <Plus className="w-3.5 h-3.5" /> Adicionar Item
+                  </Button>
                 </div>
               ) : (
                 <div className="border rounded-lg p-3 space-y-3">
@@ -544,9 +542,13 @@ export default function NotasFiscais() {
                       onAddProduto={(i) => setNovoProdutoForIdx(i)}
                     />
                   ))}
-                  <div className="flex justify-end pt-2 border-t">
+                  {/* Total + botão Adicionar na mesma linha */}
+                  <div className="flex items-center justify-between pt-2 border-t">
+                    <Button type="button" variant="outline" size="sm" onClick={addItem} className="gap-1">
+                      <Plus className="w-3.5 h-3.5" /> Adicionar Item
+                    </Button>
                     <div className="text-right">
-                      <p className="text-xs text-slate-500">TOTAL DA NF</p>
+                      <p className="text-xs text-slate-500 uppercase">Total da NF</p>
                       <p className="text-xl font-bold text-slate-800 dark:text-white">{formatMoney(formData.valor_total)}</p>
                     </div>
                   </div>
