@@ -30,7 +30,9 @@ import {
   FileBarChart,
   ClipboardList,
   HardDrive,
-  Bell
+  Bell,
+  Landmark,
+  Vault
 } from 'lucide-react';
 
 const menuGroups = [
@@ -73,7 +75,11 @@ const menuGroups = [
       { icon: CreditCard, label: 'Contas a Pagar', href: 'ContasPagar' },
       { icon: Wallet, label: 'Contas a Receber', href: 'ContasReceber' },
       { icon: PiggyBank, label: 'Banco Virtual', href: 'BancoVirtual' },
-      { icon: FileBarChart, label: 'DRE Gerencial', href: 'DRE' }
+      { icon: FileBarChart, label: 'DRE Gerencial', href: 'DRE' },
+      { icon: Landmark, label: 'Contas Bancárias', href: 'ContasBancarias' },
+      { icon: Receipt, label: 'Movimentações Bancárias', href: 'MovimentacoesBancarias' },
+      { icon: ClipboardCheck, label: 'Auditoria do Dia', href: 'AuditoriaDodia' },
+      { icon: HardDrive, label: 'Cofres', href: 'Cofres' }
     ]
   },
   {
