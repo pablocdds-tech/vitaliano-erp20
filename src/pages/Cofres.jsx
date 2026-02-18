@@ -154,7 +154,7 @@ export default function Cofres() {
       )}
 
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-lg w-[95vw] sm:w-full max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editingItem ? 'Editar' : 'Novo Cofre'}</DialogTitle>
           </DialogHeader>

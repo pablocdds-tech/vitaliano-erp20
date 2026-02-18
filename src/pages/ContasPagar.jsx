@@ -346,7 +346,7 @@ export default function ContasPagar() {
 
       {/* Modal de Cadastro/Edição */}
       <Dialog open={modalOpen} onOpenChange={(v) => { setModalOpen(v); if (!v) { setEditingItem(null); setFormData(emptyForm); } }}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto w-[95vw] sm:w-full">
           <DialogHeader>
             <DialogTitle>{editingItem ? 'Editar Conta' : 'Nova Conta a Pagar'}</DialogTitle>
           </DialogHeader>

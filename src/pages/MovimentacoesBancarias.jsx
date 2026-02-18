@@ -165,7 +165,7 @@ export default function MovimentacoesBancarias() {
       )}
 
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
-        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto w-[95vw] sm:w-full">
           <DialogHeader>
             <DialogTitle>{editingItem ? 'Editar' : 'Nova Movimentação'}</DialogTitle>
           </DialogHeader>
