@@ -63,6 +63,9 @@ import NotasFiscais from './pages/NotasFiscais';
 import Produtos from './pages/Produtos';
 import Relatorios from './pages/Relatorios';
 import Vendas from './pages/Vendas';
+import AuditoriaDodia from './pages/AuditoriaDodia';
+import Cofres from './pages/Cofres';
+import ContasBancarias from './pages/ContasBancarias';
 import __Layout from './Layout.jsx';
 
 
@@ -83,6 +86,9 @@ export const PAGES = {
     "Produtos": Produtos,
     "Relatorios": Relatorios,
     "Vendas": Vendas,
+    "AuditoriaDodia": AuditoriaDodia,
+    "Cofres": Cofres,
+    "ContasBancarias": ContasBancarias,
 }
 
 export const pagesConfig = {
