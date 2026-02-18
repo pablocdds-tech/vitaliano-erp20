@@ -51,6 +51,8 @@ import BancoVirtual from './pages/BancoVirtual';
 import Categorias from './pages/Categorias';
 import Checklists from './pages/Checklists';
 import ContasPagar from './pages/ContasPagar';
+import ContasReceber from './pages/ContasReceber';
+import DRE from './pages/DRE';
 import Dashboard from './pages/Dashboard';
 import Estoque from './pages/Estoque';
 import Fornecedores from './pages/Fornecedores';
@@ -59,10 +61,8 @@ import Lojas from './pages/Lojas';
 import Movimentacoes from './pages/Movimentacoes';
 import NotasFiscais from './pages/NotasFiscais';
 import Produtos from './pages/Produtos';
-import Vendas from './pages/Vendas';
-import ContasReceber from './pages/ContasReceber';
-import DRE from './pages/DRE';
 import Relatorios from './pages/Relatorios';
+import Vendas from './pages/Vendas';
 import __Layout from './Layout.jsx';
 
 
@@ -71,6 +71,8 @@ export const PAGES = {
     "Categorias": Categorias,
     "Checklists": Checklists,
     "ContasPagar": ContasPagar,
+    "ContasReceber": ContasReceber,
+    "DRE": DRE,
     "Dashboard": Dashboard,
     "Estoque": Estoque,
     "Fornecedores": Fornecedores,
@@ -79,10 +81,8 @@ export const PAGES = {
     "Movimentacoes": Movimentacoes,
     "NotasFiscais": NotasFiscais,
     "Produtos": Produtos,
-    "Vendas": Vendas,
-    "ContasReceber": ContasReceber,
-    "DRE": DRE,
     "Relatorios": Relatorios,
+    "Vendas": Vendas,
 }
 
 export const pagesConfig = {

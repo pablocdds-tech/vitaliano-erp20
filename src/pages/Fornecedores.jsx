@@ -230,11 +230,11 @@ export default function Fornecedores() {
                 />
               </div>
               <div className="space-y-2">
-                <Label>CNPJ *</Label>
+                <Label>CNPJ</Label>
                 <Input
                   value={formData.cnpj}
                   onChange={(e) => setFormData({ ...formData, cnpj: e.target.value })}
-                  required
+                  placeholder="00.000.000/0000-00 (opcional)"
                 />
               </div>
             </div>
