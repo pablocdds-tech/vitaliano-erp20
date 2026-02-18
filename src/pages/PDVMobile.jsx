@@ -23,6 +23,8 @@ import { createPageUrl } from '@/utils';
 export default function PDVMobile() {
   const qc = useQueryClient();
   const searchRef = useRef(null);
+  const lojaRef = useRef(null);
+  const produtoRef = useRef(null);
 
   const [lojaDestinoId, setLojaDestinoId] = useState('');
   const [busca, setBusca] = useState('');
@@ -48,6 +50,32 @@ export default function PDVMobile() {
   // Foca busca ao montar
   useEffect(() => {
     setTimeout(() => searchRef.current?.focus(), 300);
+  }, []);
+
+  // Fecha dropdowns ao clicar fora
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (lojaRef.current && !lojaRef.current.contains(e.target)) {
+        setMostrarLojas(false);
+      }
+      if (produtoRef.current && !produtoRef.current.contains(e.target)) {
+        setBusca('');
+      }
+    };
+
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setMostrarLojas(false);
+        setBusca('');
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
   }, []);
 
   // Produtos filtrados pela busca
@@ -204,7 +232,7 @@ export default function PDVMobile() {
         </div>
 
         {/* Seletor de loja destino */}
-        <div className="px-4 py-3">
+        <div className="px-4 py-3" ref={lojaRef}>
           <button
             className={`w-full flex items-center gap-3 p-3 rounded-xl border-2 transition-colors text-left ${
               lojaDestinoId ? 'border-indigo-400 bg-indigo-50' : 'border-slate-200 bg-slate-50'
@@ -243,7 +271,7 @@ export default function PDVMobile() {
         </div>
 
         {/* Busca de produto */}
-        <div className="px-4 pb-3 relative">
+        <div className="px-4 pb-3 relative" ref={produtoRef}>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
             <input
