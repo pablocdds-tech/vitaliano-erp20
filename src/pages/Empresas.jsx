@@ -22,59 +22,58 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Store, Plus, Pencil, Trash2 } from 'lucide-react';
+import { Building2, Plus, Pencil, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
-export default function Lojas() {
+export default function Empresas() {
   const queryClient = useQueryClient();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [formData, setFormData] = useState({
     nome: '',
-    codigo: '',
-    tipo: 'loja',
+    razao_social: '',
     cnpj: '',
-    contato: { telefone: '', email: '' },
+    plano: 'starter',
     status: 'ativo'
   });
 
-  const { data: lojas = [], isLoading } = useQuery({
-    queryKey: ['lojas'],
-    queryFn: () => base44.entities.Loja.list()
+  const { data: empresas = [], isLoading } = useQuery({
+    queryKey: ['empresas'],
+    queryFn: () => base44.entities.Empresa.list()
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.Loja.create(data),
+    mutationFn: (data) => base44.entities.Empresa.create(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['lojas'] });
+      queryClient.invalidateQueries({ queryKey: ['empresas'] });
       setModalOpen(false);
       resetForm();
-      toast.success('Loja criada!');
+      toast.success('Empresa criada!');
     },
     onError: () => toast.error('Erro ao criar')
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.Loja.update(id, data),
+    mutationFn: ({ id, data }) => base44.entities.Empresa.update(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['lojas'] });
+      queryClient.invalidateQueries({ queryKey: ['empresas'] });
       setModalOpen(false);
       resetForm();
-      toast.success('Loja atualizada!');
+      toast.success('Empresa atualizada!');
     },
     onError: () => toast.error('Erro ao atualizar')
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.Loja.delete(id),
+    mutationFn: (id) => base44.entities.Empresa.delete(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['lojas'] });
-      toast.success('Loja excluída!');
+      queryClient.invalidateQueries({ queryKey: ['empresas'] });
+      toast.success('Empresa excluída!');
     }
   });
 
   const resetForm = () => {
-    setFormData({ nome: '', codigo: '', tipo: 'loja', cnpj: '', contato: { telefone: '', email: '' }, status: 'ativo' });
+    setFormData({ nome: '', razao_social: '', cnpj: '', plano: 'starter', status: 'ativo' });
     setEditingItem(null);
   };
 
@@ -82,10 +81,9 @@ export default function Lojas() {
     setEditingItem(item);
     setFormData({
       nome: item.nome || '',
-      codigo: item.codigo || '',
-      tipo: item.tipo || 'loja',
+      razao_social: item.razao_social || '',
       cnpj: item.cnpj || '',
-      contato: item.contato || { telefone: '', email: '' },
+      plano: item.plano || 'starter',
       status: item.status || 'ativo'
     });
     setModalOpen(true);
@@ -103,19 +101,20 @@ export default function Lojas() {
   const columns = [
     {
       key: 'nome',
-      label: 'Loja',
+      label: 'Empresa',
       sortable: true,
       render: (value, row) => (
         <div>
           <p className="font-medium text-slate-800 dark:text-white">{value}</p>
-          <p className="text-xs text-slate-500">{row.tipo === 'cd' ? 'Centro Distribuição' : 'Loja'} • {row.codigo || '-'}</p>
+          <p className="text-xs text-slate-500">{row.cnpj || '-'}</p>
         </div>
       )
     },
+    { key: 'razao_social', label: 'Razão Social', sortable: true },
     {
-      key: 'contato',
-      label: 'Contato',
-      render: (v) => <span className="text-xs">{v?.email || v?.telefone || '-'}</span>
+      key: 'plano',
+      label: 'Plano',
+      render: (v) => <StatusBadge status={v} customLabel={v?.toUpperCase()} size="sm" />
     },
     {
       key: 'status',
@@ -127,10 +126,10 @@ export default function Lojas() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Lojas"
-        subtitle="Gerencie suas unidades operacionais"
-        icon={Store}
-        breadcrumbs={[{ label: 'Dashboard', href: 'Dashboard' }, { label: 'Lojas' }]}
+        title="Empresas"
+        subtitle="Gerencie suas empresas (tenants)"
+        icon={Building2}
+        breadcrumbs={[{ label: 'Dashboard', href: 'Dashboard' }, { label: 'Empresas' }]}
         actions={
           <Button onClick={() => { resetForm(); setModalOpen(true); }} className="gap-2">
             <Plus className="w-4 h-4" /> Nova
@@ -138,10 +137,10 @@ export default function Lojas() {
         }
       />
 
-      {lojas.length === 0 && !isLoading ? (
-        <EmptyState icon={Store} title="Nenhuma loja" description="Cadastre suas unidades." actionLabel="Criar" onAction={() => setModalOpen(true)} />
+      {empresas.length === 0 && !isLoading ? (
+        <EmptyState icon={Building2} title="Nenhuma empresa" description="Cadastre sua primeira empresa." actionLabel="Criar" onAction={() => setModalOpen(true)} />
       ) : (
-        <DataTable columns={columns} data={lojas} loading={isLoading} searchPlaceholder="Buscar..." rowActions={(row) => [
+        <DataTable columns={columns} data={empresas} loading={isLoading} searchPlaceholder="Buscar..." rowActions={(row) => [
           { label: 'Editar', icon: Pencil, onClick: () => handleEdit(row) },
           { label: 'Excluir', icon: Trash2, onClick: () => deleteMutation.mutate(row.id), destructive: true }
         ]} />
@@ -150,42 +149,31 @@ export default function Lojas() {
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle>{editingItem ? 'Editar' : 'Nova Loja'}</DialogTitle>
+            <DialogTitle>{editingItem ? 'Editar' : 'Nova Empresa'}</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label>Nome *</Label>
               <Input value={formData.nome} onChange={e => setFormData({ ...formData, nome: e.target.value })} required />
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Código</Label>
-                <Input value={formData.codigo} onChange={e => setFormData({ ...formData, codigo: e.target.value })} />
-              </div>
-              <div className="space-y-2">
-                <Label>Tipo</Label>
-                <Select value={formData.tipo} onValueChange={v => setFormData({ ...formData, tipo: v })}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="loja">Loja</SelectItem>
-                    <SelectItem value="cd">Centro Distribuição</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+            <div className="space-y-2">
+              <Label>Razão Social</Label>
+              <Input value={formData.razao_social} onChange={e => setFormData({ ...formData, razao_social: e.target.value })} />
             </div>
             <div className="space-y-2">
               <Label>CNPJ</Label>
               <Input value={formData.cnpj} onChange={e => setFormData({ ...formData, cnpj: e.target.value })} />
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Telefone</Label>
-                <Input value={formData.contato?.telefone || ''} onChange={e => setFormData({ ...formData, contato: { ...formData.contato, telefone: e.target.value } })} />
-              </div>
-              <div className="space-y-2">
-                <Label>Email</Label>
-                <Input type="email" value={formData.contato?.email || ''} onChange={e => setFormData({ ...formData, contato: { ...formData.contato, email: e.target.value } })} />
-              </div>
+            <div className="space-y-2">
+              <Label>Plano</Label>
+              <Select value={formData.plano} onValueChange={v => setFormData({ ...formData, plano: v })}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="starter">Starter</SelectItem>
+                  <SelectItem value="professional">Professional</SelectItem>
+                  <SelectItem value="enterprise">Enterprise</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-2">
               <Label>Status</Label>
@@ -193,7 +181,8 @@ export default function Lojas() {
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="ativo">Ativo</SelectItem>
-                  <SelectItem value="inativo">Inativo</SelectItem>
+                  <SelectItem value="suspenso">Suspenso</SelectItem>
+                  <SelectItem value="cancelado">Cancelado</SelectItem>
                 </SelectContent>
               </Select>
             </div>

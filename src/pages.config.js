@@ -69,6 +69,9 @@ import Vendas from './pages/Vendas';
 import Onboarding from './pages/Onboarding';
 import AdminSaaS from './pages/AdminSaaS';
 import PDVMobile from './pages/PDVMobile';
+import Empresas from './pages/Empresas';
+import Fornecedores from './pages/Fornecedores';
+import Categorias from './pages/Categorias';
 import __Layout from './Layout.jsx';
 
 
@@ -95,6 +98,9 @@ export const PAGES = {
     "Onboarding": Onboarding,
     "AdminSaaS": AdminSaaS,
     "PDVMobile": PDVMobile,
+    "Empresas": Empresas,
+    "Fornecedores": Fornecedores,
+    "Categorias": Categorias,
 }
 
 export const pagesConfig = {
