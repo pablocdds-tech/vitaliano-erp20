@@ -96,6 +96,16 @@ export default function ContasPagar() {
     queryFn: () => base44.entities.CategoriaDRE.list()
   });
 
+  const { data: contasBancarias = [] } = useQuery({
+    queryKey: ['contas-bancarias'],
+    queryFn: () => base44.entities.ContaBancaria.filter({ status: 'ativo' })
+  });
+
+  const { data: cofres = [] } = useQuery({
+    queryKey: ['cofres'],
+    queryFn: () => base44.entities.Cofre.filter({ status: 'ativo' })
+  });
+
   const createMutation = useMutation({
     mutationFn: async (form) => {
       const empresa = await getEmpresaAtiva();
