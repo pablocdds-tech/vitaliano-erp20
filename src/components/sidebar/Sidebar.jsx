@@ -32,7 +32,8 @@ import {
   HardDrive,
   Bell,
   Landmark,
-  Vault
+  Vault,
+  ShoppingBag
 } from 'lucide-react';
 
 const menuGroups = [
@@ -85,6 +86,7 @@ const menuGroups = [
   {
     label: 'Vendas',
     items: [
+      { icon: ShoppingBag, label: 'CD → Lojas', href: 'PedidosInternos' },
       { icon: TrendingUp, label: 'Fechamento de Caixa', href: 'Vendas' },
       { icon: BarChart3, label: 'Relatórios', href: 'Relatorios' }
     ]
