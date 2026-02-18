@@ -556,17 +556,44 @@ export default function NotasFiscais() {
               )}
             </div>
 
-            {/* Conta a pagar — parcelamento */}
+            {/* Conta a pagar — parcelamento + forma de pagamento */}
             <div className="border rounded-lg p-4 bg-slate-50 dark:bg-slate-800/50 space-y-3">
               <p className="text-sm font-medium text-slate-700 dark:text-slate-300">Conta a Pagar gerada ao Lançar</p>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <Label>Parcelas</Label>
-                  <Input type="number" min="1" max="48" value={formData.num_parcelas} onChange={e => setFormData({ ...formData, num_parcelas: parseInt(e.target.value) || 1 })} />
+                  <Label>Forma de Pagamento</Label>
+                  <Select value={formData.forma_pagamento || 'boleto'} onValueChange={v => setFormData({ ...formData, forma_pagamento: v })}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="boleto">Boleto</SelectItem>
+                      <SelectItem value="pix">PIX</SelectItem>
+                      <SelectItem value="transferencia">Transferência</SelectItem>
+                      <SelectItem value="dinheiro">Dinheiro</SelectItem>
+                      <SelectItem value="cartao">Cartão</SelectItem>
+                      <SelectItem value="cheque">Cheque</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="space-y-1">
                   <Label>1º Vencimento</Label>
                   <Input type="date" value={formData.primeiro_vencimento} onChange={e => setFormData({ ...formData, primeiro_vencimento: e.target.value })} />
+                </div>
+                <div className="space-y-1">
+                  <Label>Número de Parcelas</Label>
+                  <Input type="number" min="1" max="48" value={formData.num_parcelas} onChange={e => setFormData({ ...formData, num_parcelas: parseInt(e.target.value) || 1 })} />
+                </div>
+                <div className="space-y-1">
+                  <Label>Tipo de Documento</Label>
+                  <Select value={formData.documento_tipo || 'nota_fiscal'} onValueChange={v => setFormData({ ...formData, documento_tipo: v })}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="nota_fiscal">Nota Fiscal</SelectItem>
+                      <SelectItem value="boleto">Boleto</SelectItem>
+                      <SelectItem value="fatura">Fatura</SelectItem>
+                      <SelectItem value="contrato">Contrato</SelectItem>
+                      <SelectItem value="outros">Outros</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
               <p className="text-xs text-slate-400">Ao clicar em "Lançar" na lista, será criada(s) a(s) conta(s) a pagar automaticamente.</p>
