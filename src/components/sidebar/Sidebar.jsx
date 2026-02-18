@@ -6,6 +6,7 @@ import Logo from '../ui-custom/Logo';
 import {
   LayoutDashboard,
   Building2,
+  Smartphone,
   Package,
   ShoppingCart,
   FileText,
