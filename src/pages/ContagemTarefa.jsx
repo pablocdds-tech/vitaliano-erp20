@@ -18,6 +18,7 @@ export default function ContagemTarefa() {
   const [error, setError] = useState('');
   const [itens, setItens] = useState([]);
   const [finalizado, setFinalizado] = useState(false);
+  const [iniciado, setIniciado] = useState(false);
 
   useEffect(() => {
     if (!token) { setError('Token inválido.'); setLoading(false); return; }
