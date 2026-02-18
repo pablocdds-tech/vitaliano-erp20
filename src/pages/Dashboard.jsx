@@ -96,6 +96,28 @@ export default function Dashboard() {
 
   const loading = loadingVendas || loadingContas || loadingReceber || loadingEstoque;
 
+  // Tesouraria
+  const getSaldoBanco = (contaId) => {
+    const saldoInicial = contasBancarias.find(c => c.id === contaId)?.saldo_inicial || 0;
+    const movs = transacoesBanco.filter(t => t.conta_bancaria_id === contaId && t.status !== 'ignorado');
+    return saldoInicial + movs.reduce((s, t) => s + (t.valor || 0), 0);
+  };
+  const totalBancos = contasBancarias.reduce((s, c) => s + getSaldoBanco(c.id), 0);
+
+  const getSaldoCofre = (cofreId) => movsCofre.filter(m => m.cofre_id === cofreId || m.cofre_destino_id === cofreId).reduce((s, m) => {
+    if (m.tipo === 'entrada') return s + m.valor;
+    if (m.tipo === 'saida') return s - m.valor;
+    if (m.tipo === 'transferencia') return m.cofre_id === cofreId ? s - m.valor : s + m.valor;
+    return s;
+  }, 0);
+  const totalCofres = cofres.reduce((s, c) => s + getSaldoCofre(c.id), 0);
+
+  const hoje = format(new Date(), 'yyyy-MM-dd');
+  const em7dias = format(new Date(Date.now() + 7 * 86400000), 'yyyy-MM-dd');
+  const em30dias = format(new Date(Date.now() + 30 * 86400000), 'yyyy-MM-dd');
+  const receberProx7 = contasReceber.filter(c => c.data_vencimento <= em7dias).reduce((s, c) => s + (c.valor_original || 0), 0);
+  const pagarProx7 = contasPagar.filter(c => c.data_vencimento <= em7dias).reduce((s, c) => s + (c.valor_original || 0), 0);
+
   return (
     <div className="space-y-6">
       <PageHeader
