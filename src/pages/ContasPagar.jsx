@@ -334,7 +334,17 @@ export default function ContasPagar() {
         />
       )}
 
-      {/* Modal */}
+      {/* Modal de Pagamento */}
+      <RegistrarPagamentoModal
+        open={!!pagamentoModal}
+        onClose={() => setPagamentoModal(null)}
+        conta={pagamentoModal}
+        contasBancarias={contasBancarias}
+        cofres={cofres}
+        lojas={lojas}
+      />
+
+      {/* Modal de Cadastro/Edição */}
       <Dialog open={modalOpen} onOpenChange={(v) => { setModalOpen(v); if (!v) { setEditingItem(null); setFormData(emptyForm); } }}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
