@@ -28,6 +28,7 @@ import {
 import { CreditCard, Plus, Pencil, CheckCircle2, Trash2, Clock, AlertTriangle, Wallet, Layers } from 'lucide-react';
 import { format, differenceInDays, isAfter, addMonths } from 'date-fns';
 import { toast } from 'sonner';
+import { getEmpresaAtiva } from '@/components/services/tenantService';
 
 const FORMAS = ['boleto', 'pix', 'transferencia', 'dinheiro', 'cartao', 'cheque'];
 const TIPO_CREDOR = ['fornecedor', 'banco', 'servico', 'aluguel', 'outro'];
