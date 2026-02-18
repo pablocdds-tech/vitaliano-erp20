@@ -67,11 +67,13 @@ import Movimentacoes from './pages/Movimentacoes';
 import MovimentacoesBancarias from './pages/MovimentacoesBancarias';
 import NotasFiscais from './pages/NotasFiscais';
 import PedidosInternos from './pages/PedidosInternos';
+import Producao from './pages/Producao';
 import Produtos from './pages/Produtos';
 import Relatorios from './pages/Relatorios';
 import TemplatesContagem from './pages/TemplatesContagem';
 import Vendas from './pages/Vendas';
-import Producao from './pages/Producao';
+import Onboarding from './pages/Onboarding';
+import AdminSaaS from './pages/AdminSaaS';
 import __Layout from './Layout.jsx';
 
 
@@ -96,11 +98,13 @@ export const PAGES = {
     "MovimentacoesBancarias": MovimentacoesBancarias,
     "NotasFiscais": NotasFiscais,
     "PedidosInternos": PedidosInternos,
+    "Producao": Producao,
     "Produtos": Produtos,
     "Relatorios": Relatorios,
     "TemplatesContagem": TemplatesContagem,
     "Vendas": Vendas,
-    "Producao": Producao,
+    "Onboarding": Onboarding,
+    "AdminSaaS": AdminSaaS,
 }
 
 export const pagesConfig = {
