@@ -60,7 +60,8 @@ const menuGroups = [
       { icon: FileText, label: 'Notas Fiscais', href: 'NotasFiscais' },
       { icon: Boxes, label: 'Estoque', href: 'Estoque' },
       { icon: ArrowLeftRight, label: 'Movimentações', href: 'Movimentacoes' },
-      { icon: ClipboardList, label: 'Contagens', href: 'Contagens' }
+      { icon: ClipboardList, label: 'Contagens', href: 'Contagens' },
+      { icon: ClipboardCheck, label: 'Templates Contagem', href: 'TemplatesContagem' }
     ]
   },
   {
