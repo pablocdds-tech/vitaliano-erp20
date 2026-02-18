@@ -20,7 +20,9 @@ import {
   ArrowDownRight,
   Clock,
   CheckCircle2,
-  RefreshCw
+  RefreshCw,
+  Landmark,
+  Vault
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
