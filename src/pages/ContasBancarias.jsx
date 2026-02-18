@@ -45,6 +45,22 @@ export default function ContasBancarias() {
     queryFn: () => base44.entities.ContaBancaria.list()
   });
 
+  const { data: transacoes = [] } = useQuery({
+    queryKey: ['transacoesBancarias'],
+    queryFn: () => base44.entities.TransacaoBancaria.list('-data', 1000)
+  });
+
+  const calcularSaldoAtual = (contaId) => {
+    const saldoInicial = contas.find(c => c.id === contaId)?.saldo_inicial || 0;
+    const transacoesAccount = transacoes.filter(t => t.conta_bancaria_id === contaId);
+    const totalMovimentado = transacoesAccount.reduce((sum, t) => {
+      if (t.tipo === 'credito') return sum + (t.valor || 0);
+      if (t.tipo === 'debito') return sum - Math.abs(t.valor || 0);
+      return sum;
+    }, 0);
+    return saldoInicial + totalMovimentado;
+  };
+
   const createMutation = useMutation({
     mutationFn: (data) => base44.entities.ContaBancaria.create(data),
     onSuccess: () => {
@@ -124,7 +140,12 @@ export default function ContasBancarias() {
     {
       key: 'saldo_inicial',
       label: 'Saldo Inicial',
-      render: (v) => <MoneyDisplay value={v} size="sm" colorize />
+      render: (v) => <MoneyDisplay value={v} size="sm" />
+    },
+    {
+      key: 'id',
+      label: 'Saldo Atual',
+      render: (id) => <MoneyDisplay value={calcularSaldoAtual(id)} size="sm" colorize />
     },
     {
       key: 'status',
