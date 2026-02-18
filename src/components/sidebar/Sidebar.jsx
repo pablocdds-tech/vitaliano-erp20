@@ -103,7 +103,9 @@ const menuGroups = [
 
 export default function Sidebar({ collapsed, onToggle }) {
   const location = useLocation();
-  const [expandedGroups, setExpandedGroups] = React.useState({});
+  const [expandedGroups, setExpandedGroups] = React.useState(
+    Object.fromEntries(menuGroups.map(g => [g.label, false]))
+  );
 
   const toggleGroup = (label) => {
     setExpandedGroups(prev => ({
