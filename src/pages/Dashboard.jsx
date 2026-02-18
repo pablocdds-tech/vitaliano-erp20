@@ -5,6 +5,7 @@ import PageHeader from '@/components/ui-custom/PageHeader';
 import KPICard from '@/components/ui-custom/KPICard';
 import MoneyDisplay, { formatMoney } from '@/components/ui-custom/MoneyDisplay';
 import StatusBadge from '@/components/ui-custom/StatusBadge';
+import AlertasPanel from '@/components/alertas/AlertasPanel';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
