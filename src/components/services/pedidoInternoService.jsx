@@ -1,20 +1,22 @@
 /**
  * SERVIÇO DE PEDIDO INTERNO (PDV CD → Loja)
  * Regras críticas:
- * - Confirmar = movimentar estoque + banco virtual atomicamente
+ * - Confirmar = movimentar estoque REAL + banco virtual atomicamente
+ * - Usa processarEntrada/processarSaida do estoqueService (atualiza saldo + custo médio + movlog)
  * - Idempotente: checa status antes de executar
  * - Nunca editar saldo direto — somente via movimentos
  */
 
 import { base44 } from '@/api/base44Client';
-import { format } from 'date-fns';
+import { processarEntrada, processarSaida } from './estoqueService';
 
 /**
  * Confirma um pedido interno, executando:
- * 1. Saída de estoque do CD
- * 2. Entrada de estoque na loja
+ * 1. Saída de estoque do CD (via estoqueService — atualiza saldo + custo médio)
+ * 2. Entrada de estoque na loja (via estoqueService)
  * 3. Débito banco virtual na loja / crédito no CD
- * 4. Marca pedido como confirmado (idempotência)
+ * 4. Audit log
+ * 5. Marca pedido como confirmado (idempotência)
  */
 export async function confirmarPedidoInterno(pedido, lojas, user) {
   if (pedido.status !== 'draft') {
@@ -29,33 +31,33 @@ export async function confirmarPedidoInterno(pedido, lojas, user) {
 
   if (!cd || !lojaDestino) throw new Error('CD ou loja destino não encontrado.');
 
-  // 1. Movimentações de estoque para cada item
+  const empresa_id = pedido.empresa_id;
+  const pedidoRef = `#${pedido.id.slice(-6).toUpperCase()}`;
+
+  // 1. Movimentações de estoque REAIS para cada item
   for (const item of pedido.itens) {
-    // Saída do CD
-    await base44.entities.MovimentacaoEstoque.create({
-      empresa_id: pedido.empresa_id,
+    // Saída do CD — atualiza Estoque do CD e cria MovimentacaoEstoque
+    await processarSaida({
+      empresa_id,
       loja_id: pedido.cd_id,
       produto_id: item.produto_id,
-      tipo: 'saida',
-      quantidade: -Math.abs(item.quantidade),
-      documento_tipo: 'transferencia',
-      documento_id: pedido.id,
-      observacao: `Pedido interno #${pedido.id.slice(-6).toUpperCase()} → ${lojaDestino.nome}`,
-    });
-
-    // Entrada na loja destino
-    await base44.entities.MovimentacaoEstoque.create({
-      empresa_id: pedido.empresa_id,
-      loja_id: pedido.loja_destino_id,
-      produto_id: item.produto_id,
-      tipo: 'entrada',
       quantidade: Math.abs(item.quantidade),
       custo_unitario: item.preco_unitario,
-      custo_total: item.subtotal,
       documento_tipo: 'transferencia',
       documento_id: pedido.id,
-      loja_destino_id: pedido.loja_destino_id,
-      observacao: `Pedido interno #${pedido.id.slice(-6).toUpperCase()} ← ${cd.nome}`,
+      observacao: `Pedido interno ${pedidoRef} → ${lojaDestino.nome}`,
+    });
+
+    // Entrada na loja destino — atualiza Estoque da loja e custo médio
+    await processarEntrada({
+      empresa_id,
+      loja_id: pedido.loja_destino_id,
+      produto_id: item.produto_id,
+      quantidade: Math.abs(item.quantidade),
+      custo_unitario: item.preco_unitario,
+      documento_tipo: 'transferencia',
+      documento_id: pedido.id,
+      observacao: `Pedido interno ${pedidoRef} ← ${cd.nome}`,
     });
   }
 
@@ -65,12 +67,12 @@ export async function confirmarPedidoInterno(pedido, lojas, user) {
   const valor = pedido.valor_total;
 
   const movBanco = await base44.entities.BancoVirtual.create({
-    empresa_id: pedido.empresa_id,
+    empresa_id,
     loja_origem_id: pedido.loja_destino_id, // loja paga
     loja_destino_id: pedido.cd_id,          // CD recebe
     tipo: 'transferencia',
     valor,
-    descricao: `Pedido interno #${pedido.id.slice(-6).toUpperCase()} — ${lojaDestino.nome} → ${cd.nome}`,
+    descricao: `Pedido interno ${pedidoRef} — ${lojaDestino.nome} → ${cd.nome}`,
     saldo_origem_anterior: saldoLoja,
     saldo_origem_posterior: saldoLoja - valor,
     saldo_destino_anterior: saldoCd,
@@ -80,15 +82,34 @@ export async function confirmarPedidoInterno(pedido, lojas, user) {
     data_aprovacao: new Date().toISOString(),
   });
 
-  // Efetivar saldos na loja e no CD
-  await base44.entities.Loja.update(pedido.loja_destino_id, {
-    saldo_banco_virtual: saldoLoja - valor,
-  });
-  await base44.entities.Loja.update(pedido.cd_id, {
-    saldo_banco_virtual: saldoCd + valor,
+  // Efetivar saldos nas lojas
+  await Promise.all([
+    base44.entities.Loja.update(pedido.loja_destino_id, { saldo_banco_virtual: saldoLoja - valor }),
+    base44.entities.Loja.update(pedido.cd_id, { saldo_banco_virtual: saldoCd + valor }),
+  ]);
+
+  // 3. Audit log
+  await base44.entities.AcaoIA.create({
+    tipo_acao: 'outro',
+    descricao: `Pedido interno ${pedidoRef} confirmado: ${cd.nome} → ${lojaDestino.nome} | ${pedido.itens.length} itens | R$ ${valor?.toFixed(2)}`,
+    comando_original: `PEDIDO_CD_CONFIRMADO`,
+    payload: {
+      pedido_id: pedido.id,
+      cd_id: pedido.cd_id,
+      loja_destino_id: pedido.loja_destino_id,
+      valor_total: valor,
+      total_itens: pedido.total_itens,
+      banco_virtual_id: movBanco.id,
+      confirmado_por: user?.email || 'sistema',
+    },
+    requer_confirmacao: false,
+    status: 'concluida',
+    solicitado_por: user?.email,
+    aprovado_por: user?.email,
+    executado_em: new Date().toISOString(),
   });
 
-  // 3. Marcar pedido como confirmado
+  // 4. Marcar pedido como confirmado
   return base44.entities.PedidoInterno.update(pedido.id, {
     status: 'confirmado',
     confirmado_por: user?.email || 'sistema',
