@@ -33,8 +33,9 @@ export default function ContagemTarefa() {
         const cRes = await base44.entities.Contagem.filter({ id: t.contagem_id });
         setContagem(cRes[0] || null);
         setTarefa(t);
-        // Itens SEM quantidade_sistema (não exibir pro funcionário)
         setItens((t.itens || []).map(i => ({ ...i, quantidade_contada: i.quantidade_contada ?? '' })));
+        // Se já estava em andamento, pula a tela de boas-vindas
+        if (t.status === 'em_andamento') setIniciado(true);
         setLoading(false);
       } catch (e) {
         setError('Erro ao carregar tarefa.');
