@@ -60,6 +60,9 @@ import Movimentacoes from './pages/Movimentacoes';
 import NotasFiscais from './pages/NotasFiscais';
 import Produtos from './pages/Produtos';
 import Vendas from './pages/Vendas';
+import ContasReceber from './pages/ContasReceber';
+import DRE from './pages/DRE';
+import Relatorios from './pages/Relatorios';
 import __Layout from './Layout.jsx';
 
 
@@ -77,6 +80,9 @@ export const PAGES = {
     "NotasFiscais": NotasFiscais,
     "Produtos": Produtos,
     "Vendas": Vendas,
+    "ContasReceber": ContasReceber,
+    "DRE": DRE,
+    "Relatorios": Relatorios,
 }
 
 export const pagesConfig = {
