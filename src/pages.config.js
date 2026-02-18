@@ -68,6 +68,9 @@ import PedidosInternos from './pages/PedidosInternos';
 import Produtos from './pages/Produtos';
 import Relatorios from './pages/Relatorios';
 import Vendas from './pages/Vendas';
+import TemplatesContagem from './pages/TemplatesContagem';
+import Contagens from './pages/Contagens';
+import ContagemTarefa from './pages/ContagemTarefa';
 import __Layout from './Layout.jsx';
 
 
@@ -93,6 +96,9 @@ export const PAGES = {
     "Produtos": Produtos,
     "Relatorios": Relatorios,
     "Vendas": Vendas,
+    "TemplatesContagem": TemplatesContagem,
+    "Contagens": Contagens,
+    "ContagemTarefa": ContagemTarefa,
 }
 
 export const pagesConfig = {
