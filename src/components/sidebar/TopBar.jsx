@@ -70,8 +70,8 @@ export default function TopBar({ collapsed, onToggle }) {
 
   return (
     <header className={cn(
-      'fixed top-0 right-0 h-16 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg border-b border-slate-200 dark:border-slate-800 z-30 transition-all duration-300',
-      collapsed ? 'left-[70px]' : 'left-[260px]'
+      'fixed top-0 right-0 h-16 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg border-b border-slate-200 dark:border-slate-800 z-30 transition-all duration-300 w-full lg:w-auto',
+      'left-0 lg:left-[260px]'
     )}>
       <div className="flex items-center justify-between h-full px-4 lg:px-6">
         <div className="flex items-center gap-4">

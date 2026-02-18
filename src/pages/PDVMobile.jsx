@@ -259,7 +259,7 @@ export default function PDVMobile() {
 
           {/* Dropdown de resultados */}
           {produtosFiltrados.length > 0 && (
-            <div className="absolute left-4 right-4 top-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl z-50 overflow-hidden">
+            <div className="absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 overflow-y-auto max-h-72 md:max-h-96">
               {produtosFiltrados.map(p => (
                 <button
                   key={p.id}
@@ -285,7 +285,7 @@ export default function PDVMobile() {
       </div>
 
       {/* ÁREA CENTRAL — Lista de itens */}
-      <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3 pb-40">
+      <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3 pb-48 md:pb-40">
         {itens.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 gap-3 text-center">
             <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center">
