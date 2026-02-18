@@ -53,6 +53,7 @@ export default function ContasPagar() {
   const queryClient = useQueryClient();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
+  const [pagamentoModal, setPagamentoModal] = useState(null); // conta sendo paga
 
   const emptyForm = {
     descricao: '',
