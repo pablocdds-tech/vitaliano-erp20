@@ -12,6 +12,42 @@ import { base44 } from '@/api/base44Client';
 import { processarEntrada, processarSaida } from './estoqueService';
 
 /**
+ * Retorna mapa { produto_id -> custo_medio } do estoque de uma loja.
+ */
+export async function obterCustoAtualInsumos(loja_id, empresa_id) {
+  const estoques = await base44.entities.Estoque.filter({ loja_id, empresa_id });
+  const mapa = {};
+  for (const e of estoques) {
+    mapa[e.produto_id] = e.custo_medio || 0;
+  }
+  return mapa;
+}
+
+/**
+ * Calcula o custo total e unitário de uma ficha técnica,
+ * usando o custo médio atual dos insumos no estoque.
+ * Retorna { custo_total, custo_unitario, ingredientes_com_custo }
+ */
+export async function calcularCustoFicha(fichaTecnicaId, loja_id, empresa_id) {
+  const ficha = await base44.entities.FichaTecnica.filter({ id: fichaTecnicaId });
+  if (!ficha || ficha.length === 0) throw new Error('Ficha técnica não encontrada');
+  const f = ficha[0];
+
+  const custosMap = await obterCustoAtualInsumos(loja_id, empresa_id);
+
+  const ingredientes_com_custo = (f.ingredientes || []).map(ing => ({
+    ...ing,
+    custo_unitario: custosMap[ing.produto_id] || 0,
+    custo_linha: (ing.quantidade || 0) * (custosMap[ing.produto_id] || 0),
+  }));
+
+  const custo_total = ingredientes_com_custo.reduce((s, i) => s + i.custo_linha, 0);
+  const custo_unitario = f.rendimento > 0 ? custo_total / f.rendimento : 0;
+
+  return { custo_total, custo_unitario, ingredientes_com_custo, ficha: f };
+}
+
+/**
  * Inicia uma ordem de produção: planejada → em_andamento
  */
 export async function iniciarProducao(producao) {
