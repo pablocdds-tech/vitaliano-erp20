@@ -105,7 +105,8 @@ const menuGroups = [
     items: [
       { icon: Bot, label: 'IA Executora', href: 'IAExecutora' },
       { icon: Users, label: 'Usuários', href: 'Usuarios' },
-      { icon: Settings, label: 'Configurações', href: 'Configuracoes' }
+      { icon: Settings, label: 'Configurações', href: 'Configuracoes' },
+      { icon: Shield, label: 'Admin SaaS', href: 'AdminSaaS' }
     ]
   }
 ];
