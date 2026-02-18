@@ -69,14 +69,18 @@ function ContagemDetail({ contagem, onClose }) {
   const prodMap = {};
   produtos.forEach(p => { prodMap[p.id] = p; });
 
+  const getTarefaUrl = (tarefa) => {
+    const base = `${window.location.origin}${window.location.pathname}`;
+    return `${base}#/ContagemTarefa?token=${tarefa.token}`;
+  };
+
   const handleCopyLink = (tarefa) => {
-    const url = `${window.location.origin}${window.location.pathname.split('#')[0]}#/ContagemTarefa?token=${tarefa.token}`;
-    navigator.clipboard.writeText(url);
+    navigator.clipboard.writeText(getTarefaUrl(tarefa));
     toast.success('Link copiado!');
   };
 
   const handleWhatsApp = (tarefa) => {
-    const url = `${window.location.origin}${window.location.pathname.split('#')[0]}#/ContagemTarefa?token=${tarefa.token}`;
+    const url = getTarefaUrl(tarefa);
     const msg = encodeURIComponent(`Olá ${tarefa.responsavel_nome}! Por favor faça a contagem de estoque — ${tarefa.grupo || 'Geral'}\n\nAcesse aqui: ${url}`);
     window.open(`https://wa.me/?text=${msg}`, '_blank');
   };
