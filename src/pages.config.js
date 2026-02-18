@@ -75,6 +75,10 @@ import Categorias from './pages/Categorias';
 import BancoVirtual from './pages/BancoVirtual';
 import ContasBancarias from './pages/ContasBancarias';
 import Cofres from './pages/Cofres';
+import ContasReceber from './pages/ContasReceber';
+import Notificacoes from './pages/Notificacoes';
+import Usuarios from './pages/Usuarios';
+import Configuracoes from './pages/Configuracoes';
 import __Layout from './Layout.jsx';
 
 
@@ -107,6 +111,10 @@ export const PAGES = {
     "BancoVirtual": BancoVirtual,
     "ContasBancarias": ContasBancarias,
     "Cofres": Cofres,
+    "ContasReceber": ContasReceber,
+    "Notificacoes": Notificacoes,
+    "Usuarios": Usuarios,
+    "Configuracoes": Configuracoes,
 }
 
 export const pagesConfig = {
