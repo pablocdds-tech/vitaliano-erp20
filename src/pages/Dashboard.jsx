@@ -154,6 +154,11 @@ export default function Dashboard() {
         }
       />
 
+      {/* Alertas IA */}
+      {empresa_id && (
+        <AlertasPanel empresa_id={empresa_id} loja_id={null} />
+      )}
+
       {/* KPIs Principais */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <KPICard
