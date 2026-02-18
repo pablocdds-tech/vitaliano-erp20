@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import PageHeader from '@/components/ui-custom/PageHeader';
+import DataTable from '@/components/ui-custom/DataTable';
+import StatusBadge from '@/components/ui-custom/StatusBadge';
 import EmptyState from '@/components/ui-custom/EmptyState';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent } from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -21,19 +22,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Tags, Plus, Pencil, Trash2, Folder } from 'lucide-react';
+import { Tags, Plus, Pencil, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
-
-const cores = [
-  { value: '#3b82f6', label: 'Azul' },
-  { value: '#10b981', label: 'Verde' },
-  { value: '#f59e0b', label: 'Âmbar' },
-  { value: '#ef4444', label: 'Vermelho' },
-  { value: '#8b5cf6', label: 'Roxo' },
-  { value: '#ec4899', label: 'Rosa' },
-  { value: '#06b6d4', label: 'Ciano' },
-  { value: '#64748b', label: 'Cinza' }
-];
 
 export default function Categorias() {
   const queryClient = useQueryClient();
@@ -42,8 +32,10 @@ export default function Categorias() {
   const [formData, setFormData] = useState({
     nome: '',
     codigo: '',
+    categoria_pai_id: '',
     tipo: 'insumo',
     cor: '#3b82f6',
+    ordem: 0,
     status: 'ativo'
   });
 
@@ -58,8 +50,9 @@ export default function Categorias() {
       queryClient.invalidateQueries({ queryKey: ['categorias'] });
       setModalOpen(false);
       resetForm();
-      toast.success('Categoria criada!');
-    }
+      toast.success('Categoria criada com sucesso!');
+    },
+    onError: () => toast.error('Erro ao criar categoria')
   });
 
   const updateMutation = useMutation({
@@ -68,20 +61,30 @@ export default function Categorias() {
       queryClient.invalidateQueries({ queryKey: ['categorias'] });
       setModalOpen(false);
       resetForm();
-      toast.success('Categoria atualizada!');
-    }
+      toast.success('Categoria atualizada com sucesso!');
+    },
+    onError: () => toast.error('Erro ao atualizar categoria')
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id) => base44.entities.Categoria.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['categorias'] });
-      toast.success('Categoria excluída!');
-    }
+      toast.success('Categoria excluída com sucesso!');
+    },
+    onError: () => toast.error('Erro ao excluir categoria')
   });
 
   const resetForm = () => {
-    setFormData({ nome: '', codigo: '', tipo: 'insumo', cor: '#3b82f6', status: 'ativo' });
+    setFormData({
+      nome: '',
+      codigo: '',
+      categoria_pai_id: '',
+      tipo: 'insumo',
+      cor: '#3b82f6',
+      ordem: 0,
+      status: 'ativo'
+    });
     setEditingItem(null);
   };
 
@@ -90,8 +93,10 @@ export default function Categorias() {
     setFormData({
       nome: item.nome || '',
       codigo: item.codigo || '',
+      categoria_pai_id: item.categoria_pai_id || '',
       tipo: item.tipo || 'insumo',
       cor: item.cor || '#3b82f6',
+      ordem: item.ordem || 0,
       status: item.status || 'ativo'
     });
     setModalOpen(true);
@@ -105,6 +110,43 @@ export default function Categorias() {
       createMutation.mutate(formData);
     }
   };
+
+  const columns = [
+    {
+      key: 'nome',
+      label: 'Categoria',
+      sortable: true,
+      render: (value, row) => (
+        <div className="flex items-center gap-3">
+          <div 
+            className="w-4 h-4 rounded" 
+            style={{ backgroundColor: row.cor || '#3b82f6' }}
+          />
+          <div>
+            <p className="font-medium text-slate-800 dark:text-white">{value}</p>
+            <p className="text-xs text-slate-500">{row.codigo || '-'}</p>
+          </div>
+        </div>
+      )
+    },
+    {
+      key: 'tipo',
+      label: 'Tipo',
+      sortable: true,
+      render: (value) => <span className="text-sm capitalize">{value?.replace(/_/g, ' ')}</span>
+    },
+    {
+      key: 'ordem',
+      label: 'Ordem',
+      sortable: true
+    },
+    {
+      key: 'status',
+      label: 'Status',
+      sortable: true,
+      render: (value) => <StatusBadge status={value} />
+    }
+  ];
 
   return (
     <div className="space-y-6">
@@ -127,60 +169,26 @@ export default function Categorias() {
       {categorias.length === 0 && !isLoading ? (
         <EmptyState
           icon={Tags}
-          title="Nenhuma categoria"
-          description="Crie categorias para organizar seus produtos."
-          actionLabel="Criar Categoria"
+          title="Nenhuma categoria cadastrada"
+          description="Crie suas primeiras categorias de produtos."
+          actionLabel="Cadastrar Categoria"
           onAction={() => setModalOpen(true)}
         />
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {categorias.map((cat) => (
-            <Card 
-              key={cat.id} 
-              className="group hover:shadow-lg transition-all cursor-pointer border-slate-200 dark:border-slate-800"
-              onClick={() => handleEdit(cat)}
-            >
-              <CardContent className="p-4">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-3">
-                    <div 
-                      className="p-2.5 rounded-xl"
-                      style={{ backgroundColor: `${cat.cor}20` }}
-                    >
-                      <Folder className="w-5 h-5" style={{ color: cat.cor }} />
-                    </div>
-                    <div>
-                      <p className="font-medium text-slate-800 dark:text-white">{cat.nome}</p>
-                      <p className="text-xs text-slate-500 capitalize">{cat.tipo?.replace(/_/g, ' ')}</p>
-                    </div>
-                  </div>
-                  <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="h-8 w-8"
-                      onClick={(e) => { e.stopPropagation(); handleEdit(cat); }}
-                    >
-                      <Pencil className="w-4 h-4" />
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="h-8 w-8 text-red-600 hover:text-red-700"
-                      onClick={(e) => { e.stopPropagation(); deleteMutation.mutate(cat.id); }}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        <DataTable
+          columns={columns}
+          data={categorias}
+          loading={isLoading}
+          searchPlaceholder="Buscar categorias..."
+          rowActions={(row) => [
+            { label: 'Editar', icon: Pencil, onClick: () => handleEdit(row) },
+            { label: 'Excluir', icon: Trash2, onClick: () => deleteMutation.mutate(row.id), destructive: true }
+          ]}
+        />
       )}
 
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
-        <DialogContent>
+        <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle>{editingItem ? 'Editar Categoria' : 'Nova Categoria'}</DialogTitle>
           </DialogHeader>
@@ -201,7 +209,7 @@ export default function Categorias() {
               <Input
                 value={formData.codigo}
                 onChange={(e) => setFormData({ ...formData, codigo: e.target.value })}
-                placeholder="CAT001"
+                placeholder="CAT-001"
               />
             </div>
 
@@ -224,21 +232,44 @@ export default function Categorias() {
               </Select>
             </div>
 
-            <div className="space-y-2">
-              <Label>Cor</Label>
-              <div className="flex gap-2">
-                {cores.map((cor) => (
-                  <button
-                    key={cor.value}
-                    type="button"
-                    className={`w-8 h-8 rounded-full transition-all ${
-                      formData.cor === cor.value ? 'ring-2 ring-offset-2 ring-slate-400' : ''
-                    }`}
-                    style={{ backgroundColor: cor.value }}
-                    onClick={() => setFormData({ ...formData, cor: cor.value })}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Cor</Label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    value={formData.cor}
+                    onChange={(e) => setFormData({ ...formData, cor: e.target.value })}
+                    className="w-12 h-10 rounded cursor-pointer"
                   />
-                ))}
+                  <span className="text-sm text-slate-500">{formData.cor}</span>
+                </div>
               </div>
+              <div className="space-y-2">
+                <Label>Ordem</Label>
+                <Input
+                  type="number"
+                  value={formData.ordem}
+                  onChange={(e) => setFormData({ ...formData, ordem: parseInt(e.target.value) || 0 })}
+                  min="0"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Status</Label>
+              <Select 
+                value={formData.status} 
+                onValueChange={(v) => setFormData({ ...formData, status: v })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ativo">Ativo</SelectItem>
+                  <SelectItem value="inativo">Inativo</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <DialogFooter>
@@ -246,7 +277,7 @@ export default function Categorias() {
                 Cancelar
               </Button>
               <Button type="submit" disabled={createMutation.isPending || updateMutation.isPending}>
-                {editingItem ? 'Salvar' : 'Criar'}
+                {editingItem ? 'Salvar' : 'Cadastrar'}
               </Button>
             </DialogFooter>
           </form>
