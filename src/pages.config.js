@@ -67,6 +67,7 @@ import AuditoriaDodia from './pages/AuditoriaDodia';
 import Cofres from './pages/Cofres';
 import ContasBancarias from './pages/ContasBancarias';
 import MovimentacoesBancarias from './pages/MovimentacoesBancarias';
+import PedidosInternos from './pages/PedidosInternos';
 import __Layout from './Layout.jsx';
 
 
@@ -91,6 +92,7 @@ export const PAGES = {
     "Cofres": Cofres,
     "ContasBancarias": ContasBancarias,
     "MovimentacoesBancarias": MovimentacoesBancarias,
+    "PedidosInternos": PedidosInternos,
 }
 
 export const pagesConfig = {
