@@ -79,7 +79,7 @@ const menuGroups = [
       { icon: Landmark, label: 'Contas Bancárias', href: 'ContasBancarias' },
       { icon: Receipt, label: 'Movimentações Bancárias', href: 'MovimentacoesBancarias' },
       { icon: ClipboardCheck, label: 'Auditoria do Dia', href: 'AuditoriaDodia' },
-      { icon: HardDrive, label: 'Cofres', href: 'Cofres' }
+      { icon: Vault, label: 'Cofres', href: 'Cofres' }
     ]
   },
   {
