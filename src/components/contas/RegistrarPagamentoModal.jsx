@@ -140,6 +140,23 @@ export default function RegistrarPagamentoModal({ open, onClose, conta, contasBa
         pagamentos: [...pagamentosExistentes, ...novaLinhas],
       });
 
+      // Debitar cada conta bancária real usada no pagamento
+      for (const linha of linhas) {
+        if (linha.tipo_origem === 'conta_bancaria' && linha.origem_id) {
+          await base44.entities.TransacaoBancaria.create({
+            conta_bancaria_id: linha.origem_id,
+            data: dataPagamento,
+            valor: -Math.abs(parseFloat(linha.valor)),
+            tipo: 'debito',
+            descricao: `Pagamento: ${conta.descricao}`,
+            status: 'conciliado',
+            conciliado_com_tipo: 'conta_pagar',
+            conciliado_com_id: conta.id,
+            conciliado_em: new Date().toISOString(),
+          });
+        }
+      }
+
       // Se a conta é do CD → abater dívida no banco virtual para cada loja pagadora
       if (isContaDoCD && cd) {
         for (const linha of linhas) {
