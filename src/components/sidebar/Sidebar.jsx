@@ -90,7 +90,7 @@ const menuGroups = [
     label: 'Vendas',
     items: [
       { icon: ShoppingBag, label: 'CD → Lojas', href: 'PedidosInternos' },
-      { icon: ShoppingBag, label: 'PDV Mobile', href: 'PDVMobile' },
+      { icon: Smartphone, label: 'PDV Mobile', href: 'PDVMobile' },
       { icon: TrendingUp, label: 'Fechamento de Caixa', href: 'Vendas' },
       { icon: BarChart3, label: 'Relatórios', href: 'Relatorios' }
     ]
