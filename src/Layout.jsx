@@ -56,10 +56,12 @@ export default function Layout({ children, currentPageName }) {
         'pt-16 min-h-screen transition-all duration-300',
         collapsed ? 'lg:pl-[70px]' : 'lg:pl-[260px]'
       )}>
-        <div className="p-4 lg:p-6">
+        <div className="p-4 lg:p-6 pb-24 lg:pb-6">
           {children}
         </div>
       </main>
+
+      <MobileInstallBanner />
     </div>
   );
 }
