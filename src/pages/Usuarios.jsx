@@ -135,7 +135,8 @@ export default function Usuarios() {
         <EmptyState icon={Users} title="Nenhum usuário" description="Convide usuários para acessar." actionLabel="Convidar" onAction={() => setModalOpen(true)} />
       ) : (
         <DataTable columns={columns} data={usuarios} loading={isLoading} searchPlaceholder="Buscar..." rowActions={(row) => [
-          { label: 'Editar', icon: Pencil, onClick: () => handleEdit(row) }
+          { label: 'Editar', icon: Pencil, onClick: () => handleEdit(row) },
+          { label: 'Permissões', icon: Shield, onClick: () => { setUsuarioPermissoes(row); setPermissoesModalOpen(true); } },
         ]} />
       )}
 
