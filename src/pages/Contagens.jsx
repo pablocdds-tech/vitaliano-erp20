@@ -43,6 +43,9 @@ function TarefaCard({ tarefa, lojas, onCopyLink, onCopyWhatsApp }) {
         <Button type="button" variant="outline" size="sm" className="gap-1.5 flex-1 text-xs" onClick={() => onCopyLink(tarefa)}>
           <Copy className="w-3.5 h-3.5" /> Copiar Link
         </Button>
+        <Button type="button" variant="outline" size="sm" className="gap-1.5 text-xs" onClick={() => onOpenLink(tarefa)}>
+          <ExternalLink className="w-3.5 h-3.5" />
+        </Button>
         <Button type="button" variant="outline" size="sm" className="gap-1.5 flex-1 text-xs text-green-600 border-green-300 hover:bg-green-50" onClick={() => onCopyWhatsApp(tarefa)}>
           <MessageCircle className="w-3.5 h-3.5" /> WhatsApp
         </Button>
