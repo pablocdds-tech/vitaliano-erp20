@@ -29,6 +29,7 @@ import ImportarCSVModal, { IMPORT_CONFIGS } from '@/components/importacao/Import
 export default function Categorias() {
   const queryClient = useQueryClient();
   const [modalOpen, setModalOpen] = useState(false);
+  const [importarOpen, setImportarOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [formData, setFormData] = useState({
     nome: '',
@@ -130,10 +131,21 @@ export default function Categorias() {
         icon={Tags}
         breadcrumbs={[{ label: 'Dashboard', href: 'Dashboard' }, { label: 'Categorias' }]}
         actions={
-          <Button onClick={() => { resetForm(); setModalOpen(true); }} className="gap-2">
-            <Plus className="w-4 h-4" /> Nova
-          </Button>
+          <div className="flex gap-2 flex-wrap">
+            <Button variant="outline" onClick={() => setImportarOpen(true)} className="gap-2 w-full sm:w-auto">
+              <Upload className="w-4 h-4" /> Importar CSV
+            </Button>
+            <Button onClick={() => { resetForm(); setModalOpen(true); }} className="gap-2 w-full sm:w-auto">
+              <Plus className="w-4 h-4" /> Nova
+            </Button>
+          </div>
         }
+      />
+
+      <ImportarCSVModal
+        open={importarOpen}
+        onClose={() => setImportarOpen(false)}
+        config={IMPORT_CONFIGS.categoria}
       />
 
       {categorias.length === 0 && !isLoading ? (
