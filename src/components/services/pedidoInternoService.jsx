@@ -12,19 +12,37 @@ import { processarEntrada, processarSaida } from './estoqueService';
 
 /**
  * Confirma um pedido interno, executando:
- * 1. Saída de estoque do CD (via estoqueService — atualiza saldo + custo médio)
- * 2. Entrada de estoque na loja (via estoqueService)
- * 3. Débito banco virtual na loja / crédito no CD
- * 4. Audit log
- * 5. Marca pedido como confirmado (idempotência)
+ * 1. LOCK: marca pedido como 'processando' (idempotência — evita retry duplicado)
+ * 2. Saída de estoque do CD (via estoqueService — atualiza saldo + custo médio)
+ * 3. Entrada de estoque na loja (via estoqueService)
+ * 4. Débito banco virtual na loja / crédito no CD
+ * 5. Audit log
+ * 6. Marca pedido como confirmado
+ *
+ * Se falhar após o LOCK, o pedido fica em 'processando' (status de alerta para admin).
+ * Não há retry automático — evita duplicação de movimentos.
  */
 export async function confirmarPedidoInterno(pedido, lojas, user) {
+  if (pedido.status === 'confirmado') {
+    throw new Error('Este pedido já foi confirmado.');
+  }
+  if (pedido.status === 'cancelado') {
+    throw new Error('Este pedido foi cancelado e não pode ser confirmado.');
+  }
+  if (pedido.status === 'processando') {
+    throw new Error('Este pedido já está sendo processado. Aguarde ou contate o administrador.');
+  }
   if (pedido.status !== 'draft') {
-    throw new Error('Este pedido já foi confirmado ou cancelado.');
+    throw new Error(`Status inválido para confirmação: ${pedido.status}`);
   }
   if (!pedido.itens || pedido.itens.length === 0) {
     throw new Error('O pedido não possui itens.');
   }
+
+  // LOCK: marca como 'processando' ANTES de qualquer movimentação.
+  // Se falhar aqui, pedido continua 'draft' — seguro para retry.
+  // Se falhar DEPOIS, pedido fica 'processando' e não aceita novo retry — evita duplicação.
+  await base44.entities.PedidoInterno.update(pedido.id, { status: 'processando' });
 
   const cd = lojas.find(l => l.id === pedido.cd_id);
   const lojaDestino = lojas.find(l => l.id === pedido.loja_destino_id);
