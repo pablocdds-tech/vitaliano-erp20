@@ -28,26 +28,36 @@ export default function ContagemTarefa() {
   const [itens, setItens] = useState([]);
   const [finalizado, setFinalizado] = useState(false);
   const [iniciado, setIniciado] = useState(false);
+  const [loja, setLoja] = useState(null);
 
   useEffect(() => {
-    if (!token) { setError('Token inválido.'); setLoading(false); return; }
+    if (!token) { setError('Token inválido ou não encontrado na URL.'); setLoading(false); return; }
     (async () => {
       try {
         const res = await base44.entities.TarefaContagem.filter({ token });
-        if (!res[0]) { setError('Tarefa não encontrada.'); setLoading(false); return; }
+        if (!res.length) { setError('Tarefa não encontrada. Verifique o link.'); setLoading(false); return; }
         const t = res[0];
         if (t.status === 'finalizado') { setFinalizado(true); setTarefa(t); setLoading(false); return; }
 
-        // Busca contagem geral para dados contextuais
-        const cRes = await base44.entities.Contagem.filter({ id: t.contagem_id });
+        // Busca contagem e loja em paralelo
+        const [cRes, lojaRes] = await Promise.all([
+          t.contagem_id ? base44.entities.Contagem.filter({ id: t.contagem_id }) : Promise.resolve([]),
+          t.loja_id ? base44.entities.Loja.filter({ id: t.loja_id }) : Promise.resolve([]),
+        ]);
+
         setContagem(cRes[0] || null);
+        setLoja(lojaRes[0] || null);
         setTarefa(t);
-        setItens((t.itens || []).map(i => ({ ...i, quantidade_contada: i.quantidade_contada ?? '' })));
-        // Se já estava em andamento, pula a tela de boas-vindas
+        setItens((t.itens || []).map(i => ({
+          ...i,
+          // Esconde quantidade_sistema do funcionário (só aparece no admin)
+          quantidade_sistema: undefined,
+          quantidade_contada: i.quantidade_contada != null ? i.quantidade_contada : '',
+        })));
         if (t.status === 'em_andamento') setIniciado(true);
         setLoading(false);
       } catch (e) {
-        setError('Erro ao carregar tarefa.');
+        setError('Erro ao carregar tarefa: ' + e.message);
         setLoading(false);
       }
     })();
