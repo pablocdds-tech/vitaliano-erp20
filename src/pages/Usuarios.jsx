@@ -30,6 +30,8 @@ export default function Usuarios() {
   const queryClient = useQueryClient();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
+  const [permissoesModalOpen, setPermissoesModalOpen] = useState(false);
+  const [usuarioPermissoes, setUsuarioPermissoes] = useState(null);
   const [formData, setFormData] = useState({
     email: '',
     role: 'user'
