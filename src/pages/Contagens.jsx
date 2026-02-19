@@ -62,6 +62,7 @@ function ContagemDetail({ contagem, onClose }) {
     queryKey: ['tarefas-contagem', contagem?.id],
     queryFn: () => base44.entities.TarefaContagem.filter({ contagem_id: contagem.id }),
     enabled: !!contagem?.id,
+    refetchInterval: 15000, // polling a cada 15s para ver progresso em tempo real
   });
 
   const { data: produtos = [] } = useQuery({
