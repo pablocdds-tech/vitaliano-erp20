@@ -211,23 +211,45 @@ export default function PDVMobile() {
 
   // Tela de sucesso
   if (sucesso) {
+    const pedidoParaImprimir = {
+      id: sucesso.id,
+      cd: sucesso.cd,
+      lojaDestino: sucesso.lojaDestino,
+      total: sucesso.total,
+      itens: sucesso.itensData || [],
+    };
+
     return (
       <div className="min-h-screen bg-emerald-50 flex flex-col items-center justify-center p-6 gap-6">
+        <ImprimirPedidoModal
+          open={modalImprimir}
+          onClose={() => setModalImprimir(false)}
+          pedido={pedidoParaImprimir}
+        />
+
         <div className="w-20 h-20 rounded-full bg-emerald-500 flex items-center justify-center shadow-lg">
           <CheckCircle2 className="w-12 h-12 text-white" />
         </div>
         <div className="text-center">
           <h1 className="text-2xl font-bold text-emerald-800">Pedido Confirmado!</h1>
           <p className="text-emerald-600 mt-1">{sucesso.cd} → {sucesso.loja}</p>
+          <p className="text-xs text-emerald-500 font-mono mt-1">Ref: #{sucesso.id?.slice(-6).toUpperCase()}</p>
           <p className="text-3xl font-bold text-emerald-700 mt-3">{formatMoney(sucesso.total)}</p>
           <p className="text-sm text-emerald-500">{sucesso.itens} item(ns) — estoque e banco virtual atualizados</p>
         </div>
         <div className="flex flex-col gap-3 w-full max-w-xs">
+          <Button
+            onClick={() => setModalImprimir(true)}
+            variant="outline"
+            className="h-12 border-emerald-300 text-emerald-700 hover:bg-emerald-100 gap-2"
+          >
+            <Printer className="w-4 h-4" /> Imprimir
+          </Button>
           <Button onClick={resetar} className="bg-emerald-600 hover:bg-emerald-700 h-14 text-base font-semibold gap-2">
             <Plus className="w-5 h-5" /> Novo Pedido
           </Button>
           <Button variant="outline" onClick={() => window.location.href = createPageUrl('PedidosInternos')} className="h-12 gap-2">
-            <ArrowLeft className="w-4 h-4" /> Ver todos os pedidos
+            <ArrowLeft className="w-4 h-4" /> Ver pedido no CD → Lojas
           </Button>
         </div>
       </div>
