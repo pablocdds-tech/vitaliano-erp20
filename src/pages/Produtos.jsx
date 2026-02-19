@@ -162,6 +162,34 @@ export default function Produtos() {
 
   const getCategoria = (id) => categorias.find(c => c.id === id);
 
+  // Custo médio dos últimos 30 dias por produto
+  const custoMedio30d = useMemo(() => {
+    const corte = subDays(new Date(), 30);
+    const mapa = {};
+    for (const mov of movimentacoes30d) {
+      if (!mov.custo_unitario || !mov.produto_id) continue;
+      const data = new Date(mov.created_date);
+      if (data < corte) continue;
+      if (!mapa[mov.produto_id]) mapa[mov.produto_id] = { soma: 0, qtd: 0 };
+      mapa[mov.produto_id].soma += mov.custo_unitario;
+      mapa[mov.produto_id].qtd += 1;
+    }
+    const result = {};
+    for (const [pid, val] of Object.entries(mapa)) {
+      result[pid] = val.soma / val.qtd;
+    }
+    return result;
+  }, [movimentacoes30d]);
+
+  // Dados filtrados por categoria e status
+  const produtosFiltrados = useMemo(() => {
+    return produtos.filter(p => {
+      if (filtroCategoria && p.categoria_id !== filtroCategoria) return false;
+      if (filtroStatus && p.status !== filtroStatus) return false;
+      return true;
+    });
+  }, [produtos, filtroCategoria, filtroStatus]);
+
   const columns = [
     {
       key: 'nome',
