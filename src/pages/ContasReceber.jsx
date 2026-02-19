@@ -331,6 +331,5 @@ export default function ContasReceber() {
   );
 }
 
+export default withPermissao(ContasReceber, 'contas_receber');
 import withPermissao from '@/components/rbac/withPermissao';
-const ContasReceberProtegida = withPermissao(ContasReceber, 'contas_receber');
-export { ContasReceberProtegida as default };

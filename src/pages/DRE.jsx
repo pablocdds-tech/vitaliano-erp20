@@ -226,6 +226,5 @@ export default function DRE() {
   );
 }
 
+export default withPermissao(DRE, 'dre');
 import withPermissao from '@/components/rbac/withPermissao';
-const DREProtegido = withPermissao(DRE, 'dre');
-export { DREProtegido as default };

@@ -355,6 +355,5 @@ export default function Movimentacoes() {
   );
 }
 
+export default withPermissao(Movimentacoes, 'movimentacoes');
 import withPermissao from '@/components/rbac/withPermissao';
-const MovimentacoesProtegida = withPermissao(Movimentacoes, 'movimentacoes');
-export { MovimentacoesProtegida as default };

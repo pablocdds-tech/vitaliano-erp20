@@ -348,6 +348,5 @@ export default function Estoque() {
   );
 }
 
+export default withPermissao(Estoque, 'estoque');
 import withPermissao from '@/components/rbac/withPermissao';
-const EstoqueProtegido = withPermissao(Estoque, 'estoque');
-export { EstoqueProtegido as default };

@@ -511,6 +511,5 @@ export default function ContasPagar() {
   );
 }
 
+export default withPermissao(ContasPagar, 'contas_pagar');
 import withPermissao from '@/components/rbac/withPermissao';
-const ContasPagarProtegida = withPermissao(ContasPagar, 'contas_pagar');
-export { ContasPagarProtegida as default };

@@ -320,6 +320,5 @@ export default function BancoVirtual() {
   );
 }
 
+export default withPermissao(BancoVirtual, 'banco_virtual');
 import withPermissao from '@/components/rbac/withPermissao';
-const BancoVirtualProtegido = withPermissao(BancoVirtual, 'banco_virtual');
-export { BancoVirtualProtegido as default };

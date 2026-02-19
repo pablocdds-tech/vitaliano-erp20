@@ -328,6 +328,5 @@ export default function AdminSaaS() {
   );
 }
 
+export default withPermissao(AdminSaaS, 'admin_saas');
 import withPermissao from '@/components/rbac/withPermissao';
-const AdminSaaSProtegido = withPermissao(AdminSaaS, 'admin_saas');
-export { AdminSaaSProtegido as default };

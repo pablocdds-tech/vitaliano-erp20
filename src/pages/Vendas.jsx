@@ -170,6 +170,5 @@ export default function Vendas() {
   );
 }
 
+export default withPermissao(Vendas, 'vendas');
 import withPermissao from '@/components/rbac/withPermissao';
-const VendasProtegida = withPermissao(Vendas, 'vendas');
-export { VendasProtegida as default };
