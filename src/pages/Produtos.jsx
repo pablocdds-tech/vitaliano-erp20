@@ -103,6 +103,15 @@ export default function Produtos() {
     onError: () => toast.error('Erro ao excluir produto')
   });
 
+  const handleBulkDelete = async (ids) => {
+    if (!window.confirm(`Deseja excluir ${ids.length} produto(s) selecionado(s)?`)) return;
+    for (const id of ids) {
+      await base44.entities.Produto.delete(id);
+    }
+    queryClient.invalidateQueries({ queryKey: ['produtos'] });
+    toast.success(`${ids.length} produto(s) excluído(s)!`);
+  };
+
   const resetForm = () => {
     setFormData({
       nome: '',
