@@ -61,8 +61,11 @@ export default function PedidosInternos() {
 
   const confirmarMutation = useMutation({
     mutationFn: async (pedido) => {
+      // Buscar dados completos do pedido (com itens) direto da API
+      const pedidoCompleto = await base44.entities.PedidoInterno.filter({ id: pedido.id });
+      const dadosPedido = pedidoCompleto[0] || pedido;
       const user = await base44.auth.me();
-      return confirmarPedidoInterno(pedido, lojas, user);
+      return confirmarPedidoInterno(dadosPedido, lojas, user);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['pedidos-internos'] });
@@ -70,7 +73,6 @@ export default function PedidosInternos() {
       queryClient.invalidateQueries({ queryKey: ['banco-virtual'] });
       queryClient.invalidateQueries({ queryKey: ['movimentacoes-estoque'] });
       toast.success('Pedido confirmado! Estoque e banco virtual atualizados.');
-      // Recarregar pedido atualizado para mostrar cupom
       setPedidoDetalhe(prev => prev ? { ...prev, status: 'confirmado' } : prev);
     },
     onError: (e) => toast.error(e.message || 'Erro ao confirmar pedido'),
