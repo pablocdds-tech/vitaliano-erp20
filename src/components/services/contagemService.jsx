@@ -75,6 +75,8 @@ export async function gerarContagemDeTemplate(template, produtos) {
  * Gera MovimentacaoEstoque tipo 'ajuste' para cada item divergente.
  */
 export async function aprovarAjusteContagem(contagem, tarefas, empresa_id) {
+  let temDivergencia = false;
+
   for (const tarefa of tarefas) {
     for (const item of (tarefa.itens || [])) {
       if (item.quantidade_contada === null || item.quantidade_contada === undefined) continue;
@@ -82,18 +84,30 @@ export async function aprovarAjusteContagem(contagem, tarefas, empresa_id) {
       const diff = (item.quantidade_contada || 0) - (item.quantidade_sistema || 0);
       if (Math.abs(diff) < 0.001) continue;
 
-      // Busca estoque atual
+      temDivergencia = true;
+
+      // Busca estoque atual pelo saldo real atual (não o snapshot da contagem)
       const estoques = await base44.entities.Estoque.filter({
         loja_id: contagem.loja_id,
         produto_id: item.produto_id,
       });
       const estoque = estoques[0];
       const qtdAtual = estoque?.quantidade || 0;
-      const qtdNova = qtdAtual + diff;
+      // Aplica o diff relativo: nova qtd = qtd_contada (substitui pelo valor físico)
+      const qtdNova = item.quantidade_contada;
       const custoUnit = estoque?.custo_medio || 0;
 
       if (estoque) {
         await base44.entities.Estoque.update(estoque.id, { quantidade: Math.max(0, qtdNova) });
+      } else {
+        // Cria registro de estoque se não existir
+        await base44.entities.Estoque.create({
+          empresa_id,
+          loja_id: contagem.loja_id,
+          produto_id: item.produto_id,
+          quantidade: Math.max(0, qtdNova),
+          custo_medio: 0,
+        });
       }
 
       await base44.entities.MovimentacaoEstoque.create({
@@ -113,11 +127,8 @@ export async function aprovarAjusteContagem(contagem, tarefas, empresa_id) {
     }
   }
 
-  // Fecha a contagem (ajustada se havia divergências, aprovada se estava tudo certo)
   await base44.entities.Contagem.update(contagem.id, {
     status: 'ajustada',
     data_fechamento: new Date().toISOString(),
-    aprovado_por: 'admin',
-    aprovado_em: new Date().toISOString(),
   });
 }
