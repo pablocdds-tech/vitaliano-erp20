@@ -510,3 +510,7 @@ export default function ContasPagar() {
     </div>
   );
 }
+
+import withPermissao from '@/components/rbac/withPermissao';
+const ContasPagarProtegida = withPermissao(ContasPagar, 'contas_pagar');
+export { ContasPagarProtegida as default };

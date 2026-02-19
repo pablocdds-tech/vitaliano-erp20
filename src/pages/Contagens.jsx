@@ -308,3 +308,7 @@ export default function Contagens() {
     </div>
   );
 }
+
+import withPermissao from '@/components/rbac/withPermissao';
+const ContagensProtegida = withPermissao(Contagens, 'contagens');
+export { ContagensProtegida as default };
