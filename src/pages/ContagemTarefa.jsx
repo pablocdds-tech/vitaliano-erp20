@@ -160,6 +160,12 @@ export default function ContagemTarefa() {
           <p className="text-slate-500 mt-1">Olá, <strong>{tarefa?.responsavel_nome}</strong>!</p>
         </div>
         <div className="bg-slate-50 rounded-xl p-4 text-left space-y-2">
+          {loja && (
+            <div className="flex justify-between text-sm">
+              <span className="text-slate-500">Loja</span>
+              <span className="font-medium text-slate-700">{loja.nome}</span>
+            </div>
+          )}
           {tarefa?.grupo && (
             <div className="flex justify-between text-sm">
               <span className="text-slate-500">Grupo</span>
