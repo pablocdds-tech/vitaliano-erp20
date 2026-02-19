@@ -204,6 +204,7 @@ function ContagemDetail({ contagem, onClose }) {
       </div>
 
       <DialogFooter>
+        <Button variant="outline" onClick={() => refetch()}>Atualizar</Button>
         <Button variant="outline" onClick={onClose}>Fechar</Button>
         {podeAprovar && (
           <Button
@@ -212,7 +213,7 @@ function ContagemDetail({ contagem, onClose }) {
             onClick={handleAprovar}
           >
             <CheckCheck className="w-4 h-4" />
-            {aprovando ? 'Aprovando...' : `Aprovar Ajuste (${divergencias.length} itens)`}
+            {aprovando ? 'Aprovando...' : divergencias.length > 0 ? `Aprovar Ajuste (${divergencias.length} itens)` : 'Aprovar Contagem'}
           </Button>
         )}
       </DialogFooter>
