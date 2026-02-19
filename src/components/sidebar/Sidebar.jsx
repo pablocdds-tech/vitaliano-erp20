@@ -145,7 +145,16 @@ export default function Sidebar({ collapsed, onToggle }) {
       </div>
 
       <nav className="p-3 h-[calc(100vh-64px)] overflow-y-auto scrollbar-thin">
-        {menuGroups.map((group) => (
+        {menuGroups.map((group) => {
+          // Filtra itens visíveis conforme permissões
+          const visibleItems = group.items.filter(item => {
+            const modulo = PAGE_TO_MODULE[item.href];
+            if (!modulo) return true; // sem mapeamento = sempre visível
+            return podeVer(permissoes, modulo);
+          });
+          if (visibleItems.length === 0) return null;
+
+          return (
           <div key={group.label} className="mb-4">
             <button
               onClick={() => toggleGroup(group.label)}
@@ -162,7 +171,7 @@ export default function Sidebar({ collapsed, onToggle }) {
               'space-y-0.5 mt-1',
               expandedGroups[group.label] && 'hidden'
             )}>
-              {group.items.map((item) => (
+              {visibleItems.map((item) => (
                 <Link
                   key={item.href}
                   to={createPageUrl(item.href)}
@@ -185,7 +194,8 @@ export default function Sidebar({ collapsed, onToggle }) {
               ))}
             </div>
           </div>
-        ))}
+          );
+        })}
       </nav>
     </aside>
   );
