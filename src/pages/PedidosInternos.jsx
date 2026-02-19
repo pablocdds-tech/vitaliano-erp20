@@ -280,8 +280,9 @@ export default function PedidosInternos() {
                   </div>
                   <div className="flex gap-2">
                     <Button
+                      type="button"
                       size="sm"
-                      onClick={() => confirmarMutation.mutate(pedidoAtivo)}
+                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); confirmarMutation.mutate(pedidoAtivo.id); }}
                       disabled={confirmarMutation.isPending}
                       className="bg-emerald-600 hover:bg-emerald-700"
                     >
