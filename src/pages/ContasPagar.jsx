@@ -49,7 +49,7 @@ function gerarParcelas(valor, numParcelas, primeiroVencimento, intervalo = 'mens
   return parcelas;
 }
 
-export default function ContasPagar() {
+function ContasPagar() {
   const queryClient = useQueryClient();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);

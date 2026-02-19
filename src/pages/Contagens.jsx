@@ -221,7 +221,7 @@ function ContagemDetail({ contagem, onClose }) {
   );
 }
 
-export default function Contagens() {
+function Contagens() {
   const [selectedContagem, setSelectedContagem] = useState(null);
 
   // Abrir contagem via querystring (vindo de TemplatesContagem)

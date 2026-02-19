@@ -31,7 +31,7 @@ function KPI({ title, value, sub, icon: Icon, cor }) {
   );
 }
 
-export default function DRE() {
+function DRE() {
   const [mesSelecionado, setMesSelecionado] = useState(MESES[0].value);
   const [lojaFiltro, setLojaFiltro] = useState('all');
   const [tipoDRE, setTipoDRE] = useState('gerencial'); // 'gerencial' | 'financeiro'

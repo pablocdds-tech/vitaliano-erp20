@@ -33,7 +33,7 @@ import {
 } from 'lucide-react';
 import { format, startOfMonth, endOfMonth } from 'date-fns';
 
-export default function Movimentacoes() {
+function Movimentacoes() {
   const [lojaFiltro, setLojaFiltro] = useState('all');
   const [tipoFiltro, setTipoFiltro] = useState('all');
   const [dataInicio, setDataInicio] = useState(format(startOfMonth(new Date()), 'yyyy-MM-dd'));

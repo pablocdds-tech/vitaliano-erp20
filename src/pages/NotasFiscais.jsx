@@ -181,7 +181,7 @@ function ItemRow({ item, idx, produtos, onUpdate, onRemove, onAddProduto }) {
   );
 }
 
-export default function NotasFiscais() {
+function NotasFiscais() {
   const queryClient = useQueryClient();
   const [modalOpen, setModalOpen] = useState(false);
   const [viewModal, setViewModal] = useState(null);
