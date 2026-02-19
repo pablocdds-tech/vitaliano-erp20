@@ -75,6 +75,18 @@ export default function Categorias() {
     }
   });
 
+  const handleBulkDelete = async (ids) => {
+    if (!window.confirm(`Deseja excluir ${ids.length} categoria(s) selecionada(s)?`)) return;
+    for (const id of ids) await base44.entities.Categoria.delete(id);
+    queryClient.invalidateQueries({ queryKey: ['categorias'] });
+    toast.success(`${ids.length} categoria(s) excluída(s)!`);
+  };
+
+  const categoriasFiltradas = useMemo(() => {
+    if (!filtroStatus) return categorias;
+    return categorias.filter(c => c.status === filtroStatus);
+  }, [categorias, filtroStatus]);
+
   const resetForm = () => {
     setFormData({ nome: '', codigo: '', tipo: 'insumo', cor: '#3b82f6', status: 'ativo' });
     setEditingItem(null);
