@@ -155,7 +155,7 @@ export default function Estoque() {
         const abaixoMin = produto && value <= (produto.estoque_minimo || 0);
         return (
           <div>
-            <span className={`font-medium ${abaixoMin ? 'text-red-600' : 'text-slate-800 dark:text-white'}`}>
+            <span className={`font-medium ${abaixoMin ? 'text-red-600' : row._virtual ? 'text-slate-400' : 'text-slate-800 dark:text-white'}`}>
               {value || 0} {produto?.unidade_medida || 'un'}
             </span>
             {produto?.estoque_minimo > 0 && (
@@ -276,7 +276,7 @@ export default function Estoque() {
           </DialogHeader>
           
           {viewModal && (() => {
-            const produto = getProduto(viewModal.produto_id);
+            const produto = viewModal._produto || produtos.find(p => p.id === viewModal.produto_id);
             const loja = getLoja(viewModal.loja_id);
             const categoria = getCategoria(produto?.categoria_id);
             
