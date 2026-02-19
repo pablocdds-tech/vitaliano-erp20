@@ -294,11 +294,38 @@ export default function Produtos() {
       ) : (
         <DataTable
           columns={columns}
-          data={produtos}
+          data={produtosFiltrados}
           loading={isLoading}
           searchPlaceholder="Buscar produtos..."
           emptyIcon={Package}
           emptyTitle="Nenhum produto encontrado"
+          onBulkDelete={handleBulkDelete}
+          filterBar={
+            <div className="flex gap-2 flex-wrap">
+              <Select value={filtroCategoria} onValueChange={setFiltroCategoria}>
+                <SelectTrigger className="h-9 w-40 text-xs">
+                  <SelectValue placeholder="Categoria" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={null}>Todas categorias</SelectItem>
+                  {categorias.map(c => (
+                    <SelectItem key={c.id} value={c.id}>{c.nome}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select value={filtroStatus} onValueChange={setFiltroStatus}>
+                <SelectTrigger className="h-9 w-32 text-xs">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={null}>Todos status</SelectItem>
+                  <SelectItem value="ativo">Ativo</SelectItem>
+                  <SelectItem value="inativo">Inativo</SelectItem>
+                  <SelectItem value="descontinuado">Descontinuado</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          }
           rowActions={(row) => [
             { label: 'Editar', icon: Pencil, onClick: () => handleEdit(row) },
             { label: 'Excluir', icon: Trash2, onClick: () => deleteMutation.mutate(row.id), destructive: true }
