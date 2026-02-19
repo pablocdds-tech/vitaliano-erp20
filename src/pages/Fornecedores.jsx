@@ -178,10 +178,30 @@ export default function Fornecedores() {
       {fornecedores.length === 0 && !isLoading ? (
         <EmptyState icon={Truck} title="Nenhum fornecedor" description="Cadastre seus fornecedores." actionLabel="Criar" onAction={() => setModalOpen(true)} />
       ) : (
-        <DataTable columns={columns} data={fornecedores} loading={isLoading} searchPlaceholder="Buscar..." rowActions={(row) => [
-          { label: 'Editar', icon: Pencil, onClick: () => handleEdit(row) },
-          { label: 'Excluir', icon: Trash2, onClick: () => deleteMutation.mutate(row.id), destructive: true }
-        ]} />
+        <DataTable
+          columns={columns}
+          data={fornecedoresFiltrados}
+          loading={isLoading}
+          searchPlaceholder="Buscar..."
+          onBulkDelete={handleBulkDelete}
+          filterBar={
+            <Select value={filtroStatus} onValueChange={setFiltroStatus}>
+              <SelectTrigger className="h-9 w-36 text-xs">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={null}>Todos status</SelectItem>
+                <SelectItem value="ativo">Ativo</SelectItem>
+                <SelectItem value="inativo">Inativo</SelectItem>
+                <SelectItem value="bloqueado">Bloqueado</SelectItem>
+              </SelectContent>
+            </Select>
+          }
+          rowActions={(row) => [
+            { label: 'Editar', icon: Pencil, onClick: () => handleEdit(row) },
+            { label: 'Excluir', icon: Trash2, onClick: () => deleteMutation.mutate(row.id), destructive: true }
+          ]}
+        />
       )}
 
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
