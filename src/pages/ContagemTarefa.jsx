@@ -8,13 +8,18 @@ import { toast } from 'sonner';
 import { format } from 'date-fns';
 
 export default function ContagemTarefa() {
-  // HashRouter: URL é /#/ContagemTarefa?token=xxx
-  // window.location.hash = "#/ContagemTarefa?token=xxx"
-  const hashPart = window.location.hash; // "#/ContagemTarefa?token=xxx"
-  const hashQuery = hashPart.includes('?') ? hashPart.split('?')[1] : '';
-  // Fallback para window.location.search caso não seja hash router
-  const params = new URLSearchParams(hashQuery || window.location.search);
-  const token = params.get('token');
+  // Suporta HashRouter (#/ContagemTarefa?token=xxx) e path direto (/ContagemTarefa?token=xxx)
+  const getToken = () => {
+    // Tenta hash primeiro
+    const hash = window.location.hash;
+    if (hash.includes('?')) {
+      const p = new URLSearchParams(hash.split('?')[1]);
+      if (p.get('token')) return p.get('token');
+    }
+    // Fallback: search string normal
+    return new URLSearchParams(window.location.search).get('token');
+  };
+  const token = getToken();
 
   const [tarefa, setTarefa] = useState(null);
   const [contagem, setContagem] = useState(null);
