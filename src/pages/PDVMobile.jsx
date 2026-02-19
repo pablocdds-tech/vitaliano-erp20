@@ -147,8 +147,20 @@ export default function PDVMobile() {
     if (!cd) { toast.error('Nenhum CD cadastrado.'); return; }
     if (itens.length === 0) { toast.error('Adicione pelo menos um item.'); return; }
 
+    // Captura dados ANTES de qualquer await para uso posterior
+    const itensCapturados = [...itens];
+    const totalCapturado = totalPedido;
+    const lojaDestinoCapturada = lojaDestino;
+    const lojaDestinoIdCapturado = lojaDestinoId;
+
     confirmandoRef.current = true;
     setConfirmando(true);
+
+    // Limpa carrinho IMEDIATAMENTE para feedback visual instantâneo
+    setItens([]);
+    setLojaDestinoId('');
+    setBusca('');
+
     try {
       const empresa = await getEmpresaAtiva();
       const user = await base44.auth.me().catch(() => null);
