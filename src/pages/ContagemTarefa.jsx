@@ -76,9 +76,19 @@ export default function ContagemTarefa() {
       const itensPreenchidos = itens.filter(i => i.quantidade_contada !== '' && i.quantidade_contada !== null);
       const novoStatus = finalizar ? 'finalizado' : 'em_andamento';
 
+      // Busca quantidade_sistema original do banco (não enviamos para o funcionário no state)
+      const tarefaAtual = await base44.entities.TarefaContagem.filter({ id: tarefa.id });
+      const itensOriginais = tarefaAtual[0]?.itens || [];
+      const sistemaMap = {};
+      itensOriginais.forEach(i => { if (i.produto_id) sistemaMap[i.produto_id] = i.quantidade_sistema; });
+
       await base44.entities.TarefaContagem.update(tarefa.id, {
         itens: itens.map(i => ({
-          ...i,
+          produto_id: i.produto_id,
+          produto_nome: i.produto_nome,
+          unidade_medida: i.unidade_medida,
+          observacao: i.observacao || '',
+          quantidade_sistema: sistemaMap[i.produto_id] ?? null,
           quantidade_contada: i.quantidade_contada === '' ? null : parseFloat(i.quantidade_contada),
         })),
         itens_preenchidos: itensPreenchidos.length,
@@ -89,26 +99,23 @@ export default function ContagemTarefa() {
       // Atualiza status da Contagem pai
       if (tarefa.contagem_id) {
         if (finalizar) {
-          // Verifica se todas as tarefas da contagem estão finalizadas
           const todasTarefas = await base44.entities.TarefaContagem.filter({ contagem_id: tarefa.contagem_id });
           const todasFinalizadas = todasTarefas.every(t => t.id === tarefa.id ? true : t.status === 'finalizado');
           await base44.entities.Contagem.update(tarefa.contagem_id, {
             status: todasFinalizadas ? 'aguardando_conferencia' : 'em_contagem',
-            itens_contados: itensPreenchidos.length,
           });
         } else {
-          // Só muda para em_contagem se ainda estava aberta
           const contagemAtual = await base44.entities.Contagem.filter({ id: tarefa.contagem_id });
-          if (contagemAtual[0] && contagemAtual[0].status === 'aberta') {
+          if (contagemAtual[0] && ['aberta', 'pendente'].includes(contagemAtual[0].status)) {
             await base44.entities.Contagem.update(tarefa.contagem_id, { status: 'em_contagem' });
           }
         }
       }
 
       if (finalizar) setFinalizado(true);
-      else toast.success('Rascunho salvo!');
+      else toast.success('Progresso salvo!');
     },
-    onError: e => toast.error('Erro: ' + e.message),
+    onError: e => toast.error('Erro ao salvar: ' + e.message),
   });
 
   if (loading) return (
