@@ -60,22 +60,36 @@ export default function PedidosInternos() {
   });
 
   const confirmarMutation = useMutation({
-    mutationFn: async (pedido) => {
-      // Buscar dados completos do pedido (com itens) direto da API
-      const pedidoCompleto = await base44.entities.PedidoInterno.filter({ id: pedido.id });
-      const dadosPedido = pedidoCompleto[0] || pedido;
+    mutationFn: async (pedidoId) => {
+      console.log('[CONFIRMAR_CLICK]', { pedidoId });
+      toast.loading('Confirmando pedido…', { id: 'confirmar' });
+
+      // Busca pedido completo com itens
+      const lista = await base44.entities.PedidoInterno.filter({ id: pedidoId });
+      const pedidoCompleto = lista[0];
+      if (!pedidoCompleto) throw new Error('Pedido não encontrado.');
+      if (!pedidoCompleto.itens || pedidoCompleto.itens.length === 0) throw new Error('Pedido sem itens — não é possível confirmar.');
+      if (pedidoCompleto.status !== 'draft') throw new Error(`Pedido já está com status: ${pedidoCompleto.status}`);
+
+      console.log('[CONFIRMAR_BEFORE_API]', { itensCount: pedidoCompleto.itens.length, valor: pedidoCompleto.valor_total });
+
       const user = await base44.auth.me();
-      return confirmarPedidoInterno(dadosPedido, lojas, user);
+      return confirmarPedidoInterno(pedidoCompleto, lojas, user);
     },
-    onSuccess: () => {
+    onSuccess: (result) => {
+      console.log('[CONFIRMAR_SUCCESS]', result);
+      toast.success('Pedido confirmado! Estoque e banco virtual atualizados.', { id: 'confirmar' });
       queryClient.invalidateQueries({ queryKey: ['pedidos-internos'] });
       queryClient.invalidateQueries({ queryKey: ['lojas'] });
       queryClient.invalidateQueries({ queryKey: ['banco-virtual'] });
       queryClient.invalidateQueries({ queryKey: ['movimentacoes-estoque'] });
-      toast.success('Pedido confirmado! Estoque e banco virtual atualizados.');
+      // Atualiza local imediatamente sem esperar refetch
       setPedidoDetalhe(prev => prev ? { ...prev, status: 'confirmado' } : prev);
     },
-    onError: (e) => toast.error(e.message || 'Erro ao confirmar pedido'),
+    onError: (e) => {
+      console.error('[CONFIRMAR_ERROR]', e);
+      toast.error(e.message || 'Erro ao confirmar pedido', { id: 'confirmar' });
+    },
   });
 
   const cancelarMutation = useMutation({
