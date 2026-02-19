@@ -277,8 +277,19 @@ export default function NotasFiscais() {
   };
 
   const handleLancar = async (nota) => {
+    // Idempotência: impede duplo clique e relançamento de nota já lançada
+    if (lancandoId === nota.id) return;
+    if (nota.status === 'lancada') {
+      toast.error('Esta nota já foi lançada.');
+      return;
+    }
+
+    setLancandoId(nota.id);
     try {
       const empresa = await getEmpresaAtiva();
+
+      // Marca como lançada PRIMEIRO (lock) — se falhar aqui, nota permanece no estado anterior (seguro para retry)
+      // Se falhar DEPOIS, a nota fica 'lancada' mas estoque/CP podem estar incompletos (admin precisa verificar)
       await updateMutation.mutateAsync({ id: nota.id, data: { status: 'lancada' } });
 
       if (nota.itens?.length > 0) {
@@ -304,9 +315,12 @@ export default function NotasFiscais() {
         nota,
       });
 
+      queryClient.invalidateQueries({ queryKey: ['notas-fiscais'] });
       toast.success('Nota lançada! Estoque e conta a pagar atualizados.');
     } catch (err) {
       toast.error('Erro ao lançar: ' + err.message);
+    } finally {
+      setLancandoId(null);
     }
   };
 
