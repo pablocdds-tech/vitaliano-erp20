@@ -9,25 +9,42 @@ import { Upload, Download, CheckCircle2, Loader2, AlertTriangle } from 'lucide-r
 import { toast } from 'sonner';
 
 // ─── CSV Parser básico ──────────────────────────────────────────────────────
+function detectSeparator(firstLine) {
+  const semicolons = (firstLine.match(/;/g) || []).length;
+  const commas = (firstLine.match(/,/g) || []).length;
+  const tabs = (firstLine.match(/\t/g) || []).length;
+  if (tabs >= semicolons && tabs >= commas) return '\t';
+  if (semicolons >= commas) return ';';
+  return ',';
+}
+
+function splitLine(line, sep) {
+  const values = [];
+  let current = '';
+  let inQuote = false;
+  for (const char of line) {
+    if (char === '"') { inQuote = !inQuote; }
+    else if (char === sep && !inQuote) { values.push(current.trim().replace(/^"|"$/g, '')); current = ''; }
+    else { current += char; }
+  }
+  values.push(current.trim().replace(/^"|"$/g, ''));
+  return values;
+}
+
 function parseCSV(text) {
-  const lines = text.trim().split(/\r?\n/).filter(Boolean);
-  if (lines.length < 2) return { headers: [], rows: [] };
-  const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+  // Remove BOM if present
+  const cleaned = text.replace(/^\uFEFF/, '').trim();
+  const lines = cleaned.split(/\r?\n/).filter(Boolean);
+  if (lines.length < 2) return { headers: [], rows: [], separator: ',' };
+  const sep = detectSeparator(lines[0]);
+  const headers = splitLine(lines[0], sep);
   const rows = lines.slice(1).map(line => {
-    const values = [];
-    let current = '';
-    let inQuote = false;
-    for (const char of line) {
-      if (char === '"') { inQuote = !inQuote; }
-      else if (char === ',' && !inQuote) { values.push(current.trim()); current = ''; }
-      else { current += char; }
-    }
-    values.push(current.trim());
+    const values = splitLine(line, sep);
     const row = {};
-    headers.forEach((h, i) => { row[h] = (values[i] || '').replace(/^"|"$/g, ''); });
+    headers.forEach((h, i) => { row[h] = values[i] || ''; });
     return row;
   });
-  return { headers, rows };
+  return { headers, rows, separator: sep };
 }
 
 // ─── Configs por entidade ────────────────────────────────────────────────────
