@@ -3,6 +3,8 @@ import { Link, useLocation } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { cn } from '@/lib/utils';
 import Logo from '../ui-custom/Logo';
+import usePermissoes from '@/components/rbac/usePermissoes';
+import { podeVer, PAGE_TO_MODULE } from '@/components/services/permissaoService';
 import {
   LayoutDashboard,
   Building2,
