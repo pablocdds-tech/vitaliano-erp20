@@ -12,9 +12,10 @@ import { getEmpresaAtiva } from '@/components/services/tenantService';
 import { formatMoney } from '@/components/ui-custom/MoneyDisplay';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import ImprimirPedidoModal from '@/components/pdv/ImprimirPedidoModal';
 import {
   Store, Search, Plus, Minus, Trash2, CheckCircle2,
-  ChevronDown, Package, ShoppingBag, ArrowLeft, Loader2
+  ChevronDown, Package, ShoppingBag, ArrowLeft, Loader2, Printer
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
