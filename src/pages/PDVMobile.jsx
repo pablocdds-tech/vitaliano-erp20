@@ -170,16 +170,16 @@ export default function PDVMobile() {
       const pedidoRascunho = await base44.entities.PedidoInterno.create({
         empresa_id: empresa.id,
         cd_id: cd.id,
-        loja_destino_id: lojaDestinoId,
+        loja_destino_id: lojaDestinoIdCapturado,
         data: hoje,
-        itens,
-        total_itens: itens.length,
-        valor_total: totalPedido,
+        itens: itensCapturados,
+        total_itens: itensCapturados.length,
+        valor_total: totalCapturado,
         status: 'draft',
       });
 
       // Confirma imediatamente (reutiliza serviço B12 — idempotente por status)
-      const pedidoConfirmado = await confirmarPedidoInterno(pedidoRascunho, lojas, user);
+      await confirmarPedidoInterno(pedidoRascunho, lojas, user);
 
       // Invalida caches
       qc.invalidateQueries({ queryKey: ['pedidos-internos'] });
@@ -187,19 +187,10 @@ export default function PDVMobile() {
       qc.invalidateQueries({ queryKey: ['banco-virtual'] });
       qc.invalidateQueries({ queryKey: ['movimentacoes-estoque'] });
 
-      // Captura dados para sucesso/impressão ANTES de limpar state
-      const itensCapturados = [...itens];
-      const totalCapturado = totalPedido;
-
-      // Limpa carrinho imediatamente
-      setItens([]);
-      setLojaDestinoId('');
-      setBusca('');
-
       setSucesso({
         id: pedidoRascunho.id,
-        loja: lojaDestino?.nome,
-        lojaDestino: lojaDestino?.nome,
+        loja: lojaDestinoCapturada?.nome,
+        lojaDestino: lojaDestinoCapturada?.nome,
         cd: cd?.nome,
         total: totalCapturado,
         itens: itensCapturados.length,
