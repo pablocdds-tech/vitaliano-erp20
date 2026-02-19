@@ -1,5 +1,4 @@
 import React, { useState, useMemo } from 'react';
-import withPermissao from '@/components/rbac/withPermissao';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import PageHeader from '@/components/ui-custom/PageHeader';
@@ -29,7 +28,7 @@ import { Landmark, Plus, Pencil, Trash2, TrendingDown, AlertCircle } from 'lucid
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 
-function BancoVirtual() {
+export default function BancoVirtual() {
   const queryClient = useQueryClient();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
@@ -320,5 +319,3 @@ function BancoVirtual() {
     </div>
   );
 }
-
-export default withPermissao(BancoVirtual, 'banco_virtual');

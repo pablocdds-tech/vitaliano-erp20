@@ -22,16 +22,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Users, Plus, Pencil, Shield } from 'lucide-react';
+import { Users, Plus, Mail, Pencil, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
-import PermissoesModal from '@/components/rbac/PermissoesModal';
 
 export default function Usuarios() {
   const queryClient = useQueryClient();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
-  const [permissoesModalOpen, setPermissoesModalOpen] = useState(false);
-  const [usuarioPermissoes, setUsuarioPermissoes] = useState(null);
   const [formData, setFormData] = useState({
     email: '',
     role: 'user'
@@ -135,8 +132,7 @@ export default function Usuarios() {
         <EmptyState icon={Users} title="Nenhum usuário" description="Convide usuários para acessar." actionLabel="Convidar" onAction={() => setModalOpen(true)} />
       ) : (
         <DataTable columns={columns} data={usuarios} loading={isLoading} searchPlaceholder="Buscar..." rowActions={(row) => [
-          { label: 'Editar', icon: Pencil, onClick: () => handleEdit(row) },
-          { label: 'Permissões', icon: Shield, onClick: () => { setUsuarioPermissoes(row); setPermissoesModalOpen(true); } },
+          { label: 'Editar', icon: Pencil, onClick: () => handleEdit(row) }
         ]} />
       )}
 
@@ -176,12 +172,6 @@ export default function Usuarios() {
           </form>
         </DialogContent>
       </Dialog>
-
-      <PermissoesModal
-        open={permissoesModalOpen}
-        onClose={() => setPermissoesModalOpen(false)}
-        usuario={usuarioPermissoes}
-      />
     </div>
   );
 }

@@ -1,5 +1,4 @@
 import React, { useState, useMemo } from 'react';
-import withPermissao from '@/components/rbac/withPermissao';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import PageHeader from '@/components/ui-custom/PageHeader';
@@ -25,7 +24,7 @@ const RELATORIOS = [
   { value: 'lojas', label: 'Resultado por Loja', icon: Store, cor: 'indigo' },
 ];
 
-function Relatorios() {
+export default function Relatorios() {
   const [relatorio, setRelatorio] = useState('cmv');
   const [mesSelecionado, setMesSelecionado] = useState(MESES[0].value);
   const [lojaFiltro, setLojaFiltro] = useState('all');
@@ -158,5 +157,3 @@ function Relatorios() {
     </div>
   );
 }
-
-export default withPermissao(Relatorios, 'relatorios');

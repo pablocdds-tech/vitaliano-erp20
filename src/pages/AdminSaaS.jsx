@@ -4,7 +4,6 @@
  * Lista empresas, planos, status e ações de gestão.
  */
 import React, { useState } from 'react';
-import withPermissao from '@/components/rbac/withPermissao';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import PageHeader from '@/components/ui-custom/PageHeader';
@@ -30,7 +29,7 @@ const STATUS_STYLE = {
   bloqueada: 'bg-red-100 text-red-700',
 };
 
-function AdminSaaS() {
+export default function AdminSaaS() {
   const qc = useQueryClient();
   const [modalEmpresa, setModalEmpresa] = useState(null); // empresa selecionada para ações
   const [acaoAtual, setAcaoAtual] = useState(''); // 'plano' | 'bloquear' | 'trial'
@@ -328,5 +327,3 @@ function AdminSaaS() {
     </div>
   );
 }
-
-export default withPermissao(AdminSaaS, 'admin_saas');

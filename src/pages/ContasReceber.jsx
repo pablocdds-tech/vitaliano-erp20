@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import withPermissao from '@/components/rbac/withPermissao';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import PageHeader from '@/components/ui-custom/PageHeader';
@@ -32,7 +31,7 @@ import RegistrarRecebimentoModal from '@/components/contas/RegistrarRecebimentoM
 import KPICard from '@/components/ui-custom/KPICard';
 import { formatMoney } from '@/components/ui-custom/MoneyDisplay';
 
-function ContasReceber() {
+export default function ContasReceber() {
   const queryClient = useQueryClient();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
@@ -331,5 +330,3 @@ function ContasReceber() {
     </div>
   );
 }
-
-export default withPermissao(ContasReceber, 'contas_receber');

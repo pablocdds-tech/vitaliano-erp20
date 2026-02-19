@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import withPermissao from '@/components/rbac/withPermissao';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import PageHeader from '@/components/ui-custom/PageHeader';
@@ -24,7 +23,7 @@ import {
 import { Boxes, Package, AlertTriangle, TrendingDown, TrendingUp, Tags, Store } from 'lucide-react';
 import { format } from 'date-fns';
 
-function Estoque() {
+export default function Estoque() {
   const [lojaFiltro, setLojaFiltro] = useState('all');
   const [categoriaFiltro, setCategoriaFiltro] = useState('all');
   const [viewModal, setViewModal] = useState(null);
@@ -348,5 +347,3 @@ function Estoque() {
     </div>
   );
 }
-
-export default withPermissao(Estoque, 'estoque');

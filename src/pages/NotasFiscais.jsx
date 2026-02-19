@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import withPermissao from '@/components/rbac/withPermissao';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import PageHeader from '@/components/ui-custom/PageHeader';
@@ -182,7 +181,7 @@ function ItemRow({ item, idx, produtos, onUpdate, onRemove, onAddProduto }) {
   );
 }
 
-function NotasFiscais() {
+export default function NotasFiscais() {
   const queryClient = useQueryClient();
   const [modalOpen, setModalOpen] = useState(false);
   const [viewModal, setViewModal] = useState(null);
@@ -682,5 +681,3 @@ function NotasFiscais() {
     </div>
   );
 }
-
-export default withPermissao(NotasFiscais, 'notas_fiscais');

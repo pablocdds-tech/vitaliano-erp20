@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import withPermissao from '@/components/rbac/withPermissao';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import PageHeader from '@/components/ui-custom/PageHeader';
@@ -29,7 +28,7 @@ import { toast } from 'sonner';
 import { formatMoney } from '@/components/ui-custom/MoneyDisplay';
 import KPICard from '@/components/ui-custom/KPICard';
 
-function ContasBancarias() {
+export default function ContasBancarias() {
   const queryClient = useQueryClient();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
@@ -248,5 +247,3 @@ function ContasBancarias() {
     </div>
   );
 }
-
-export default withPermissao(ContasBancarias, 'bancos');

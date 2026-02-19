@@ -1,5 +1,4 @@
 import React, { useState, useMemo } from 'react';
-import withPermissao from '@/components/rbac/withPermissao';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import PageHeader from '@/components/ui-custom/PageHeader';
@@ -32,7 +31,7 @@ function KPI({ title, value, sub, icon: Icon, cor }) {
   );
 }
 
-function DRE() {
+export default function DRE() {
   const [mesSelecionado, setMesSelecionado] = useState(MESES[0].value);
   const [lojaFiltro, setLojaFiltro] = useState('all');
   const [tipoDRE, setTipoDRE] = useState('gerencial'); // 'gerencial' | 'financeiro'
@@ -226,5 +225,3 @@ function DRE() {
     </div>
   );
 }
-
-export default withPermissao(DRE, 'dre');

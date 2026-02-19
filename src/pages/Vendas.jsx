@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import withPermissao from '@/components/rbac/withPermissao';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import PageHeader from '@/components/ui-custom/PageHeader';
@@ -16,7 +15,7 @@ import { TrendingUp, Plus, DollarSign, Receipt, CreditCard, Eye, Trash2, Setting
 import { format, startOfMonth, endOfMonth } from 'date-fns';
 import { toast } from 'sonner';
 
-function Vendas() {
+export default function Vendas() {
   const qc = useQueryClient();
   const [novoOpen, setNovoOpen] = useState(false);
   const [verFechamento, setVerFechamento] = useState(null);
@@ -170,5 +169,3 @@ function Vendas() {
     </div>
   );
 }
-
-export default withPermissao(Vendas, 'vendas');

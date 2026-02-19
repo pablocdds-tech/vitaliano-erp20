@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import withPermissao from '@/components/rbac/withPermissao';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import PageHeader from '@/components/ui-custom/PageHeader';
@@ -34,7 +33,7 @@ import {
 } from 'lucide-react';
 import { format, startOfMonth, endOfMonth } from 'date-fns';
 
-function Movimentacoes() {
+export default function Movimentacoes() {
   const [lojaFiltro, setLojaFiltro] = useState('all');
   const [tipoFiltro, setTipoFiltro] = useState('all');
   const [dataInicio, setDataInicio] = useState(format(startOfMonth(new Date()), 'yyyy-MM-dd'));
@@ -355,5 +354,3 @@ function Movimentacoes() {
     </div>
   );
 }
-
-export default withPermissao(Movimentacoes, 'movimentacoes');

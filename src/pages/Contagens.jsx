@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import withPermissao from '@/components/rbac/withPermissao';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import PageHeader from '@/components/ui-custom/PageHeader';
@@ -222,7 +221,7 @@ function ContagemDetail({ contagem, onClose }) {
   );
 }
 
-function Contagens() {
+export default function Contagens() {
   const [selectedContagem, setSelectedContagem] = useState(null);
 
   // Abrir contagem via querystring (vindo de TemplatesContagem)
@@ -309,5 +308,3 @@ function Contagens() {
     </div>
   );
 }
-
-export default withPermissao(Contagens, 'contagens');
