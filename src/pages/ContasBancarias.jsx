@@ -247,3 +247,7 @@ export default function ContasBancarias() {
     </div>
   );
 }
+
+import withPermissao from '@/components/rbac/withPermissao';
+const ContasBancariasProtegida = withPermissao(ContasBancarias, 'bancos');
+export { ContasBancariasProtegida as default };

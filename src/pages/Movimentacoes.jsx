@@ -354,3 +354,7 @@ export default function Movimentacoes() {
     </div>
   );
 }
+
+import withPermissao from '@/components/rbac/withPermissao';
+const MovimentacoesProtegida = withPermissao(Movimentacoes, 'movimentacoes');
+export { MovimentacoesProtegida as default };

@@ -225,3 +225,7 @@ export default function DRE() {
     </div>
   );
 }
+
+import withPermissao from '@/components/rbac/withPermissao';
+const DREProtegido = withPermissao(DRE, 'dre');
+export { DREProtegido as default };

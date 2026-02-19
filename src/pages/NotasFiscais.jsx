@@ -681,3 +681,7 @@ export default function NotasFiscais() {
     </div>
   );
 }
+
+import withPermissao from '@/components/rbac/withPermissao';
+const NotasFiscaisProtegida = withPermissao(NotasFiscais, 'notas_fiscais');
+export { NotasFiscaisProtegida as default };

@@ -157,3 +157,7 @@ export default function Relatorios() {
     </div>
   );
 }
+
+import withPermissao from '@/components/rbac/withPermissao';
+const RelatoriosProtegido = withPermissao(Relatorios, 'relatorios');
+export { RelatoriosProtegido as default };
