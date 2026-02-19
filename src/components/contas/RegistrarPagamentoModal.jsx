@@ -179,6 +179,7 @@ export default function RegistrarPagamentoModal({ open, onClose, conta, contasBa
       queryClient.invalidateQueries({ queryKey: ['contas-pagar'] });
       queryClient.invalidateQueries({ queryKey: ['banco-virtual'] });
       queryClient.invalidateQueries({ queryKey: ['lojas'] });
+      queryClient.invalidateQueries({ queryKey: ['transacoes-bancarias'] });
       toast.success(isQuitado ? 'Conta quitada com sucesso!' : 'Pagamento parcial registrado!');
       onClose();
     },
