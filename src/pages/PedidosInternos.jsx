@@ -156,8 +156,10 @@ export default function PedidosInternos() {
     }
   ];
 
+  // pedidoAtivo: prioriza o estado local (pedidoDetalhe) para refletir mudanças imediatas
+  // mas merge com dados da lista (sem sobrescrever itens, que só existem no detalhe)
   const pedidoAtivo = pedidoDetalhe
-    ? (pedidos.find(p => p.id === pedidoDetalhe.id) || pedidoDetalhe)
+    ? { ...(pedidos.find(p => p.id === pedidoDetalhe.id) || {}), ...pedidoDetalhe }
     : null;
 
   return (
