@@ -231,9 +231,19 @@ export default function Produtos() {
     },
     {
       key: 'custo_medio',
-      label: 'Custo Médio',
+      label: 'Custo Médio (30d)',
       sortable: true,
-      render: (value) => <MoneyDisplay value={value || 0} size="sm" />
+      render: (value, row) => {
+        const c30 = custoMedio30d[row.id];
+        return (
+          <div>
+            <MoneyDisplay value={c30 ?? value ?? 0} size="sm" />
+            {c30 !== undefined && (
+              <p className="text-xs text-slate-400">30d</p>
+            )}
+          </div>
+        );
+      }
     },
     {
       key: 'estoque_minimo',
