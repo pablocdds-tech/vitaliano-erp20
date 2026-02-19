@@ -320,7 +320,12 @@ export default function NotasFiscais() {
         empresa_id: empresa.id,
         loja_id: nota.loja_id,
         fornecedor_id: nota.fornecedor_id,
-        nota,
+        nota: {
+          ...nota,
+          // Repassa campos de parcelamento que podem ter sido salvos no formData
+          num_parcelas: nota.num_parcelas || 1,
+          primeiro_vencimento: nota.primeiro_vencimento || nota.data_entrada || nota.data_emissao,
+        },
       });
 
       queryClient.invalidateQueries({ queryKey: ['notas-fiscais'] });
