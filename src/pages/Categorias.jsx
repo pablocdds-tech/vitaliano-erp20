@@ -164,10 +164,29 @@ export default function Categorias() {
       {categorias.length === 0 && !isLoading ? (
         <EmptyState icon={Tags} title="Nenhuma categoria" description="Crie suas categorias." actionLabel="Criar" onAction={() => setModalOpen(true)} />
       ) : (
-        <DataTable columns={columns} data={categorias} loading={isLoading} searchPlaceholder="Buscar..." rowActions={(row) => [
-          { label: 'Editar', icon: Pencil, onClick: () => handleEdit(row) },
-          { label: 'Excluir', icon: Trash2, onClick: () => deleteMutation.mutate(row.id), destructive: true }
-        ]} />
+        <DataTable
+          columns={columns}
+          data={categoriasFiltradas}
+          loading={isLoading}
+          searchPlaceholder="Buscar..."
+          onBulkDelete={handleBulkDelete}
+          filterBar={
+            <Select value={filtroStatus} onValueChange={setFiltroStatus}>
+              <SelectTrigger className="h-9 w-32 text-xs">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={null}>Todos</SelectItem>
+                <SelectItem value="ativo">Ativo</SelectItem>
+                <SelectItem value="inativo">Inativo</SelectItem>
+              </SelectContent>
+            </Select>
+          }
+          rowActions={(row) => [
+            { label: 'Editar', icon: Pencil, onClick: () => handleEdit(row) },
+            { label: 'Excluir', icon: Trash2, onClick: () => deleteMutation.mutate(row.id), destructive: true }
+          ]}
+        />
       )}
 
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
