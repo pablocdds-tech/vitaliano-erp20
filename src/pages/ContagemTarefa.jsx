@@ -8,8 +8,9 @@ import { toast } from 'sonner';
 import { format } from 'date-fns';
 
 export default function ContagemTarefa() {
-  const hashSearch = window.location.hash.includes('?') ? window.location.hash.split('?')[1] : window.location.search;
-  const params = new URLSearchParams(hashSearch);
+  // Suporta tanto /ContagemTarefa?token=xxx (hash router: #/ContagemTarefa?token=xxx) quanto window.location.search
+  const hashSearch = window.location.hash.includes('?') ? window.location.hash.split('?')[1] : '';
+  const params = new URLSearchParams(hashSearch || window.location.search);
   const token = params.get('token');
 
   const [tarefa, setTarefa] = useState(null);
