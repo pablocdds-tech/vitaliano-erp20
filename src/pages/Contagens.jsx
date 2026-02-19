@@ -83,6 +83,10 @@ function ContagemDetail({ contagem, onClose }) {
     toast.success('Link copiado!');
   };
 
+  const handleOpenLink = (tarefa) => {
+    window.open(getTarefaUrl(tarefa), '_blank');
+  };
+
   const handleWhatsApp = (tarefa) => {
     const url = getTarefaUrl(tarefa);
     const msg = encodeURIComponent(`Olá ${tarefa.responsavel_nome}! Por favor faça a contagem de estoque — ${tarefa.grupo || 'Geral'}\n\nAcesse aqui: ${url}`);
