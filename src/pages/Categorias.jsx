@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import PageHeader from '@/components/ui-custom/PageHeader';
@@ -31,6 +31,7 @@ export default function Categorias() {
   const [modalOpen, setModalOpen] = useState(false);
   const [importarOpen, setImportarOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
+  const [filtroStatus, setFiltroStatus] = useState('');
   const [formData, setFormData] = useState({
     nome: '',
     codigo: '',
