@@ -326,11 +326,15 @@ export default function ContasPagar() {
           searchPlaceholder="Buscar contas..."
           emptyIcon={CreditCard}
           emptyTitle="Nenhuma conta encontrada"
-          rowActions={(row) => [
-            ...(['pendente', 'parcial', 'vencido'].includes(row.status) ? [{ label: 'Registrar Pagamento', icon: BanknoteIcon, onClick: () => setPagamentoModal(row) }] : []),
-            { label: 'Editar', icon: Pencil, onClick: () => handleEdit(row) },
-            { label: 'Excluir', icon: Trash2, onClick: () => deleteMutation.mutate(row.id), destructive: true }
-          ]}
+          rowActions={(row) => {
+            const isVencida = row.status === 'pendente' && row.data_vencimento && isAfter(hoje, new Date(row.data_vencimento + 'T23:59:59'));
+            const podeReceber = ['pendente', 'parcial'].includes(row.status) || isVencida;
+            return [
+              ...(podeReceber ? [{ label: 'Registrar Pagamento', icon: BanknoteIcon, onClick: () => setPagamentoModal(row) }] : []),
+              ...(row.status !== 'pago' ? [{ label: 'Editar', icon: Pencil, onClick: () => handleEdit(row) }] : []),
+              { label: 'Excluir', icon: Trash2, onClick: () => deleteMutation.mutate(row.id), destructive: true }
+            ];
+          }}
         />
       )}
 
