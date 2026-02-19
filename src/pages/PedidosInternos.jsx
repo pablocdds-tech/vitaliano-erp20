@@ -226,7 +226,7 @@ export default function PedidosInternos() {
           rowActions={(row) => {
             const actions = [{ label: 'Ver detalhes', icon: Eye, onClick: () => { setPedidoDetalhe(row); setMostrarCupom(false); } }];
             if (row.status === 'draft') {
-              actions.push({ label: 'Confirmar pedido', icon: CheckCircle2, onClick: () => confirmarMutation.mutate(row) });
+              actions.push({ label: 'Confirmar pedido', icon: CheckCircle2, onClick: () => confirmarMutation.mutate(row.id) });
               actions.push({ label: 'Cancelar', icon: XCircle, onClick: () => cancelarMutation.mutate(row.id), destructive: true });
             }
             if (row.status === 'confirmado') {
