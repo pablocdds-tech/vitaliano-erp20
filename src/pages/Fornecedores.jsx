@@ -32,6 +32,7 @@ export default function Fornecedores() {
   const [modalOpen, setModalOpen] = useState(false);
   const [importarOpen, setImportarOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
+  const [filtroStatus, setFiltroStatus] = useState('');
   const [formData, setFormData] = useState({
     razao_social: '',
     nome_fantasia: '',
