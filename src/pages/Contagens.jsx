@@ -70,8 +70,7 @@ function ContagemDetail({ contagem, onClose }) {
   produtos.forEach(p => { prodMap[p.id] = p; });
 
   const getTarefaUrl = (tarefa) => {
-    const base = `${window.location.origin}${window.location.pathname}`;
-    return `${base}#/ContagemTarefa?token=${tarefa.token}`;
+    return `${window.location.origin}/ContagemTarefa?token=${tarefa.token}`;
   };
 
   const handleCopyLink = (tarefa) => {
