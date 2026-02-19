@@ -70,7 +70,9 @@ function ContagemDetail({ contagem, onClose }) {
   produtos.forEach(p => { prodMap[p.id] = p; });
 
   const getTarefaUrl = (tarefa) => {
-    return `${window.location.origin}/ContagemTarefa?token=${tarefa.token}`;
+    // Base44 usa HashRouter: todas as rotas ficam em /#/NomePagina
+    const base = `${window.location.origin}${window.location.pathname}`;
+    return `${base}#/ContagemTarefa?token=${tarefa.token}`;
   };
 
   const handleCopyLink = (tarefa) => {
