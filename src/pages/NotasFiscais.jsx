@@ -239,7 +239,6 @@ export default function NotasFiscais() {
     mutationFn: ({ id, data }) => base44.entities.NotaFiscal.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notas-fiscais'] });
-      toast.success('Nota fiscal atualizada!');
     },
     onError: (e) => toast.error('Erro: ' + e.message),
   });
