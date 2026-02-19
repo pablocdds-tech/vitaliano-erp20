@@ -113,9 +113,11 @@ export async function aprovarAjusteContagem(contagem, tarefas, empresa_id) {
     }
   }
 
-  // Fecha a contagem
+  // Fecha a contagem (ajustada se havia divergências, aprovada se estava tudo certo)
   await base44.entities.Contagem.update(contagem.id, {
     status: 'ajustada',
     data_fechamento: new Date().toISOString(),
+    aprovado_por: 'admin',
+    aprovado_em: new Date().toISOString(),
   });
 }
