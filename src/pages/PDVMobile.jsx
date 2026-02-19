@@ -31,8 +31,11 @@ export default function PDVMobile() {
   const [busca, setBusca] = useState('');
   const [itens, setItens] = useState([]);          // { produto_id, produto_nome, quantidade, preco_unitario, subtotal }
   const [confirmando, setConfirmando] = useState(false);
-  const [sucesso, setSucesso] = useState(null);    // pedido confirmado
+  const [sucesso, setSucesso] = useState(null);    // pedido confirmado { id, loja, cd, total, itens, itensData }
   const [mostrarLojas, setMostrarLojas] = useState(false);
+  const [modalImprimir, setModalImprimir] = useState(false);
+  // Flag de idempotência: impede criar novo pedido se já há um em confirmação
+  const confirmandoRef = useRef(false);
 
   const { data: lojas = [] } = useQuery({
     queryKey: ['lojas'],
