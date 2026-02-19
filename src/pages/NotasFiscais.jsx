@@ -187,6 +187,7 @@ export default function NotasFiscais() {
   const [viewModal, setViewModal] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [processing, setProcessing] = useState(false);
+  const [lancandoId, setLancandoId] = useState(null); // ID da nota sendo lançada — bloqueia duplo clique
   const [novoProdutoForIdx, setNovoProdutoForIdx] = useState(null); // idx do item que vai receber o novo produto
 
   const emptyForm = {
