@@ -16,8 +16,9 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Truck, Plus, Pencil, Trash2 } from 'lucide-react';
+import { Truck, Plus, Pencil, Trash2, Upload } from 'lucide-react';
 import { toast } from 'sonner';
+import ImportarCSVModal, { IMPORT_CONFIGS } from '@/components/importacao/ImportarCSVModal';
 
 export default function Fornecedores() {
   const queryClient = useQueryClient();

@@ -26,8 +26,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Package, Plus, Pencil, Trash2, Tags, AlertTriangle } from 'lucide-react';
+import { Package, Plus, Pencil, Trash2, Tags, Upload } from 'lucide-react';
 import { toast } from 'sonner';
+import ImportarCSVModal, { IMPORT_CONFIGS } from '@/components/importacao/ImportarCSVModal';
 
 export default function Produtos() {
   const queryClient = useQueryClient();

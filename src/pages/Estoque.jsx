@@ -28,12 +28,12 @@ export default function Estoque() {
   const [categoriaFiltro, setCategoriaFiltro] = useState('all');
   const [viewModal, setViewModal] = useState(null);
 
-  const { data: estoques = [], isLoading } = useQuery({
+  const { data: estoques = [], isLoading: loadingEstoques } = useQuery({
     queryKey: ['estoques'],
     queryFn: () => base44.entities.Estoque.list()
   });
 
-  const { data: produtos = [] } = useQuery({
+  const { data: produtos = [], isLoading: loadingProdutos } = useQuery({
     queryKey: ['produtos'],
     queryFn: () => base44.entities.Produto.list()
   });
@@ -48,23 +48,58 @@ export default function Estoque() {
     queryFn: () => base44.entities.Categoria.list()
   });
 
-  const getProduto = (id) => produtos.find(p => p.id === id);
+  const isLoading = loadingEstoques || loadingProdutos;
+
   const getLoja = (id) => lojas.find(l => l.id === id);
   const getCategoria = (id) => categorias.find(c => c.id === id);
 
+  /**
+   * REGRA: "Mostrar todos os produtos com estoque"
+   * Construímos uma linha por produto por loja onde há registro Estoque.
+   * Produtos sem nenhum registro aparecem na linha "Sem loja" (loja_id=null) com saldo 0.
+   * Isso garante que todo produto cadastrado seja visível.
+   */
+  const linhasEstoque = React.useMemo(() => {
+    const registrosMap = new Map(); // key: produto_id|loja_id
+    estoques.forEach(e => {
+      registrosMap.set(`${e.produto_id}|${e.loja_id}`, e);
+    });
+
+    const linhas = [];
+    produtos.filter(p => p.controla_estoque !== false && p.status === 'ativo').forEach(produto => {
+      const registrosDoProduto = estoques.filter(e => e.produto_id === produto.id);
+      if (registrosDoProduto.length > 0) {
+        registrosDoProduto.forEach(e => linhas.push({ ...e, _produto: produto }));
+      } else {
+        // Produto sem movimentação: aparece com saldo 0
+        linhas.push({
+          id: `virtual_${produto.id}`,
+          produto_id: produto.id,
+          loja_id: null,
+          quantidade: 0,
+          custo_medio: produto.custo_medio || 0,
+          ultima_entrada: null,
+          ultima_saida: null,
+          _produto: produto,
+          _virtual: true,
+        });
+      }
+    });
+    return linhas;
+  }, [produtos, estoques]);
+
   // Filtros
-  const estoquesFiltrados = estoques.filter(e => {
-    const produto = getProduto(e.produto_id);
+  const estoquesFiltrados = linhasEstoque.filter(e => {
     if (lojaFiltro !== 'all' && e.loja_id !== lojaFiltro) return false;
-    if (categoriaFiltro !== 'all' && produto?.categoria_id !== categoriaFiltro) return false;
+    if (categoriaFiltro !== 'all' && e._produto?.categoria_id !== categoriaFiltro) return false;
     return true;
   });
 
   // Cálculos
   const totalItens = estoquesFiltrados.length;
   const abaixoMinimo = estoquesFiltrados.filter(e => {
-    const produto = getProduto(e.produto_id);
-    return produto && e.quantidade <= (produto.estoque_minimo || 0);
+    const produto = e._produto;
+    return produto && e.quantidade <= (produto.estoque_minimo || 0) && e.quantidade >= 0;
   }).length;
   const valorTotal = estoquesFiltrados.reduce((sum, e) => sum + ((e.quantidade || 0) * (e.custo_medio || 0)), 0);
   const zerado = estoquesFiltrados.filter(e => (e.quantidade || 0) === 0).length;

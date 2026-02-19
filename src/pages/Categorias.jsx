@@ -22,8 +22,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Tags, Plus, Pencil, Trash2 } from 'lucide-react';
+import { Tags, Plus, Pencil, Trash2, Upload } from 'lucide-react';
 import { toast } from 'sonner';
+import ImportarCSVModal, { IMPORT_CONFIGS } from '@/components/importacao/ImportarCSVModal';
 
 export default function Categorias() {
   const queryClient = useQueryClient();
