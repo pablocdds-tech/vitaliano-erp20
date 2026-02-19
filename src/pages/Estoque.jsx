@@ -110,22 +110,24 @@ export default function Estoque() {
       label: 'Produto',
       sortable: true,
       render: (value, row) => {
-        const produto = getProduto(value);
+        const produto = row._produto;
         const abaixoMin = produto && row.quantidade <= (produto.estoque_minimo || 0);
         return (
           <div className="flex items-center gap-3">
             <div className={`p-2 rounded-lg ${
-              abaixoMin ? 'bg-red-100 dark:bg-red-900/30' : 'bg-slate-100 dark:bg-slate-800'
+              abaixoMin ? 'bg-red-100 dark:bg-red-900/30' : row._virtual ? 'bg-slate-50 dark:bg-slate-900' : 'bg-slate-100 dark:bg-slate-800'
             }`}>
               {abaixoMin ? (
                 <AlertTriangle className="w-4 h-4 text-red-600" />
               ) : (
-                <Package className="w-4 h-4 text-slate-500" />
+                <Package className={`w-4 h-4 ${row._virtual ? 'text-slate-300' : 'text-slate-500'}`} />
               )}
             </div>
             <div>
-              <p className="font-medium text-slate-800 dark:text-white">{produto?.nome || 'Produto não encontrado'}</p>
-              <p className="text-xs text-slate-500">{produto?.codigo || '-'}</p>
+              <p className={`font-medium ${row._virtual ? 'text-slate-400 dark:text-slate-500' : 'text-slate-800 dark:text-white'}`}>
+                {produto?.nome || 'Produto não encontrado'}
+              </p>
+              <p className="text-xs text-slate-500">{produto?.codigo || '-'}{row._virtual ? ' • sem movimentação' : ''}</p>
             </div>
           </div>
         );
@@ -134,12 +136,12 @@ export default function Estoque() {
     {
       key: 'loja_id',
       label: 'Loja',
-      render: (value) => {
+      render: (value, row) => {
         const loja = getLoja(value);
         return (
           <div className="flex items-center gap-2 text-sm">
             <Store className="w-4 h-4 text-slate-400" />
-            {loja?.nome || '-'}
+            {loja?.nome || <span className="text-slate-400 italic text-xs">Sem loja</span>}
           </div>
         );
       }
@@ -149,7 +151,7 @@ export default function Estoque() {
       label: 'Quantidade',
       sortable: true,
       render: (value, row) => {
-        const produto = getProduto(row.produto_id);
+        const produto = row._produto;
         const abaixoMin = produto && value <= (produto.estoque_minimo || 0);
         return (
           <div>
