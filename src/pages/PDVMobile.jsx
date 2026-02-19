@@ -141,10 +141,13 @@ export default function PDVMobile() {
   const totalItens = itens.reduce((s, i) => s + i.quantidade, 0);
 
   const handleConfirmar = async () => {
+    // Anti-duplo-clique: impede re-submission enquanto estiver confirmando
+    if (confirmandoRef.current) return;
     if (!lojaDestinoId) { toast.error('Selecione a loja destino.'); return; }
     if (!cd) { toast.error('Nenhum CD cadastrado.'); return; }
     if (itens.length === 0) { toast.error('Adicione pelo menos um item.'); return; }
 
+    confirmandoRef.current = true;
     setConfirmando(true);
     try {
       const empresa = await getEmpresaAtiva();
@@ -163,8 +166,8 @@ export default function PDVMobile() {
         status: 'draft',
       });
 
-      // Confirma imediatamente (reutiliza serviço B12)
-      await confirmarPedidoInterno(pedidoRascunho, lojas, user);
+      // Confirma imediatamente (reutiliza serviço B12 — idempotente por status)
+      const pedidoConfirmado = await confirmarPedidoInterno(pedidoRascunho, lojas, user);
 
       // Invalida caches
       qc.invalidateQueries({ queryKey: ['pedidos-internos'] });
@@ -172,16 +175,29 @@ export default function PDVMobile() {
       qc.invalidateQueries({ queryKey: ['banco-virtual'] });
       qc.invalidateQueries({ queryKey: ['movimentacoes-estoque'] });
 
+      // Captura dados para sucesso/impressão ANTES de limpar state
+      const itensCapturados = [...itens];
+      const totalCapturado = totalPedido;
+
+      // Limpa carrinho imediatamente
+      setItens([]);
+      setLojaDestinoId('');
+      setBusca('');
+
       setSucesso({
+        id: pedidoRascunho.id,
         loja: lojaDestino?.nome,
+        lojaDestino: lojaDestino?.nome,
         cd: cd?.nome,
-        total: totalPedido,
-        itens: itens.length,
+        total: totalCapturado,
+        itens: itensCapturados.length,
+        itensData: itensCapturados,
       });
     } catch (e) {
       toast.error(e.message || 'Erro ao confirmar pedido.');
     } finally {
       setConfirmando(false);
+      confirmandoRef.current = false;
     }
   };
 
