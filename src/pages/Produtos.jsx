@@ -64,6 +64,14 @@ export default function Produtos() {
     queryFn: () => base44.entities.Categoria.list()
   });
 
+  // Movimentações dos últimos 30 dias para custo médio real
+  const { data: movimentacoes30d = [] } = useQuery({
+    queryKey: ['movimentacoes-30d'],
+    queryFn: () => base44.entities.MovimentacaoEstoque.filter({
+      tipo: 'entrada'
+    })
+  });
+
   const createMutation = useMutation({
     mutationFn: (data) => base44.entities.Produto.create(data),
     onSuccess: () => {
