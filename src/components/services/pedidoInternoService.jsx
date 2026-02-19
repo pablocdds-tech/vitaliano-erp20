@@ -127,7 +127,7 @@ export async function confirmarPedidoInterno(pedido, lojas, user) {
     executado_em: new Date().toISOString(),
   });
 
-  // 4. Marcar pedido como confirmado
+  // 4. Marcar pedido como confirmado (saindo do lock 'processando')
   return base44.entities.PedidoInterno.update(pedido.id, {
     status: 'confirmado',
     confirmado_por: user?.email || 'sistema',
@@ -135,6 +135,7 @@ export async function confirmarPedidoInterno(pedido, lojas, user) {
     banco_virtual_id: movBanco.id,
   });
 }
+
 
 /**
  * Cancela um pedido (só draft — não desfaz movimentos)
