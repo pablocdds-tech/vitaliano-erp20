@@ -78,6 +78,18 @@ export default function Fornecedores() {
     }
   });
 
+  const handleBulkDelete = async (ids) => {
+    if (!window.confirm(`Deseja excluir ${ids.length} fornecedor(es) selecionado(s)?`)) return;
+    for (const id of ids) await base44.entities.Fornecedor.delete(id);
+    queryClient.invalidateQueries({ queryKey: ['fornecedores'] });
+    toast.success(`${ids.length} fornecedor(es) excluído(s)!`);
+  };
+
+  const fornecedoresFiltrados = useMemo(() => {
+    if (!filtroStatus) return fornecedores;
+    return fornecedores.filter(f => f.status === filtroStatus);
+  }, [fornecedores, filtroStatus]);
+
   const resetForm = () => {
     setFormData({
       razao_social: '',
