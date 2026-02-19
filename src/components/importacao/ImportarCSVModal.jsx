@@ -159,8 +159,16 @@ export default function ImportarCSVModal({ open, onClose, config, extraData = {}
     if (!file) return;
     const reader = new FileReader();
     reader.onload = (ev) => {
-      const { rows: parsed } = parseCSV(ev.target.result);
+      const { rows: parsed, headers, separator } = parseCSV(ev.target.result);
       const validationErrors = [];
+
+      // Warn if header columns don't match expected
+      const expected = config.campos;
+      const missing = expected.filter(c => !headers.includes(c));
+      if (missing.length > 0) {
+        validationErrors.push({ row: 1, msg: `Colunas não encontradas no CSV: ${missing.join(', ')} (separador detectado: "${separator === '\t' ? 'TAB' : separator}")` });
+      }
+
       parsed.forEach((row, idx) => {
         config.obrigatorios.forEach(campo => {
           if (!row[campo]?.trim()) {
@@ -172,6 +180,7 @@ export default function ImportarCSVModal({ open, onClose, config, extraData = {}
       setErros(validationErrors);
       setStep('preview');
     };
+    // Try UTF-8 first; if garbled, user can re-upload with latin1 hint
     reader.readAsText(file, 'UTF-8');
     // reset input so same file can be re-uploaded
     e.target.value = '';
