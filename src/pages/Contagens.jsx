@@ -161,7 +161,7 @@ function ContagemDetail({ contagem, onClose }) {
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {tarefas.map(t => (
-              <TarefaCard key={t.id} tarefa={t} onCopyLink={handleCopyLink} onCopyWhatsApp={handleWhatsApp} />
+              <TarefaCard key={t.id} tarefa={t} onCopyLink={handleCopyLink} onCopyWhatsApp={handleWhatsApp} onOpenLink={handleOpenLink} />
             ))}
           </div>
         </div>
