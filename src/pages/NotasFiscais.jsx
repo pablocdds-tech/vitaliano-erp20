@@ -449,7 +449,12 @@ export default function NotasFiscais() {
           rowActions={(row) => [
             { label: 'Visualizar', icon: Eye, onClick: () => setViewModal(row) },
             ...(row.status === 'pendente' ? [{ label: 'Conferir', icon: CheckCircle2, onClick: () => handleConferir(row) }] : []),
-            ...(row.status === 'conferida' ? [{ label: 'Lançar no Sistema', icon: CheckCircle2, onClick: () => handleLancar(row) }] : []),
+            ...(row.status === 'conferida' ? [{
+              label: lancandoId === row.id ? 'Lançando...' : 'Lançar no Sistema',
+              icon: lancandoId === row.id ? Loader2 : CheckCircle2,
+              onClick: () => lancandoId === row.id ? null : handleLancar(row),
+              disabled: lancandoId === row.id,
+            }] : []),
           ]}
         />
       )}
