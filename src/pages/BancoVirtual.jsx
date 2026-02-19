@@ -28,7 +28,7 @@ import { Landmark, Plus, Pencil, Trash2, TrendingDown, AlertCircle } from 'lucid
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 
-export default function BancoVirtual() {
+function BancoVirtual() {
   const queryClient = useQueryClient();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);

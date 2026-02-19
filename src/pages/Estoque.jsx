@@ -23,7 +23,7 @@ import {
 import { Boxes, Package, AlertTriangle, TrendingDown, TrendingUp, Tags, Store } from 'lucide-react';
 import { format } from 'date-fns';
 
-export default function Estoque() {
+function Estoque() {
   const [lojaFiltro, setLojaFiltro] = useState('all');
   const [categoriaFiltro, setCategoriaFiltro] = useState('all');
   const [viewModal, setViewModal] = useState(null);

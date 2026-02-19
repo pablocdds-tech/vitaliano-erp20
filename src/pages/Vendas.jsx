@@ -15,7 +15,7 @@ import { TrendingUp, Plus, DollarSign, Receipt, CreditCard, Eye, Trash2, Setting
 import { format, startOfMonth, endOfMonth } from 'date-fns';
 import { toast } from 'sonner';
 
-export default function Vendas() {
+function Vendas() {
   const qc = useQueryClient();
   const [novoOpen, setNovoOpen] = useState(false);
   const [verFechamento, setVerFechamento] = useState(null);

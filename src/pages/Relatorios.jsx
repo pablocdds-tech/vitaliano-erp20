@@ -24,7 +24,7 @@ const RELATORIOS = [
   { value: 'lojas', label: 'Resultado por Loja', icon: Store, cor: 'indigo' },
 ];
 
-export default function Relatorios() {
+function Relatorios() {
   const [relatorio, setRelatorio] = useState('cmv');
   const [mesSelecionado, setMesSelecionado] = useState(MESES[0].value);
   const [lojaFiltro, setLojaFiltro] = useState('all');

@@ -29,7 +29,7 @@ const STATUS_STYLE = {
   bloqueada: 'bg-red-100 text-red-700',
 };
 
-export default function AdminSaaS() {
+function AdminSaaS() {
   const qc = useQueryClient();
   const [modalEmpresa, setModalEmpresa] = useState(null); // empresa selecionada para ações
   const [acaoAtual, setAcaoAtual] = useState(''); // 'plano' | 'bloquear' | 'trial'

@@ -31,7 +31,7 @@ import RegistrarRecebimentoModal from '@/components/contas/RegistrarRecebimentoM
 import KPICard from '@/components/ui-custom/KPICard';
 import { formatMoney } from '@/components/ui-custom/MoneyDisplay';
 
-export default function ContasReceber() {
+function ContasReceber() {
   const queryClient = useQueryClient();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);

@@ -28,7 +28,7 @@ import { toast } from 'sonner';
 import { formatMoney } from '@/components/ui-custom/MoneyDisplay';
 import KPICard from '@/components/ui-custom/KPICard';
 
-export default function ContasBancarias() {
+function ContasBancarias() {
   const queryClient = useQueryClient();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
