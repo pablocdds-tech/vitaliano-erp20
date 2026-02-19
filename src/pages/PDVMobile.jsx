@@ -197,6 +197,9 @@ export default function PDVMobile() {
         itensData: itensCapturados,
       });
     } catch (e) {
+      // Se falhou, devolve o carrinho para o usuário
+      setItens(itensCapturados);
+      setLojaDestinoId(lojaDestinoIdCapturado);
       toast.error(e.message || 'Erro ao confirmar pedido.');
     } finally {
       setConfirmando(false);
