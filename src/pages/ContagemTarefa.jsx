@@ -202,7 +202,11 @@ export default function ContagemTarefa() {
             </div>
             <div>
               <h1 className="font-bold text-slate-800 text-lg leading-tight">Contagem de Estoque</h1>
-              <p className="text-sm text-slate-500">{tarefa?.responsavel_nome} · {tarefa?.grupo || 'Geral'}</p>
+              <p className="text-sm text-slate-500">
+                {tarefa?.responsavel_nome}
+                {loja ? ` · ${loja.nome}` : ''}
+                {tarefa?.grupo ? ` · ${tarefa.grupo}` : ''}
+              </p>
             </div>
           </div>
           {/* Progress bar */}
