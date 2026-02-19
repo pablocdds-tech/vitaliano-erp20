@@ -16,7 +16,7 @@ import { aprovarAjusteContagem } from '@/components/services/contagemService';
 import { getEmpresaAtiva } from '@/components/services/tenantService';
 import { createPageUrl } from '@/utils';
 
-function TarefaCard({ tarefa, lojas, onCopyLink, onCopyWhatsApp }) {
+function TarefaCard({ tarefa, lojas, onCopyLink, onCopyWhatsApp, onOpenLink }) {
   const pct = tarefa.total_itens > 0 ? Math.round((tarefa.itens_preenchidos / tarefa.total_itens) * 100) : 0;
   const statusColor = { pendente: 'bg-slate-400', em_andamento: 'bg-amber-400', finalizado: 'bg-emerald-500' };
 
