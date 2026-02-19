@@ -22,8 +22,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Users, Plus, Mail, Pencil, Trash2 } from 'lucide-react';
+import { Users, Plus, Pencil, Shield } from 'lucide-react';
 import { toast } from 'sonner';
+import PermissoesModal from '@/components/rbac/PermissoesModal';
 
 export default function Usuarios() {
   const queryClient = useQueryClient();
