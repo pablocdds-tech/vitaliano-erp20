@@ -176,6 +176,12 @@ export default function Usuarios() {
           </form>
         </DialogContent>
       </Dialog>
+
+      <PermissoesModal
+        open={permissoesModalOpen}
+        onClose={() => setPermissoesModalOpen(false)}
+        usuario={usuarioPermissoes}
+      />
     </div>
   );
 }
