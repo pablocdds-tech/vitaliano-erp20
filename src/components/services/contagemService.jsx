@@ -128,7 +128,7 @@ export async function aprovarAjusteContagem(contagem, tarefas, empresa_id) {
   }
 
   await base44.entities.Contagem.update(contagem.id, {
-    status: 'ajustada',
+    status: temDivergencia ? 'ajustada' : 'aprovada',
     data_fechamento: new Date().toISOString(),
   });
 }
