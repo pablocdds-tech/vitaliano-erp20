@@ -47,78 +47,78 @@
  *
  * The mainPage value must match a key in the PAGES object exactly.
  */
-import AdminSaaS from './pages/AdminSaaS';
 import AuditoriaDodia from './pages/AuditoriaDodia';
-import BancoVirtual from './pages/BancoVirtual';
 import Categorias from './pages/Categorias';
 import Checklists from './pages/Checklists';
 import Cofres from './pages/Cofres';
 import Configuracoes from './pages/Configuracoes';
 import ContagemTarefa from './pages/ContagemTarefa';
-import Contagens from './pages/Contagens';
-import ContasBancarias from './pages/ContasBancarias';
-import ContasPagar from './pages/ContasPagar';
-import ContasReceber from './pages/ContasReceber';
-import DRE from './pages/DRE';
 import Dashboard from './pages/Dashboard';
 import Empresas from './pages/Empresas';
-import Estoque from './pages/Estoque';
 import FichasTecnicas from './pages/FichasTecnicas';
 import Fornecedores from './pages/Fornecedores';
 import IAExecutora from './pages/IAExecutora';
 import Lojas from './pages/Lojas';
 import Manutencao from './pages/Manutencao';
-import Movimentacoes from './pages/Movimentacoes';
 import MovimentacoesBancarias from './pages/MovimentacoesBancarias';
-import NotasFiscais from './pages/NotasFiscais';
 import Notificacoes from './pages/Notificacoes';
 import Onboarding from './pages/Onboarding';
 import PDVMobile from './pages/PDVMobile';
 import PedidosInternos from './pages/PedidosInternos';
 import Producao from './pages/Producao';
 import Produtos from './pages/Produtos';
-import Relatorios from './pages/Relatorios';
 import TemplatesContagem from './pages/TemplatesContagem';
-import Usuarios from './pages/Usuarios';
+import BancoVirtual from './pages/BancoVirtual';
+import ContasBancarias from './pages/ContasBancarias';
+import ContasReceber from './pages/ContasReceber';
+import DRE from './pages/DRE';
+import Movimentacoes from './pages/Movimentacoes';
+import NotasFiscais from './pages/NotasFiscais';
+import Relatorios from './pages/Relatorios';
 import Vendas from './pages/Vendas';
+import AdminSaaS from './pages/AdminSaaS';
+import Estoque from './pages/Estoque';
+import Contagens from './pages/Contagens';
+import ContasPagar from './pages/ContasPagar';
+import Usuarios from './pages/Usuarios';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
-    "AdminSaaS": AdminSaaS,
     "AuditoriaDodia": AuditoriaDodia,
-    "BancoVirtual": BancoVirtual,
     "Categorias": Categorias,
     "Checklists": Checklists,
     "Cofres": Cofres,
     "Configuracoes": Configuracoes,
     "ContagemTarefa": ContagemTarefa,
-    "Contagens": Contagens,
-    "ContasBancarias": ContasBancarias,
-    "ContasPagar": ContasPagar,
-    "ContasReceber": ContasReceber,
-    "DRE": DRE,
     "Dashboard": Dashboard,
     "Empresas": Empresas,
-    "Estoque": Estoque,
     "FichasTecnicas": FichasTecnicas,
     "Fornecedores": Fornecedores,
     "IAExecutora": IAExecutora,
     "Lojas": Lojas,
     "Manutencao": Manutencao,
-    "Movimentacoes": Movimentacoes,
     "MovimentacoesBancarias": MovimentacoesBancarias,
-    "NotasFiscais": NotasFiscais,
     "Notificacoes": Notificacoes,
     "Onboarding": Onboarding,
     "PDVMobile": PDVMobile,
     "PedidosInternos": PedidosInternos,
     "Producao": Producao,
     "Produtos": Produtos,
-    "Relatorios": Relatorios,
     "TemplatesContagem": TemplatesContagem,
-    "Usuarios": Usuarios,
+    "BancoVirtual": BancoVirtual,
+    "ContasBancarias": ContasBancarias,
+    "ContasReceber": ContasReceber,
+    "DRE": DRE,
+    "Movimentacoes": Movimentacoes,
+    "NotasFiscais": NotasFiscais,
+    "Relatorios": Relatorios,
     "Vendas": Vendas,
+    "AdminSaaS": AdminSaaS,
+    "Estoque": Estoque,
+    "Contagens": Contagens,
+    "ContasPagar": ContasPagar,
+    "Usuarios": Usuarios,
 }
 
 export const pagesConfig = {
