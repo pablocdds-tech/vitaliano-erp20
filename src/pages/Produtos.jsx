@@ -33,6 +33,7 @@ import ImportarCSVModal, { IMPORT_CONFIGS } from '@/components/importacao/Import
 export default function Produtos() {
   const queryClient = useQueryClient();
   const [modalOpen, setModalOpen] = useState(false);
+  const [importarOpen, setImportarOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [formData, setFormData] = useState({
     nome: '',
@@ -213,10 +214,14 @@ export default function Produtos() {
           { label: 'Produtos' }
         ]}
         actions={
-          <Button onClick={() => { resetForm(); setModalOpen(true); }} className="gap-2">
-            <Plus className="w-4 h-4" />
-            Novo Produto
-          </Button>
+          <div className="flex gap-2 flex-wrap">
+            <Button variant="outline" onClick={() => setImportarOpen(true)} className="gap-2 w-full sm:w-auto">
+              <Upload className="w-4 h-4" /> Importar CSV
+            </Button>
+            <Button onClick={() => { resetForm(); setModalOpen(true); }} className="gap-2 w-full sm:w-auto">
+              <Plus className="w-4 h-4" /> Novo Produto
+            </Button>
+          </div>
         }
       />
 
@@ -242,6 +247,13 @@ export default function Produtos() {
           ]}
         />
       )}
+
+      <ImportarCSVModal
+        open={importarOpen}
+        onClose={() => setImportarOpen(false)}
+        config={IMPORT_CONFIGS.produto}
+        extraData={{ categorias }}
+      />
 
       {/* Modal de Cadastro/Edição */}
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
