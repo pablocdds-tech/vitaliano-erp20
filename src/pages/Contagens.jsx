@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import withPermissao from '@/components/rbac/withPermissao';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import PageHeader from '@/components/ui-custom/PageHeader';
@@ -310,4 +311,3 @@ function Contagens() {
 }
 
 export default withPermissao(Contagens, 'contagens');
-import withPermissao from '@/components/rbac/withPermissao';

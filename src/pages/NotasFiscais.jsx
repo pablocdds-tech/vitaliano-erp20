@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import withPermissao from '@/components/rbac/withPermissao';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import PageHeader from '@/components/ui-custom/PageHeader';
@@ -683,4 +684,3 @@ function NotasFiscais() {
 }
 
 export default withPermissao(NotasFiscais, 'notas_fiscais');
-import withPermissao from '@/components/rbac/withPermissao';

@@ -4,6 +4,7 @@
  * Lista empresas, planos, status e ações de gestão.
  */
 import React, { useState } from 'react';
+import withPermissao from '@/components/rbac/withPermissao';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import PageHeader from '@/components/ui-custom/PageHeader';
@@ -329,4 +330,3 @@ function AdminSaaS() {
 }
 
 export default withPermissao(AdminSaaS, 'admin_saas');
-import withPermissao from '@/components/rbac/withPermissao';

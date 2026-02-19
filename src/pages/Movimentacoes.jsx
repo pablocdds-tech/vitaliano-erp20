@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import withPermissao from '@/components/rbac/withPermissao';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import PageHeader from '@/components/ui-custom/PageHeader';
@@ -356,4 +357,3 @@ function Movimentacoes() {
 }
 
 export default withPermissao(Movimentacoes, 'movimentacoes');
-import withPermissao from '@/components/rbac/withPermissao';

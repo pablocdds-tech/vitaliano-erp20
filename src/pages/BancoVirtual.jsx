@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import withPermissao from '@/components/rbac/withPermissao';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import PageHeader from '@/components/ui-custom/PageHeader';
@@ -321,4 +322,3 @@ function BancoVirtual() {
 }
 
 export default withPermissao(BancoVirtual, 'banco_virtual');
-import withPermissao from '@/components/rbac/withPermissao';

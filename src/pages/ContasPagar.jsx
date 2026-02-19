@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import withPermissao from '@/components/rbac/withPermissao';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import PageHeader from '@/components/ui-custom/PageHeader';
@@ -512,4 +513,3 @@ function ContasPagar() {
 }
 
 export default withPermissao(ContasPagar, 'contas_pagar');
-import withPermissao from '@/components/rbac/withPermissao';

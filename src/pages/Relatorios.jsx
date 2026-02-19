@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import withPermissao from '@/components/rbac/withPermissao';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import PageHeader from '@/components/ui-custom/PageHeader';
@@ -159,4 +160,3 @@ function Relatorios() {
 }
 
 export default withPermissao(Relatorios, 'relatorios');
-import withPermissao from '@/components/rbac/withPermissao';
