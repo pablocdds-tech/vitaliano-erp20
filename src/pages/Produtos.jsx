@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import PageHeader from '@/components/ui-custom/PageHeader';
@@ -29,6 +29,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Package, Plus, Pencil, Trash2, Tags, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 import ImportarCSVModal, { IMPORT_CONFIGS } from '@/components/importacao/ImportarCSVModal';
+import { subDays } from 'date-fns';
 
 export default function Produtos() {
   const queryClient = useQueryClient();
