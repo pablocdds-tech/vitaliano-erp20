@@ -171,7 +171,8 @@ export default function ContasPagar() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['contas-pagar'] });
       toast.success('Conta excluída!');
-    }
+    },
+    onError: (e) => toast.error('Erro ao excluir: ' + e.message),
   });
 
   // Removido: handlePay simples. Substituído por modal de registro de pagamento.
