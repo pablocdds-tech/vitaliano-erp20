@@ -225,15 +225,15 @@ export default function PedidosInternos() {
           searchPlaceholder="Buscar pedidos..."
           emptyIcon={ShoppingBag}
           emptyTitle="Nenhum pedido encontrado"
-          onRowClick={(row) => { setPedidoDetalhe(row); setMostrarCupom(false); }}
+          onRowClick={(row) => { abrirDetalhe(row); }}
           rowActions={(row) => {
-            const actions = [{ label: 'Ver detalhes', icon: Eye, onClick: () => { setPedidoDetalhe(row); setMostrarCupom(false); } }];
+            const actions = [{ label: 'Ver detalhes', icon: Eye, onClick: () => { abrirDetalhe(row); } }];
             if (row.status === 'draft') {
-              actions.push({ label: 'Confirmar pedido', icon: CheckCircle2, onClick: () => confirmarMutation.mutate(row.id) });
+              actions.push({ label: 'Confirmar pedido', icon: CheckCircle2, onClick: () => { abrirDetalhe(row); } });
               actions.push({ label: 'Cancelar', icon: XCircle, onClick: () => cancelarMutation.mutate(row.id), destructive: true });
             }
             if (row.status === 'confirmado') {
-              actions.push({ label: 'Ver cupom', icon: FileText, onClick: () => { setPedidoDetalhe(row); setMostrarCupom(true); } });
+              actions.push({ label: 'Ver cupom', icon: FileText, onClick: () => { abrirDetalhe(row, true); } });
             }
             return actions;
           }}
