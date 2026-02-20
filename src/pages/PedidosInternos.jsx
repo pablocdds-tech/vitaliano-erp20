@@ -74,7 +74,6 @@ export default function PedidosInternos() {
       return confirmarPedidoInterno(pedidoCompleto, lojas, user);
     },
     onSuccess: (result) => {
-      console.log('[CONFIRMAR_SUCCESS]', result);
       toast.success('Pedido confirmado! Estoque e banco virtual atualizados.', { id: 'confirmar' });
       queryClient.invalidateQueries({ queryKey: ['pedidos-internos'] });
       queryClient.invalidateQueries({ queryKey: ['lojas'] });
