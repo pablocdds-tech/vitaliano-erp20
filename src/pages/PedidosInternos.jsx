@@ -103,6 +103,18 @@ export default function PedidosInternos() {
     onError: (e) => toast.error(e.message || 'Erro ao cancelar'),
   });
 
+  // Abre detalhe buscando pedido completo com itens do banco
+  const abrirDetalhe = async (row, cupom = false) => {
+    setMostrarCupom(cupom);
+    setCarregandoDetalhe(true);
+    setPedidoDetalhe(row); // mostra imediatamente com dados da lista
+    const completo = await base44.entities.PedidoInterno.filter({ id: row.id });
+    if (completo[0]) {
+      setPedidoDetalhe(completo[0]);
+    }
+    setCarregandoDetalhe(false);
+  };
+
   const pedidosFiltrados = pedidos.filter(p => {
     const lojaOk = filtroLoja === 'todos' || p.loja_destino_id === filtroLoja;
     const statusOk = filtroStatus === 'todos' || p.status === filtroStatus;
