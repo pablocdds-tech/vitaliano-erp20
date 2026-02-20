@@ -326,7 +326,9 @@ export default function NotasFiscais() {
   };
 
   const handleConferir = async (nota) => {
+    if (nota.status !== 'pendente') { toast.info('Nota já foi conferida.'); return; }
     await updateMutation.mutateAsync({ id: nota.id, data: { status: 'conferida' } });
+    toast.success('Nota marcada como conferida.');
   };
 
   const addItem = () => {
