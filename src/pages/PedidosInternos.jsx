@@ -76,19 +76,24 @@ export default function PedidosInternos() {
       const user = await base44.auth.me();
       return confirmarPedidoInterno(pedidoCompleto, lojas, user);
     },
-    onSuccess: (result) => {
-      console.log('[CONFIRMAR_SUCCESS]', result);
+    onSuccess: async (result) => {
       toast.success('Pedido confirmado! Estoque e banco virtual atualizados.', { id: 'confirmar' });
       queryClient.invalidateQueries({ queryKey: ['pedidos-internos'] });
       queryClient.invalidateQueries({ queryKey: ['lojas'] });
       queryClient.invalidateQueries({ queryKey: ['banco-virtual'] });
       queryClient.invalidateQueries({ queryKey: ['movimentacoes-estoque'] });
-      // Atualiza local imediatamente sem esperar refetch
-      setPedidoDetalhe(prev => prev ? { ...prev, status: 'confirmado' } : prev);
+      // Busca pedido atualizado com dados de confirmação para mostrar cupom
+      if (pedidoDetalhe?.id) {
+        const atualizado = await base44.entities.PedidoInterno.filter({ id: pedidoDetalhe.id });
+        if (atualizado[0]) setPedidoDetalhe(atualizado[0]);
+      } else {
+        setPedidoDetalhe(prev => prev ? { ...prev, status: 'confirmado' } : prev);
+      }
     },
     onError: (e) => {
-      console.error('[CONFIRMAR_ERROR]', e);
       toast.error(e.message || 'Erro ao confirmar pedido', { id: 'confirmar' });
+      // Re-fetch para mostrar estado real (pode ter ficado como processando)
+      queryClient.invalidateQueries({ queryKey: ['pedidos-internos'] });
     },
   });
 
