@@ -328,7 +328,7 @@ export default function ContasPagar() {
           emptyIcon={CreditCard}
           emptyTitle="Nenhuma conta encontrada"
           rowActions={(row) => [
-            ...(['pendente', 'parcial', 'vencido'].includes(row.status) ? [{ label: 'Registrar Pagamento', icon: BanknoteIcon, onClick: () => setPagamentoModal(row) }] : []),
+            ...(row.status !== 'pago' && row.status !== 'cancelado' ? [{ label: 'Registrar Pagamento', icon: BanknoteIcon, onClick: () => setPagamentoModal(row) }] : []),
             { label: 'Editar', icon: Pencil, onClick: () => handleEdit(row) },
             { label: 'Excluir', icon: Trash2, onClick: () => deleteMutation.mutate(row.id), destructive: true }
           ]}
