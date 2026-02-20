@@ -131,8 +131,8 @@ export default function RegistrarPagamentoModal({ open, onClose, conta, contasBa
       const pagamentosExistentes = conta.pagamentos || [];
       const novaLinhas = linhas.map(l => ({
         tipo_origem: l.tipo_origem,
-        origem_id: l.origem_id,
-        origem_label: getOrigemLabel(l.tipo_origem, l.origem_id),
+        origem_id: l.origem_id || '',
+        origem_label: l.tipo_origem === 'manual' ? 'Pagamento Manual' : getOrigemLabel(l.tipo_origem, l.origem_id),
         valor: parseFloat(l.valor),
         data: dataPagamento,
       }));
