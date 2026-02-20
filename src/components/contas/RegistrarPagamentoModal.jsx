@@ -254,6 +254,7 @@ export default function RegistrarPagamentoModal({ open, onClose, conta, contasBa
                       <SelectItem value="conta_bancaria">Conta Bancária</SelectItem>
                       <SelectItem value="cofre_loja">Cofre da Loja</SelectItem>
                       <SelectItem value="cofre_central">Cofre Central</SelectItem>
+                      <SelectItem value="manual">Pagamento Manual (sem conta vinculada)</SelectItem>
                     </SelectContent>
                   </Select>
                   <Input
