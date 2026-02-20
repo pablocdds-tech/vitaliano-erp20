@@ -112,7 +112,6 @@ export default function RegistrarPagamentoModal({ open, onClose, conta, contasBa
   const mutation = useMutation({
     mutationFn: async () => {
       if (!conta) throw new Error('Conta não encontrada');
-      if (conta.status === 'pago') throw new Error('Esta conta já está quitada');
       if (linhas.some(l => !l.origem_id || !l.valor || parseFloat(l.valor) <= 0)) {
         throw new Error('Preencha todas as origens e valores');
       }
@@ -179,7 +178,6 @@ export default function RegistrarPagamentoModal({ open, onClose, conta, contasBa
       queryClient.invalidateQueries({ queryKey: ['contas-pagar'] });
       queryClient.invalidateQueries({ queryKey: ['banco-virtual'] });
       queryClient.invalidateQueries({ queryKey: ['lojas'] });
-      queryClient.invalidateQueries({ queryKey: ['transacoes-bancarias'] });
       toast.success(isQuitado ? 'Conta quitada com sucesso!' : 'Pagamento parcial registrado!');
       onClose();
     },

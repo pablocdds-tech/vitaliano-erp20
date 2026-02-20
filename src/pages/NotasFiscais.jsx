@@ -187,7 +187,6 @@ export default function NotasFiscais() {
   const [viewModal, setViewModal] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [processing, setProcessing] = useState(false);
-  const [lancandoId, setLancandoId] = useState(null); // ID da nota sendo lançada — bloqueia duplo clique
   const [novoProdutoForIdx, setNovoProdutoForIdx] = useState(null); // idx do item que vai receber o novo produto
 
   const emptyForm = {
@@ -212,19 +211,11 @@ export default function NotasFiscais() {
 
   const createMutation = useMutation({
     mutationFn: async (data) => {
-      const empresa = await getEmpresaAtiva();
       // Calcula valor_total a partir dos itens, se houver
       const total = data.itens?.length > 0
         ? data.itens.reduce((s, i) => s + (i.subtotal || 0), 0)
         : data.valor_total;
-      // Inclui empresa_id (required) e campos de parcelamento para gerar CP corretamente no lançamento
-      return base44.entities.NotaFiscal.create({
-        ...data,
-        empresa_id: empresa.id,
-        valor_total: total,
-        valor_produtos: total,
-        status: 'pendente',
-      });
+      return base44.entities.NotaFiscal.create({ ...data, valor_total: total });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notas-fiscais'] });
@@ -239,6 +230,7 @@ export default function NotasFiscais() {
     mutationFn: ({ id, data }) => base44.entities.NotaFiscal.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notas-fiscais'] });
+      toast.success('Nota fiscal atualizada!');
     },
     onError: (e) => toast.error('Erro: ' + e.message),
   });
@@ -284,19 +276,8 @@ export default function NotasFiscais() {
   };
 
   const handleLancar = async (nota) => {
-    // Idempotência: impede duplo clique e relançamento de nota já lançada
-    if (lancandoId === nota.id) return;
-    if (nota.status === 'lancada') {
-      toast.error('Esta nota já foi lançada.');
-      return;
-    }
-
-    setLancandoId(nota.id);
     try {
       const empresa = await getEmpresaAtiva();
-
-      // Marca como lançada PRIMEIRO (lock) — se falhar aqui, nota permanece no estado anterior (seguro para retry)
-      // Se falhar DEPOIS, a nota fica 'lancada' mas estoque/CP podem estar incompletos (admin precisa verificar)
       await updateMutation.mutateAsync({ id: nota.id, data: { status: 'lancada' } });
 
       if (nota.itens?.length > 0) {
@@ -319,20 +300,12 @@ export default function NotasFiscais() {
         empresa_id: empresa.id,
         loja_id: nota.loja_id,
         fornecedor_id: nota.fornecedor_id,
-        nota: {
-          ...nota,
-          // Repassa campos de parcelamento que podem ter sido salvos no formData
-          num_parcelas: nota.num_parcelas || 1,
-          primeiro_vencimento: nota.primeiro_vencimento || nota.data_entrada || nota.data_emissao,
-        },
+        nota,
       });
 
-      queryClient.invalidateQueries({ queryKey: ['notas-fiscais'] });
       toast.success('Nota lançada! Estoque e conta a pagar atualizados.');
     } catch (err) {
       toast.error('Erro ao lançar: ' + err.message);
-    } finally {
-      setLancandoId(null);
     }
   };
 
@@ -461,12 +434,7 @@ export default function NotasFiscais() {
           rowActions={(row) => [
             { label: 'Visualizar', icon: Eye, onClick: () => setViewModal(row) },
             ...(row.status === 'pendente' ? [{ label: 'Conferir', icon: CheckCircle2, onClick: () => handleConferir(row) }] : []),
-            ...(row.status === 'conferida' ? [{
-              label: lancandoId === row.id ? 'Lançando...' : 'Lançar no Sistema',
-              icon: lancandoId === row.id ? Loader2 : CheckCircle2,
-              onClick: () => lancandoId === row.id ? null : handleLancar(row),
-              disabled: lancandoId === row.id,
-            }] : []),
+            ...(row.status === 'conferida' ? [{ label: 'Lançar no Sistema', icon: CheckCircle2, onClick: () => handleLancar(row) }] : []),
           ]}
         />
       )}
