@@ -293,9 +293,20 @@ export default function PedidosInternos() {
                       size="sm"
                       variant="destructive"
                       onClick={() => cancelarMutation.mutate(pedidoAtivo.id)}
+                      disabled={cancelarMutation.isPending}
                     >
                       <XCircle className="w-4 h-4 mr-1" /> Cancelar
                     </Button>
+                  </div>
+                </div>
+              )}
+
+              {pedidoAtivo.status === 'em_confirmacao' && (
+                <div className="flex gap-2 p-3 bg-purple-50 border border-purple-200 rounded-lg">
+                  <AlertTriangle className="w-5 h-5 text-purple-500 flex-shrink-0 mt-0.5" />
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-purple-800">Pedido em processamento</p>
+                    <p className="text-xs text-purple-600">A confirmação está em andamento. Aguarde ou contate o administrador.</p>
                   </div>
                 </div>
               )}
