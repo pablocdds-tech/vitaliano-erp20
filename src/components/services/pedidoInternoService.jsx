@@ -19,7 +19,7 @@ import { processarEntrada, processarSaida } from './estoqueService';
  * 5. Marca pedido como confirmado (idempotência)
  */
 export async function confirmarPedidoInterno(pedido, lojas, user) {
-  if (pedido.status !== 'draft') {
+  if (pedido.status !== 'draft' && pedido.status !== 'processando') {
     throw new Error('Este pedido já foi confirmado ou cancelado.');
   }
   if (!pedido.itens || pedido.itens.length === 0) {
