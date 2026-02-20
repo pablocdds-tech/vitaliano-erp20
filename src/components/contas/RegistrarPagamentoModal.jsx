@@ -157,6 +157,21 @@ export default function RegistrarPagamentoModal({ open, onClose, conta, contasBa
             conciliado_em: new Date().toISOString(),
           });
         }
+        // Dinheiro: registrar como movimentação de cofre se houver cofre da loja
+        if (linha.tipo_origem === 'dinheiro') {
+          const cofreLoja = (cofres || []).find(c => c.loja_id === conta.loja_id);
+          if (cofreLoja) {
+            await base44.entities.MovimentacaoCofre.create({
+              cofre_id: cofreLoja.id,
+              tipo: 'saida',
+              valor: parseFloat(linha.valor),
+              descricao: `Pagamento: ${conta.descricao}`,
+              data: dataPagamento,
+              referencia_tipo: 'conta_pagar',
+              referencia_id: conta.id,
+            });
+          }
+        }
       }
 
       // Se a conta é do CD → abater dívida no banco virtual para cada loja pagadora
