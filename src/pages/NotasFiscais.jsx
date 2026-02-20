@@ -211,17 +211,20 @@ export default function NotasFiscais() {
 
   const createMutation = useMutation({
     mutationFn: async (data) => {
+      if (!data.loja_id) throw new Error('Selecione a Loja / CD.');
+      if (!data.numero) throw new Error('Informe o número da NF.');
+      const empresa = await getEmpresaAtiva();
       // Calcula valor_total a partir dos itens, se houver
       const total = data.itens?.length > 0
         ? data.itens.reduce((s, i) => s + (i.subtotal || 0), 0)
         : data.valor_total;
-      return base44.entities.NotaFiscal.create({ ...data, valor_total: total });
+      return base44.entities.NotaFiscal.create({ ...data, empresa_id: empresa.id, valor_total: total, status: 'pendente' });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notas-fiscais'] });
       setModalOpen(false);
       setFormData(emptyForm);
-      toast.success('Nota fiscal cadastrada! Clique em "Lançar" para dar entrada no estoque.');
+      toast.success('Nota fiscal cadastrada! Clique em "Conferir" e depois "Lançar" para dar entrada no estoque.');
     },
     onError: (e) => toast.error('Erro ao cadastrar: ' + e.message),
   });
