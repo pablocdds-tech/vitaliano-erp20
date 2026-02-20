@@ -211,20 +211,17 @@ export default function NotasFiscais() {
 
   const createMutation = useMutation({
     mutationFn: async (data) => {
-      if (!data.loja_id) throw new Error('Selecione a Loja / CD.');
-      if (!data.numero) throw new Error('Informe o número da NF.');
-      const empresa = await getEmpresaAtiva();
       // Calcula valor_total a partir dos itens, se houver
       const total = data.itens?.length > 0
         ? data.itens.reduce((s, i) => s + (i.subtotal || 0), 0)
         : data.valor_total;
-      return base44.entities.NotaFiscal.create({ ...data, empresa_id: empresa.id, valor_total: total, status: 'pendente' });
+      return base44.entities.NotaFiscal.create({ ...data, valor_total: total });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notas-fiscais'] });
       setModalOpen(false);
       setFormData(emptyForm);
-      toast.success('Nota fiscal cadastrada! Clique em "Conferir" e depois "Lançar" para dar entrada no estoque.');
+      toast.success('Nota fiscal cadastrada! Clique em "Lançar" para dar entrada no estoque.');
     },
     onError: (e) => toast.error('Erro ao cadastrar: ' + e.message),
   });
@@ -278,22 +275,11 @@ export default function NotasFiscais() {
     }
   };
 
-  const [lancando, setLancando] = useState(null); // id da nota sendo lançada
-
   const handleLancar = async (nota) => {
-    // Proteção contra duplo lançamento
-    if (lancando) return;
-    if (nota.status === 'lancada') { toast.info('Nota já foi lançada.'); return; }
-    
-    setLancando(nota.id);
-    toast.loading('Lançando nota…', { id: 'lancar-nf' });
     try {
       const empresa = await getEmpresaAtiva();
-      
-      // 1. Marca como lançada PRIMEIRO (idempotência: se falhar depois, não duplica)
       await updateMutation.mutateAsync({ id: nota.id, data: { status: 'lancada' } });
 
-      // 2. Processa estoque
       if (nota.itens?.length > 0) {
         for (const item of nota.itens) {
           if (!item.produto_id || !item.quantidade) continue;
@@ -310,7 +296,6 @@ export default function NotasFiscais() {
         }
       }
 
-      // 3. Gera conta a pagar
       await criarContasPagarNF({
         empresa_id: empresa.id,
         loja_id: nota.loja_id,
@@ -318,20 +303,14 @@ export default function NotasFiscais() {
         nota,
       });
 
-      queryClient.invalidateQueries({ queryKey: ['contas-pagar'] });
-      queryClient.invalidateQueries({ queryKey: ['estoque'] });
-      toast.success('Nota lançada! Estoque e conta a pagar atualizados.', { id: 'lancar-nf' });
+      toast.success('Nota lançada! Estoque e conta a pagar atualizados.');
     } catch (err) {
-      toast.error('Erro ao lançar: ' + err.message, { id: 'lancar-nf' });
-    } finally {
-      setLancando(null);
+      toast.error('Erro ao lançar: ' + err.message);
     }
   };
 
   const handleConferir = async (nota) => {
-    if (nota.status !== 'pendente') { toast.info('Nota já foi conferida.'); return; }
     await updateMutation.mutateAsync({ id: nota.id, data: { status: 'conferida' } });
-    toast.success('Nota marcada como conferida.');
   };
 
   const addItem = () => {
@@ -454,8 +433,8 @@ export default function NotasFiscais() {
           onRowClick={(row) => setViewModal(row)}
           rowActions={(row) => [
             { label: 'Visualizar', icon: Eye, onClick: () => setViewModal(row) },
-            ...(row.status === 'pendente' ? [{ label: 'Conferir', icon: CheckCircle2, onClick: () => handleConferir(row), disabled: lancando === row.id }] : []),
-            ...(row.status === 'conferida' ? [{ label: lancando === row.id ? 'Lançando…' : 'Lançar no Sistema', icon: CheckCircle2, onClick: () => handleLancar(row), disabled: !!lancando }] : []),
+            ...(row.status === 'pendente' ? [{ label: 'Conferir', icon: CheckCircle2, onClick: () => handleConferir(row) }] : []),
+            ...(row.status === 'conferida' ? [{ label: 'Lançar no Sistema', icon: CheckCircle2, onClick: () => handleLancar(row) }] : []),
           ]}
         />
       )}
@@ -682,8 +661,8 @@ export default function NotasFiscais() {
                   </Button>
                 )}
                 {viewModal.status === 'conferida' && (
-                  <Button disabled={!!lancando} onClick={() => { handleLancar(viewModal); setViewModal(null); }}>
-                    <CheckCircle2 className="w-4 h-4 mr-2" /> {lancando ? 'Lançando…' : 'Lançar no Sistema'}
+                  <Button onClick={() => { handleLancar(viewModal); setViewModal(null); }}>
+                    <CheckCircle2 className="w-4 h-4 mr-2" /> Lançar no Sistema
                   </Button>
                 )}
               </DialogFooter>

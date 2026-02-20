@@ -34,11 +34,6 @@ export async function confirmarPedidoInterno(pedido, lojas, user) {
   const empresa_id = pedido.empresa_id;
   const pedidoRef = `#${pedido.id.slice(-6).toUpperCase()}`;
 
-  // IDEMPOTÊNCIA: marca como 'em_confirmacao' ANTES de movimentar
-  // Se falhar depois, o pedido fica em estado intermediário mas não é re-executável como 'draft'
-  await base44.entities.PedidoInterno.update(pedido.id, { status: 'em_confirmacao' });
-
-  try {
   // 1. Movimentações de estoque REAIS para cada item
   for (const item of pedido.itens) {
     // Saída do CD — atualiza Estoque do CD e cria MovimentacaoEstoque
@@ -121,12 +116,6 @@ export async function confirmarPedidoInterno(pedido, lojas, user) {
     data_confirmacao: new Date().toISOString(),
     banco_virtual_id: movBanco.id,
   });
-  } catch (err) {
-    // Se falhou após marcar 'em_confirmacao', deixa nesse estado para análise manual
-    // NÃO volta para 'draft' para evitar reprocessamento
-    console.error('[pedidoInternoService] Falha parcial na confirmação:', err);
-    throw new Error(`Falha ao confirmar pedido (estado: em_confirmacao). Detalhes: ${err.message}. Contate o administrador.`);
-  }
 }
 
 /**

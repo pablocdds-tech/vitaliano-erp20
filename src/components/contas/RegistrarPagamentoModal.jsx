@@ -86,7 +86,6 @@ export default function RegistrarPagamentoModal({ open, onClose, conta, contasBa
   const getOrigemOptions = (tipoOrigem) => {
     if (tipoOrigem === 'conta_bancaria') return contasBancarias || [];
     if (tipoOrigem === 'cofre_loja' || tipoOrigem === 'cofre_central') return cofres || [];
-    if (tipoOrigem === 'dinheiro') return [{ id: 'caixa', nome: 'Caixa / Dinheiro' }];
     return [];
   };
 
@@ -113,8 +112,7 @@ export default function RegistrarPagamentoModal({ open, onClose, conta, contasBa
   const mutation = useMutation({
     mutationFn: async () => {
       if (!conta) throw new Error('Conta não encontrada');
-      if (conta.status === 'pago') throw new Error('Esta conta já está paga.');
-      if (linhas.some(l => (l.tipo_origem !== 'dinheiro' && !l.origem_id) || !l.valor || parseFloat(l.valor) <= 0)) {
+      if (linhas.some(l => !l.origem_id || !l.valor || parseFloat(l.valor) <= 0)) {
         throw new Error('Preencha todas as origens e valores');
       }
       if (totalLinhas <= 0) throw new Error('Total pago deve ser maior que zero');
@@ -157,21 +155,6 @@ export default function RegistrarPagamentoModal({ open, onClose, conta, contasBa
             conciliado_em: new Date().toISOString(),
           });
         }
-        // Dinheiro: registrar como movimentação de cofre se houver cofre da loja
-        if (linha.tipo_origem === 'dinheiro') {
-          const cofreLoja = (cofres || []).find(c => c.loja_id === conta.loja_id);
-          if (cofreLoja) {
-            await base44.entities.MovimentacaoCofre.create({
-              cofre_id: cofreLoja.id,
-              tipo: 'saida',
-              valor: parseFloat(linha.valor),
-              descricao: `Pagamento: ${conta.descricao}`,
-              data: dataPagamento,
-              referencia_tipo: 'conta_pagar',
-              referencia_id: conta.id,
-            });
-          }
-        }
       }
 
       // Se a conta é do CD → abater dívida no banco virtual para cada loja pagadora
@@ -195,8 +178,6 @@ export default function RegistrarPagamentoModal({ open, onClose, conta, contasBa
       queryClient.invalidateQueries({ queryKey: ['contas-pagar'] });
       queryClient.invalidateQueries({ queryKey: ['banco-virtual'] });
       queryClient.invalidateQueries({ queryKey: ['lojas'] });
-      queryClient.invalidateQueries({ queryKey: ['transacoes-bancarias'] });
-      queryClient.invalidateQueries({ queryKey: ['cofres'] });
       toast.success(isQuitado ? 'Conta quitada com sucesso!' : 'Pagamento parcial registrado!');
       onClose();
     },
@@ -268,7 +249,6 @@ export default function RegistrarPagamentoModal({ open, onClose, conta, contasBa
                       <SelectItem value="conta_bancaria">Conta Bancária</SelectItem>
                       <SelectItem value="cofre_loja">Cofre da Loja</SelectItem>
                       <SelectItem value="cofre_central">Cofre Central</SelectItem>
-                      <SelectItem value="dinheiro">Dinheiro / Caixa</SelectItem>
                     </SelectContent>
                   </Select>
                   <Input

@@ -61,6 +61,7 @@ export default function PedidosInternos() {
 
   const confirmarMutation = useMutation({
     mutationFn: async (pedidoId) => {
+      console.log('[CONFIRMAR_CLICK]', { pedidoId });
       toast.loading('Confirmando pedido…', { id: 'confirmar' });
 
       // Busca pedido completo com itens
@@ -70,10 +71,13 @@ export default function PedidosInternos() {
       if (!pedidoCompleto.itens || pedidoCompleto.itens.length === 0) throw new Error('Pedido sem itens — não é possível confirmar.');
       if (pedidoCompleto.status !== 'draft') throw new Error(`Pedido já está com status: ${pedidoCompleto.status}`);
 
+      console.log('[CONFIRMAR_BEFORE_API]', { itensCount: pedidoCompleto.itens.length, valor: pedidoCompleto.valor_total });
+
       const user = await base44.auth.me();
       return confirmarPedidoInterno(pedidoCompleto, lojas, user);
     },
     onSuccess: (result) => {
+      console.log('[CONFIRMAR_SUCCESS]', result);
       toast.success('Pedido confirmado! Estoque e banco virtual atualizados.', { id: 'confirmar' });
       queryClient.invalidateQueries({ queryKey: ['pedidos-internos'] });
       queryClient.invalidateQueries({ queryKey: ['lojas'] });
@@ -83,6 +87,7 @@ export default function PedidosInternos() {
       setPedidoDetalhe(prev => prev ? { ...prev, status: 'confirmado' } : prev);
     },
     onError: (e) => {
+      console.error('[CONFIRMAR_ERROR]', e);
       toast.error(e.message || 'Erro ao confirmar pedido', { id: 'confirmar' });
     },
   });
@@ -223,11 +228,8 @@ export default function PedidosInternos() {
           rowActions={(row) => {
             const actions = [{ label: 'Ver detalhes', icon: Eye, onClick: () => { setPedidoDetalhe(row); setMostrarCupom(false); } }];
             if (row.status === 'draft') {
-              actions.push({ label: confirmarMutation.isPending ? 'Confirmando…' : 'Confirmar pedido', icon: CheckCircle2, onClick: () => confirmarMutation.mutate(row.id), disabled: confirmarMutation.isPending });
+              actions.push({ label: 'Confirmar pedido', icon: CheckCircle2, onClick: () => confirmarMutation.mutate(row.id) });
               actions.push({ label: 'Cancelar', icon: XCircle, onClick: () => cancelarMutation.mutate(row.id), destructive: true });
-            }
-            if (row.status === 'em_confirmacao') {
-              actions.push({ label: 'Em processamento…', icon: CheckCircle2, disabled: true });
             }
             if (row.status === 'confirmado') {
               actions.push({ label: 'Ver cupom', icon: FileText, onClick: () => { setPedidoDetalhe(row); setMostrarCupom(true); } });
@@ -293,20 +295,9 @@ export default function PedidosInternos() {
                       size="sm"
                       variant="destructive"
                       onClick={() => cancelarMutation.mutate(pedidoAtivo.id)}
-                      disabled={cancelarMutation.isPending}
                     >
                       <XCircle className="w-4 h-4 mr-1" /> Cancelar
                     </Button>
-                  </div>
-                </div>
-              )}
-
-              {pedidoAtivo.status === 'em_confirmacao' && (
-                <div className="flex gap-2 p-3 bg-purple-50 border border-purple-200 rounded-lg">
-                  <AlertTriangle className="w-5 h-5 text-purple-500 flex-shrink-0 mt-0.5" />
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-purple-800">Pedido em processamento</p>
-                    <p className="text-xs text-purple-600">A confirmação está em andamento. Aguarde ou contate o administrador.</p>
                   </div>
                 </div>
               )}
