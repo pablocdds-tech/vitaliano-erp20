@@ -28,6 +28,7 @@ export default function PedidosInternos() {
   const [modalNovo, setModalNovo] = useState(false);
   const [pedidoDetalhe, setPedidoDetalhe] = useState(null);
   const [mostrarCupom, setMostrarCupom] = useState(false);
+  const [carregandoDetalhe, setCarregandoDetalhe] = useState(false);
   const [filtroLoja, setFiltroLoja] = useState('todos');
   const [filtroStatus, setFiltroStatus] = useState('todos');
 
