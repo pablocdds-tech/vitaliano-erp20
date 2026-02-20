@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { formatMoney } from '@/components/ui-custom/MoneyDisplay';
 import { Plus, Trash2, Package } from 'lucide-react';
 import { format } from 'date-fns';
+import { toast } from 'sonner';
 
 export default function PedidoForm({ onSave, onCancel, saving }) {
   const [lojaDestinoId, setLojaDestinoId] = useState('');
@@ -60,9 +61,9 @@ export default function PedidoForm({ onSave, onCancel, saving }) {
   const totalItens = itens.reduce((s, i) => s + i.quantidade, 0);
 
   const handleSave = () => {
-    if (!cd) { alert('Nenhum CD cadastrado.'); return; }
-    if (!lojaDestinoId) { alert('Selecione a loja destino.'); return; }
-    if (itens.length === 0) { alert('Adicione pelo menos um item.'); return; }
+    if (!cd) { toast.error('Nenhum CD cadastrado. Cadastre um CD em Lojas.'); return; }
+    if (!lojaDestinoId) { toast.error('Selecione a loja destino.'); return; }
+    if (itens.length === 0) { toast.error('Adicione pelo menos um item.'); return; }
     onSave({ cd_id: cd.id, loja_destino_id: lojaDestinoId, data, observacoes, itens, total_itens: totalItens, valor_total: valorTotal, status: 'draft' });
   };
 

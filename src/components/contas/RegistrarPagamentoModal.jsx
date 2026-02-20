@@ -86,6 +86,7 @@ export default function RegistrarPagamentoModal({ open, onClose, conta, contasBa
   const getOrigemOptions = (tipoOrigem) => {
     if (tipoOrigem === 'conta_bancaria') return contasBancarias || [];
     if (tipoOrigem === 'cofre_loja' || tipoOrigem === 'cofre_central') return cofres || [];
+    if (tipoOrigem === 'dinheiro') return [{ id: 'caixa', nome: 'Caixa / Dinheiro' }];
     return [];
   };
 
@@ -249,6 +250,7 @@ export default function RegistrarPagamentoModal({ open, onClose, conta, contasBa
                       <SelectItem value="conta_bancaria">Conta Bancária</SelectItem>
                       <SelectItem value="cofre_loja">Cofre da Loja</SelectItem>
                       <SelectItem value="cofre_central">Cofre Central</SelectItem>
+                      <SelectItem value="dinheiro">Dinheiro / Caixa</SelectItem>
                     </SelectContent>
                   </Select>
                   <Input
