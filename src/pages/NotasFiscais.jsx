@@ -275,9 +275,19 @@ export default function NotasFiscais() {
     }
   };
 
+  const [lancando, setLancando] = useState(false);
+
   const handleLancar = async (nota) => {
+    // Guard: impede duplo lançamento
+    if (nota.status === 'lancada') {
+      toast.info('Esta nota já foi lançada.');
+      return;
+    }
+    if (lancando) return;
+    setLancando(true);
     try {
       const empresa = await getEmpresaAtiva();
+      // Marca como lançada PRIMEIRO para idempotência
       await updateMutation.mutateAsync({ id: nota.id, data: { status: 'lancada' } });
 
       if (nota.itens?.length > 0) {
@@ -303,13 +313,21 @@ export default function NotasFiscais() {
         nota,
       });
 
+      queryClient.invalidateQueries({ queryKey: ['contas-pagar'] });
+      queryClient.invalidateQueries({ queryKey: ['estoque'] });
       toast.success('Nota lançada! Estoque e conta a pagar atualizados.');
     } catch (err) {
       toast.error('Erro ao lançar: ' + err.message);
+    } finally {
+      setLancando(false);
     }
   };
 
   const handleConferir = async (nota) => {
+    if (nota.status !== 'pendente') {
+      toast.info('Esta nota já foi conferida.');
+      return;
+    }
     await updateMutation.mutateAsync({ id: nota.id, data: { status: 'conferida' } });
   };
 
@@ -434,7 +452,7 @@ export default function NotasFiscais() {
           rowActions={(row) => [
             { label: 'Visualizar', icon: Eye, onClick: () => setViewModal(row) },
             ...(row.status === 'pendente' ? [{ label: 'Conferir', icon: CheckCircle2, onClick: () => handleConferir(row) }] : []),
-            ...(row.status === 'conferida' ? [{ label: 'Lançar no Sistema', icon: CheckCircle2, onClick: () => handleLancar(row) }] : []),
+            ...(row.status === 'conferida' ? [{ label: lancando ? 'Lançando...' : 'Lançar no Sistema', icon: CheckCircle2, onClick: () => handleLancar(row), disabled: lancando }] : []),
           ]}
         />
       )}

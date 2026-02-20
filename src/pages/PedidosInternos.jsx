@@ -59,17 +59,23 @@ export default function PedidosInternos() {
     onError: (e) => toast.error(e.message || 'Erro ao criar pedido'),
   });
 
+  const [confirmandoId, setConfirmandoId] = useState(null);
+
   const confirmarMutation = useMutation({
     mutationFn: async (pedidoId) => {
+      // Guard duplo clique
+      if (confirmandoId) throw new Error('Já há uma confirmação em andamento.');
+      setConfirmandoId(pedidoId);
+
       console.log('[CONFIRMAR_CLICK]', { pedidoId });
       toast.loading('Confirmando pedido…', { id: 'confirmar' });
 
-      // Busca pedido completo com itens
+      // Busca pedido completo com itens (fonte da verdade do banco)
       const lista = await base44.entities.PedidoInterno.filter({ id: pedidoId });
       const pedidoCompleto = lista[0];
       if (!pedidoCompleto) throw new Error('Pedido não encontrado.');
+      if (pedidoCompleto.status !== 'draft') throw new Error(`Pedido já está com status "${pedidoCompleto.status}". Não é possível confirmar.`);
       if (!pedidoCompleto.itens || pedidoCompleto.itens.length === 0) throw new Error('Pedido sem itens — não é possível confirmar.');
-      if (pedidoCompleto.status !== 'draft') throw new Error(`Pedido já está com status: ${pedidoCompleto.status}`);
 
       console.log('[CONFIRMAR_BEFORE_API]', { itensCount: pedidoCompleto.itens.length, valor: pedidoCompleto.valor_total });
 
@@ -83,12 +89,15 @@ export default function PedidosInternos() {
       queryClient.invalidateQueries({ queryKey: ['lojas'] });
       queryClient.invalidateQueries({ queryKey: ['banco-virtual'] });
       queryClient.invalidateQueries({ queryKey: ['movimentacoes-estoque'] });
+      queryClient.invalidateQueries({ queryKey: ['estoque'] });
       // Atualiza local imediatamente sem esperar refetch
-      setPedidoDetalhe(prev => prev ? { ...prev, status: 'confirmado' } : prev);
+      setPedidoDetalhe(prev => prev ? { ...prev, status: 'confirmado', confirmado_por: result?.confirmado_por, data_confirmacao: result?.data_confirmacao } : prev);
+      setConfirmandoId(null);
     },
     onError: (e) => {
       console.error('[CONFIRMAR_ERROR]', e);
       toast.error(e.message || 'Erro ao confirmar pedido', { id: 'confirmar' });
+      setConfirmandoId(null);
     },
   });
 
@@ -285,7 +294,7 @@ export default function PedidosInternos() {
                       type="button"
                       size="sm"
                       onClick={(e) => { e.preventDefault(); e.stopPropagation(); confirmarMutation.mutate(pedidoAtivo.id); }}
-                      disabled={confirmarMutation.isPending}
+                      disabled={confirmarMutation.isPending || !!confirmandoId}
                       className="bg-emerald-600 hover:bg-emerald-700"
                     >
                       <CheckCircle2 className="w-4 h-4 mr-1" />
