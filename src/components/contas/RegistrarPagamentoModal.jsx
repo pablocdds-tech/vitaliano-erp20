@@ -59,7 +59,10 @@ export default function RegistrarPagamentoModal({ open, onClose, conta, contasBa
   const cd = lojas?.find(l => l.tipo === 'cd');
   const isContaDoCD = conta?.loja_id && lojas?.find(l => l.id === conta.loja_id)?.tipo === 'cd';
 
-  const emptyLine = { tipo_origem: 'conta_bancaria', origem_id: '', valor: '' };
+  const temContas = (contasBancarias || []).length > 0;
+  const temCofres = (cofres || []).length > 0;
+  const defaultTipoOrigem = temContas ? 'conta_bancaria' : temCofres ? 'cofre_loja' : 'manual';
+  const emptyLine = { tipo_origem: defaultTipoOrigem, origem_id: '', valor: '' };
 
   const [dataPagamento, setDataPagamento] = useState(format(new Date(), 'yyyy-MM-dd'));
   const [observacao, setObservacao] = useState('');
