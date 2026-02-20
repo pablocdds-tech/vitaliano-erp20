@@ -275,11 +275,20 @@ export default function NotasFiscais() {
     }
   };
 
+  const [lancando, setLancando] = useState(null); // id da nota sendo lançada
+  const [conferindo, setConferindo] = useState(null);
+
   const handleLancar = async (nota) => {
+    // Idempotência: impede duplo clique e NF já lançada
+    if (lancando) return;
+    if (nota.status === 'lancada') { toast.error('Esta nota já foi lançada.'); return; }
+    if (!nota.loja_id) { toast.error('Nota sem loja definida — edite antes de lançar.'); return; }
+
+    setLancando(nota.id);
     try {
       const empresa = await getEmpresaAtiva();
-      await updateMutation.mutateAsync({ id: nota.id, data: { status: 'lancada' } });
 
+      // 1. Entrada no estoque
       if (nota.itens?.length > 0) {
         for (const item of nota.itens) {
           if (!item.produto_id || !item.quantidade) continue;
@@ -296,6 +305,7 @@ export default function NotasFiscais() {
         }
       }
 
+      // 2. Gera conta(s) a pagar
       await criarContasPagarNF({
         empresa_id: empresa.id,
         loja_id: nota.loja_id,
@@ -303,14 +313,30 @@ export default function NotasFiscais() {
         nota,
       });
 
+      // 3. Atualiza status da NF para 'lancada' (POR ÚLTIMO — garante consistência)
+      await updateMutation.mutateAsync({ id: nota.id, data: { status: 'lancada' } });
+
+      queryClient.invalidateQueries({ queryKey: ['contas-pagar'] });
+      queryClient.invalidateQueries({ queryKey: ['estoque'] });
       toast.success('Nota lançada! Estoque e conta a pagar atualizados.');
     } catch (err) {
       toast.error('Erro ao lançar: ' + err.message);
+    } finally {
+      setLancando(null);
     }
   };
 
   const handleConferir = async (nota) => {
-    await updateMutation.mutateAsync({ id: nota.id, data: { status: 'conferida' } });
+    if (conferindo) return;
+    setConferindo(nota.id);
+    try {
+      await updateMutation.mutateAsync({ id: nota.id, data: { status: 'conferida' } });
+      toast.success('Nota conferida!');
+    } catch (err) {
+      toast.error('Erro ao conferir: ' + err.message);
+    } finally {
+      setConferindo(null);
+    }
   };
 
   const addItem = () => {
