@@ -28,7 +28,6 @@ export default function PedidosInternos() {
   const [modalNovo, setModalNovo] = useState(false);
   const [pedidoDetalhe, setPedidoDetalhe] = useState(null);
   const [mostrarCupom, setMostrarCupom] = useState(false);
-  const [carregandoDetalhe, setCarregandoDetalhe] = useState(false);
   const [filtroLoja, setFiltroLoja] = useState('todos');
   const [filtroStatus, setFiltroStatus] = useState('todos');
 
@@ -62,38 +61,34 @@ export default function PedidosInternos() {
 
   const confirmarMutation = useMutation({
     mutationFn: async (pedidoId) => {
+      console.log('[CONFIRMAR_CLICK]', { pedidoId });
       toast.loading('Confirmando pedido…', { id: 'confirmar' });
 
-      // Busca pedido completo com itens diretamente do banco
+      // Busca pedido completo com itens
       const lista = await base44.entities.PedidoInterno.filter({ id: pedidoId });
       const pedidoCompleto = lista[0];
       if (!pedidoCompleto) throw new Error('Pedido não encontrado.');
       if (!pedidoCompleto.itens || pedidoCompleto.itens.length === 0) throw new Error('Pedido sem itens — não é possível confirmar.');
-      if (pedidoCompleto.status === 'confirmado') throw new Error('Pedido já está confirmado.');
-      if (pedidoCompleto.status === 'cancelado') throw new Error('Pedido está cancelado.');
-      if (pedidoCompleto.status === 'processando') throw new Error('Pedido já está sendo processado. Aguarde.');
+      if (pedidoCompleto.status !== 'draft') throw new Error(`Pedido já está com status: ${pedidoCompleto.status}`);
+
+      console.log('[CONFIRMAR_BEFORE_API]', { itensCount: pedidoCompleto.itens.length, valor: pedidoCompleto.valor_total });
 
       const user = await base44.auth.me();
       return confirmarPedidoInterno(pedidoCompleto, lojas, user);
     },
-    onSuccess: async (result) => {
+    onSuccess: (result) => {
+      console.log('[CONFIRMAR_SUCCESS]', result);
       toast.success('Pedido confirmado! Estoque e banco virtual atualizados.', { id: 'confirmar' });
       queryClient.invalidateQueries({ queryKey: ['pedidos-internos'] });
       queryClient.invalidateQueries({ queryKey: ['lojas'] });
       queryClient.invalidateQueries({ queryKey: ['banco-virtual'] });
       queryClient.invalidateQueries({ queryKey: ['movimentacoes-estoque'] });
-      // Busca pedido atualizado com dados de confirmação para mostrar cupom
-      if (pedidoDetalhe?.id) {
-        const atualizado = await base44.entities.PedidoInterno.filter({ id: pedidoDetalhe.id });
-        if (atualizado[0]) setPedidoDetalhe(atualizado[0]);
-      } else {
-        setPedidoDetalhe(prev => prev ? { ...prev, status: 'confirmado' } : prev);
-      }
+      // Atualiza local imediatamente sem esperar refetch
+      setPedidoDetalhe(prev => prev ? { ...prev, status: 'confirmado' } : prev);
     },
     onError: (e) => {
+      console.error('[CONFIRMAR_ERROR]', e);
       toast.error(e.message || 'Erro ao confirmar pedido', { id: 'confirmar' });
-      // Re-fetch para mostrar estado real (pode ter ficado como processando)
-      queryClient.invalidateQueries({ queryKey: ['pedidos-internos'] });
     },
   });
 
@@ -106,18 +101,6 @@ export default function PedidosInternos() {
     },
     onError: (e) => toast.error(e.message || 'Erro ao cancelar'),
   });
-
-  // Abre detalhe buscando pedido completo com itens do banco
-  const abrirDetalhe = async (row, cupom = false) => {
-    setMostrarCupom(cupom);
-    setCarregandoDetalhe(true);
-    setPedidoDetalhe(row); // mostra imediatamente com dados da lista
-    const completo = await base44.entities.PedidoInterno.filter({ id: row.id });
-    if (completo[0]) {
-      setPedidoDetalhe(completo[0]);
-    }
-    setCarregandoDetalhe(false);
-  };
 
   const pedidosFiltrados = pedidos.filter(p => {
     const lojaOk = filtroLoja === 'todos' || p.loja_destino_id === filtroLoja;
@@ -173,8 +156,11 @@ export default function PedidosInternos() {
     }
   ];
 
-  // pedidoAtivo: usa pedidoDetalhe direto (já buscado completo com itens)
-  const pedidoAtivo = pedidoDetalhe || null;
+  // pedidoAtivo: prioriza o estado local (pedidoDetalhe) para refletir mudanças imediatas
+  // mas merge com dados da lista (sem sobrescrever itens, que só existem no detalhe)
+  const pedidoAtivo = pedidoDetalhe
+    ? { ...(pedidos.find(p => p.id === pedidoDetalhe.id) || {}), ...pedidoDetalhe }
+    : null;
 
   return (
     <div className="space-y-6">
@@ -238,15 +224,15 @@ export default function PedidosInternos() {
           searchPlaceholder="Buscar pedidos..."
           emptyIcon={ShoppingBag}
           emptyTitle="Nenhum pedido encontrado"
-          onRowClick={(row) => { abrirDetalhe(row); }}
+          onRowClick={(row) => { setPedidoDetalhe(row); setMostrarCupom(false); }}
           rowActions={(row) => {
-            const actions = [{ label: 'Ver detalhes', icon: Eye, onClick: () => { abrirDetalhe(row); } }];
+            const actions = [{ label: 'Ver detalhes', icon: Eye, onClick: () => { setPedidoDetalhe(row); setMostrarCupom(false); } }];
             if (row.status === 'draft') {
-              actions.push({ label: 'Confirmar pedido', icon: CheckCircle2, onClick: () => { abrirDetalhe(row); } });
+              actions.push({ label: 'Confirmar pedido', icon: CheckCircle2, onClick: () => confirmarMutation.mutate(row.id) });
               actions.push({ label: 'Cancelar', icon: XCircle, onClick: () => cancelarMutation.mutate(row.id), destructive: true });
             }
             if (row.status === 'confirmado') {
-              actions.push({ label: 'Ver cupom', icon: FileText, onClick: () => { abrirDetalhe(row, true); } });
+              actions.push({ label: 'Ver cupom', icon: FileText, onClick: () => { setPedidoDetalhe(row); setMostrarCupom(true); } });
             }
             return actions;
           }}

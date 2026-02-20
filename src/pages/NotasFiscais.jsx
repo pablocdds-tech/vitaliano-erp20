@@ -211,21 +211,17 @@ export default function NotasFiscais() {
 
   const createMutation = useMutation({
     mutationFn: async (data) => {
-      if (!data.loja_id) throw new Error('Selecione a Loja/CD.');
-      const empresa = await getEmpresaAtiva();
       // Calcula valor_total a partir dos itens, se houver
       const total = data.itens?.length > 0
         ? data.itens.reduce((s, i) => s + (i.subtotal || 0), 0)
         : data.valor_total;
-      // Marca itens vinculados a produto
-      const itens = (data.itens || []).map(i => ({ ...i, vinculado: !!i.produto_id }));
-      return base44.entities.NotaFiscal.create({ ...data, empresa_id: empresa.id, valor_total: total, itens, status: 'pendente' });
+      return base44.entities.NotaFiscal.create({ ...data, valor_total: total });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notas-fiscais'] });
       setModalOpen(false);
       setFormData(emptyForm);
-      toast.success('Nota fiscal cadastrada! Confira e depois clique em "Lançar" para dar entrada no estoque.');
+      toast.success('Nota fiscal cadastrada! Clique em "Lançar" para dar entrada no estoque.');
     },
     onError: (e) => toast.error('Erro ao cadastrar: ' + e.message),
   });
@@ -279,20 +275,11 @@ export default function NotasFiscais() {
     }
   };
 
-  const [lancando, setLancando] = useState(null); // id da nota sendo lançada
-  const [conferindo, setConferindo] = useState(null);
-
   const handleLancar = async (nota) => {
-    // Idempotência: impede duplo clique e NF já lançada
-    if (lancando) return;
-    if (nota.status === 'lancada') { toast.error('Esta nota já foi lançada.'); return; }
-    if (!nota.loja_id) { toast.error('Nota sem loja definida — edite antes de lançar.'); return; }
-
-    setLancando(nota.id);
     try {
       const empresa = await getEmpresaAtiva();
+      await updateMutation.mutateAsync({ id: nota.id, data: { status: 'lancada' } });
 
-      // 1. Entrada no estoque
       if (nota.itens?.length > 0) {
         for (const item of nota.itens) {
           if (!item.produto_id || !item.quantidade) continue;
@@ -309,7 +296,6 @@ export default function NotasFiscais() {
         }
       }
 
-      // 2. Gera conta(s) a pagar
       await criarContasPagarNF({
         empresa_id: empresa.id,
         loja_id: nota.loja_id,
@@ -317,30 +303,14 @@ export default function NotasFiscais() {
         nota,
       });
 
-      // 3. Atualiza status da NF para 'lancada' (POR ÚLTIMO — garante consistência)
-      await updateMutation.mutateAsync({ id: nota.id, data: { status: 'lancada' } });
-
-      queryClient.invalidateQueries({ queryKey: ['contas-pagar'] });
-      queryClient.invalidateQueries({ queryKey: ['estoque'] });
       toast.success('Nota lançada! Estoque e conta a pagar atualizados.');
     } catch (err) {
       toast.error('Erro ao lançar: ' + err.message);
-    } finally {
-      setLancando(null);
     }
   };
 
   const handleConferir = async (nota) => {
-    if (conferindo) return;
-    setConferindo(nota.id);
-    try {
-      await updateMutation.mutateAsync({ id: nota.id, data: { status: 'conferida' } });
-      toast.success('Nota conferida!');
-    } catch (err) {
-      toast.error('Erro ao conferir: ' + err.message);
-    } finally {
-      setConferindo(null);
-    }
+    await updateMutation.mutateAsync({ id: nota.id, data: { status: 'conferida' } });
   };
 
   const addItem = () => {
@@ -463,8 +433,8 @@ export default function NotasFiscais() {
           onRowClick={(row) => setViewModal(row)}
           rowActions={(row) => [
             { label: 'Visualizar', icon: Eye, onClick: () => setViewModal(row) },
-            ...(row.status === 'pendente' ? [{ label: conferindo === row.id ? 'Conferindo...' : 'Conferir', icon: CheckCircle2, onClick: () => handleConferir(row), disabled: !!conferindo }] : []),
-            ...(row.status === 'conferida' ? [{ label: lancando === row.id ? 'Lançando...' : 'Lançar no Sistema', icon: CheckCircle2, onClick: () => handleLancar(row), disabled: !!lancando }] : []),
+            ...(row.status === 'pendente' ? [{ label: 'Conferir', icon: CheckCircle2, onClick: () => handleConferir(row) }] : []),
+            ...(row.status === 'conferida' ? [{ label: 'Lançar no Sistema', icon: CheckCircle2, onClick: () => handleLancar(row) }] : []),
           ]}
         />
       )}

@@ -19,7 +19,7 @@ import { processarEntrada, processarSaida } from './estoqueService';
  * 5. Marca pedido como confirmado (idempotência)
  */
 export async function confirmarPedidoInterno(pedido, lojas, user) {
-  if (pedido.status !== 'draft' && pedido.status !== 'processando') {
+  if (pedido.status !== 'draft') {
     throw new Error('Este pedido já foi confirmado ou cancelado.');
   }
   if (!pedido.itens || pedido.itens.length === 0) {
@@ -30,10 +30,6 @@ export async function confirmarPedidoInterno(pedido, lojas, user) {
   const lojaDestino = lojas.find(l => l.id === pedido.loja_destino_id);
 
   if (!cd || !lojaDestino) throw new Error('CD ou loja destino não encontrado.');
-
-  // Idempotência: marca como "em processamento" ANTES de processar estoque
-  // Isso impede que outro clique execute a mesma lógica novamente
-  await base44.entities.PedidoInterno.update(pedido.id, { status: 'processando' });
 
   const empresa_id = pedido.empresa_id;
   const pedidoRef = `#${pedido.id.slice(-6).toUpperCase()}`;

@@ -59,10 +59,7 @@ export default function RegistrarPagamentoModal({ open, onClose, conta, contasBa
   const cd = lojas?.find(l => l.tipo === 'cd');
   const isContaDoCD = conta?.loja_id && lojas?.find(l => l.id === conta.loja_id)?.tipo === 'cd';
 
-  const temContas = (contasBancarias || []).length > 0;
-  const temCofres = (cofres || []).length > 0;
-  const defaultTipoOrigem = temContas ? 'conta_bancaria' : temCofres ? 'cofre_loja' : 'manual';
-  const emptyLine = { tipo_origem: defaultTipoOrigem, origem_id: '', valor: '' };
+  const emptyLine = { tipo_origem: 'conta_bancaria', origem_id: '', valor: '' };
 
   const [dataPagamento, setDataPagamento] = useState(format(new Date(), 'yyyy-MM-dd'));
   const [observacao, setObservacao] = useState('');
@@ -115,9 +112,7 @@ export default function RegistrarPagamentoModal({ open, onClose, conta, contasBa
   const mutation = useMutation({
     mutationFn: async () => {
       if (!conta) throw new Error('Conta não encontrada');
-      if (conta.status === 'pago') throw new Error('Esta conta já está paga.');
-      // Valida linhas — se tipo é 'manual', não precisa de origem_id
-      if (linhas.some(l => (l.tipo_origem !== 'manual' && !l.origem_id) || !l.valor || parseFloat(l.valor) <= 0)) {
+      if (linhas.some(l => !l.origem_id || !l.valor || parseFloat(l.valor) <= 0)) {
         throw new Error('Preencha todas as origens e valores');
       }
       if (totalLinhas <= 0) throw new Error('Total pago deve ser maior que zero');
@@ -131,8 +126,8 @@ export default function RegistrarPagamentoModal({ open, onClose, conta, contasBa
       const pagamentosExistentes = conta.pagamentos || [];
       const novaLinhas = linhas.map(l => ({
         tipo_origem: l.tipo_origem,
-        origem_id: l.origem_id || '',
-        origem_label: l.tipo_origem === 'manual' ? 'Pagamento Manual' : getOrigemLabel(l.tipo_origem, l.origem_id),
+        origem_id: l.origem_id,
+        origem_label: getOrigemLabel(l.tipo_origem, l.origem_id),
         valor: parseFloat(l.valor),
         data: dataPagamento,
       }));
@@ -254,7 +249,6 @@ export default function RegistrarPagamentoModal({ open, onClose, conta, contasBa
                       <SelectItem value="conta_bancaria">Conta Bancária</SelectItem>
                       <SelectItem value="cofre_loja">Cofre da Loja</SelectItem>
                       <SelectItem value="cofre_central">Cofre Central</SelectItem>
-                      <SelectItem value="manual">Pagamento Manual (sem conta vinculada)</SelectItem>
                     </SelectContent>
                   </Select>
                   <Input
@@ -271,23 +265,19 @@ export default function RegistrarPagamentoModal({ open, onClose, conta, contasBa
                   )}
                 </div>
 
-                {linha.tipo_origem !== 'manual' ? (
-                  <Select value={linha.origem_id || '__none__'} onValueChange={v => updateLinha(idx, 'origem_id', v === '__none__' ? '' : v)}>
-                    <SelectTrigger className="h-8 text-xs">
-                      <SelectValue placeholder="Selecione a conta / cofre..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="__none__">Selecione...</SelectItem>
-                      {getOrigemOptions(linha.tipo_origem).map(o => (
-                        <SelectItem key={o.id} value={o.id}>
-                          {o.nome || o.banco} {o.loja_id ? `(${lojas?.find(l => l.id === o.loja_id)?.nome || ''})` : ''}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                ) : (
-                  <p className="text-xs text-slate-400 px-2 py-1">Sem vínculo com conta bancária — apenas registra o pagamento.</p>
-                )}
+                <Select value={linha.origem_id || '__none__'} onValueChange={v => updateLinha(idx, 'origem_id', v === '__none__' ? '' : v)}>
+                  <SelectTrigger className="h-8 text-xs">
+                    <SelectValue placeholder="Selecione a conta / cofre..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="__none__">Selecione...</SelectItem>
+                    {getOrigemOptions(linha.tipo_origem).map(o => (
+                      <SelectItem key={o.id} value={o.id}>
+                        {o.nome || o.banco} {o.loja_id ? `(${lojas?.find(l => l.id === o.loja_id)?.nome || ''})` : ''}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             ))}
           </div>
