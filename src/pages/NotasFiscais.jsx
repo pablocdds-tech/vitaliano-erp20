@@ -459,8 +459,8 @@ export default function NotasFiscais() {
           onRowClick={(row) => setViewModal(row)}
           rowActions={(row) => [
             { label: 'Visualizar', icon: Eye, onClick: () => setViewModal(row) },
-            ...(row.status === 'pendente' ? [{ label: 'Conferir', icon: CheckCircle2, onClick: () => handleConferir(row) }] : []),
-            ...(row.status === 'conferida' ? [{ label: 'Lançar no Sistema', icon: CheckCircle2, onClick: () => handleLancar(row) }] : []),
+            ...(row.status === 'pendente' ? [{ label: conferindo === row.id ? 'Conferindo...' : 'Conferir', icon: CheckCircle2, onClick: () => handleConferir(row), disabled: !!conferindo }] : []),
+            ...(row.status === 'conferida' ? [{ label: lancando === row.id ? 'Lançando...' : 'Lançar no Sistema', icon: CheckCircle2, onClick: () => handleLancar(row), disabled: !!lancando }] : []),
           ]}
         />
       )}
