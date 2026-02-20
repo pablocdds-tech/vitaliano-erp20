@@ -121,6 +121,12 @@ export async function confirmarPedidoInterno(pedido, lojas, user) {
     data_confirmacao: new Date().toISOString(),
     banco_virtual_id: movBanco.id,
   });
+  } catch (err) {
+    // Se falhou após marcar 'em_confirmacao', deixa nesse estado para análise manual
+    // NÃO volta para 'draft' para evitar reprocessamento
+    console.error('[pedidoInternoService] Falha parcial na confirmação:', err);
+    throw new Error(`Falha ao confirmar pedido (estado: em_confirmacao). Detalhes: ${err.message}. Contate o administrador.`);
+  }
 }
 
 /**
