@@ -682,8 +682,8 @@ export default function NotasFiscais() {
                   </Button>
                 )}
                 {viewModal.status === 'conferida' && (
-                  <Button onClick={() => { handleLancar(viewModal); setViewModal(null); }}>
-                    <CheckCircle2 className="w-4 h-4 mr-2" /> Lançar no Sistema
+                  <Button disabled={!!lancando} onClick={() => { handleLancar(viewModal); setViewModal(null); }}>
+                    <CheckCircle2 className="w-4 h-4 mr-2" /> {lancando ? 'Lançando…' : 'Lançar no Sistema'}
                   </Button>
                 )}
               </DialogFooter>
