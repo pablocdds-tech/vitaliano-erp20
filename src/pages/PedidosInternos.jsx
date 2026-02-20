@@ -83,7 +83,6 @@ export default function PedidosInternos() {
       setPedidoDetalhe(prev => prev ? { ...prev, status: 'confirmado' } : prev);
     },
     onError: (e) => {
-      console.error('[CONFIRMAR_ERROR]', e);
       toast.error(e.message || 'Erro ao confirmar pedido', { id: 'confirmar' });
     },
   });
