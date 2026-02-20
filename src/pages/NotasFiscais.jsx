@@ -275,11 +275,22 @@ export default function NotasFiscais() {
     }
   };
 
+  const [lancando, setLancando] = useState(null); // id da nota sendo lançada
+
   const handleLancar = async (nota) => {
+    // Proteção contra duplo lançamento
+    if (lancando) return;
+    if (nota.status === 'lancada') { toast.info('Nota já foi lançada.'); return; }
+    
+    setLancando(nota.id);
+    toast.loading('Lançando nota…', { id: 'lancar-nf' });
     try {
       const empresa = await getEmpresaAtiva();
+      
+      // 1. Marca como lançada PRIMEIRO (idempotência: se falhar depois, não duplica)
       await updateMutation.mutateAsync({ id: nota.id, data: { status: 'lancada' } });
 
+      // 2. Processa estoque
       if (nota.itens?.length > 0) {
         for (const item of nota.itens) {
           if (!item.produto_id || !item.quantidade) continue;
@@ -296,6 +307,7 @@ export default function NotasFiscais() {
         }
       }
 
+      // 3. Gera conta a pagar
       await criarContasPagarNF({
         empresa_id: empresa.id,
         loja_id: nota.loja_id,
@@ -303,9 +315,13 @@ export default function NotasFiscais() {
         nota,
       });
 
-      toast.success('Nota lançada! Estoque e conta a pagar atualizados.');
+      queryClient.invalidateQueries({ queryKey: ['contas-pagar'] });
+      queryClient.invalidateQueries({ queryKey: ['estoque'] });
+      toast.success('Nota lançada! Estoque e conta a pagar atualizados.', { id: 'lancar-nf' });
     } catch (err) {
-      toast.error('Erro ao lançar: ' + err.message);
+      toast.error('Erro ao lançar: ' + err.message, { id: 'lancar-nf' });
+    } finally {
+      setLancando(null);
     }
   };
 
