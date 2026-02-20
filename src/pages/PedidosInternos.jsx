@@ -62,17 +62,16 @@ export default function PedidosInternos() {
 
   const confirmarMutation = useMutation({
     mutationFn: async (pedidoId) => {
-      console.log('[CONFIRMAR_CLICK]', { pedidoId });
       toast.loading('Confirmando pedido…', { id: 'confirmar' });
 
-      // Busca pedido completo com itens
+      // Busca pedido completo com itens diretamente do banco
       const lista = await base44.entities.PedidoInterno.filter({ id: pedidoId });
       const pedidoCompleto = lista[0];
       if (!pedidoCompleto) throw new Error('Pedido não encontrado.');
       if (!pedidoCompleto.itens || pedidoCompleto.itens.length === 0) throw new Error('Pedido sem itens — não é possível confirmar.');
-      if (pedidoCompleto.status !== 'draft') throw new Error(`Pedido já está com status: ${pedidoCompleto.status}`);
-
-      console.log('[CONFIRMAR_BEFORE_API]', { itensCount: pedidoCompleto.itens.length, valor: pedidoCompleto.valor_total });
+      if (pedidoCompleto.status === 'confirmado') throw new Error('Pedido já está confirmado.');
+      if (pedidoCompleto.status === 'cancelado') throw new Error('Pedido está cancelado.');
+      if (pedidoCompleto.status === 'processando') throw new Error('Pedido já está sendo processado. Aguarde.');
 
       const user = await base44.auth.me();
       return confirmarPedidoInterno(pedidoCompleto, lojas, user);
