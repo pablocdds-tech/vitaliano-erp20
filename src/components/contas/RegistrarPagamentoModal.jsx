@@ -115,7 +115,9 @@ export default function RegistrarPagamentoModal({ open, onClose, conta, contasBa
   const mutation = useMutation({
     mutationFn: async () => {
       if (!conta) throw new Error('Conta não encontrada');
-      if (linhas.some(l => !l.origem_id || !l.valor || parseFloat(l.valor) <= 0)) {
+      if (conta.status === 'pago') throw new Error('Esta conta já está paga.');
+      // Valida linhas — se tipo é 'manual', não precisa de origem_id
+      if (linhas.some(l => (l.tipo_origem !== 'manual' && !l.origem_id) || !l.valor || parseFloat(l.valor) <= 0)) {
         throw new Error('Preencha todas as origens e valores');
       }
       if (totalLinhas <= 0) throw new Error('Total pago deve ser maior que zero');
