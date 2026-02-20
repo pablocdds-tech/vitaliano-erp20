@@ -211,11 +211,12 @@ export default function NotasFiscais() {
 
   const createMutation = useMutation({
     mutationFn: async (data) => {
+      const empresa = await getEmpresaAtiva();
       // Calcula valor_total a partir dos itens, se houver
       const total = data.itens?.length > 0
         ? data.itens.reduce((s, i) => s + (i.subtotal || 0), 0)
         : data.valor_total;
-      return base44.entities.NotaFiscal.create({ ...data, valor_total: total });
+      return base44.entities.NotaFiscal.create({ ...data, empresa_id: empresa.id, valor_total: total, status: 'pendente' });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notas-fiscais'] });
