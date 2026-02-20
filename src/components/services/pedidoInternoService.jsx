@@ -31,6 +31,10 @@ export async function confirmarPedidoInterno(pedido, lojas, user) {
 
   if (!cd || !lojaDestino) throw new Error('CD ou loja destino não encontrado.');
 
+  // Idempotência: marca como "em processamento" ANTES de processar estoque
+  // Isso impede que outro clique execute a mesma lógica novamente
+  await base44.entities.PedidoInterno.update(pedido.id, { status: 'processando' });
+
   const empresa_id = pedido.empresa_id;
   const pedidoRef = `#${pedido.id.slice(-6).toUpperCase()}`;
 
