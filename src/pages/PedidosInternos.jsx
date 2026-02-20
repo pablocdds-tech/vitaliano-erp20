@@ -223,8 +223,11 @@ export default function PedidosInternos() {
           rowActions={(row) => {
             const actions = [{ label: 'Ver detalhes', icon: Eye, onClick: () => { setPedidoDetalhe(row); setMostrarCupom(false); } }];
             if (row.status === 'draft') {
-              actions.push({ label: 'Confirmar pedido', icon: CheckCircle2, onClick: () => confirmarMutation.mutate(row.id) });
+              actions.push({ label: confirmarMutation.isPending ? 'Confirmando…' : 'Confirmar pedido', icon: CheckCircle2, onClick: () => confirmarMutation.mutate(row.id), disabled: confirmarMutation.isPending });
               actions.push({ label: 'Cancelar', icon: XCircle, onClick: () => cancelarMutation.mutate(row.id), destructive: true });
+            }
+            if (row.status === 'em_confirmacao') {
+              actions.push({ label: 'Em processamento…', icon: CheckCircle2, disabled: true });
             }
             if (row.status === 'confirmado') {
               actions.push({ label: 'Ver cupom', icon: FileText, onClick: () => { setPedidoDetalhe(row); setMostrarCupom(true); } });
