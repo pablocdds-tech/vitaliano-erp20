@@ -271,19 +271,23 @@ export default function RegistrarPagamentoModal({ open, onClose, conta, contasBa
                   )}
                 </div>
 
-                <Select value={linha.origem_id || '__none__'} onValueChange={v => updateLinha(idx, 'origem_id', v === '__none__' ? '' : v)}>
-                  <SelectTrigger className="h-8 text-xs">
-                    <SelectValue placeholder="Selecione a conta / cofre..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="__none__">Selecione...</SelectItem>
-                    {getOrigemOptions(linha.tipo_origem).map(o => (
-                      <SelectItem key={o.id} value={o.id}>
-                        {o.nome || o.banco} {o.loja_id ? `(${lojas?.find(l => l.id === o.loja_id)?.nome || ''})` : ''}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                {linha.tipo_origem !== 'manual' ? (
+                  <Select value={linha.origem_id || '__none__'} onValueChange={v => updateLinha(idx, 'origem_id', v === '__none__' ? '' : v)}>
+                    <SelectTrigger className="h-8 text-xs">
+                      <SelectValue placeholder="Selecione a conta / cofre..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__none__">Selecione...</SelectItem>
+                      {getOrigemOptions(linha.tipo_origem).map(o => (
+                        <SelectItem key={o.id} value={o.id}>
+                          {o.nome || o.banco} {o.loja_id ? `(${lojas?.find(l => l.id === o.loja_id)?.nome || ''})` : ''}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <p className="text-xs text-slate-400 px-2 py-1">Sem vínculo com conta bancária — apenas registra o pagamento.</p>
+                )}
               </div>
             ))}
           </div>
