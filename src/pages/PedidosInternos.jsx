@@ -20,6 +20,7 @@ import { confirmarPedidoInterno, cancelarPedidoInterno } from '@/components/serv
 import { getEmpresaAtiva } from '@/components/services/tenantService';
 import PedidoForm from '@/components/pedidos/PedidoForm';
 import CupomConferencia from '@/components/pedidos/CupomConferencia';
+import CupomTermico from '@/components/pedidos/CupomTermico';
 
 export default function PedidosInternos() {
   const queryClient = useQueryClient();
@@ -461,11 +462,18 @@ export default function PedidosInternos() {
                   )}
                 </>
               ) : (
-                <CupomConferencia
-                  pedido={pedidoAtivo}
-                  cd={getLoja(pedidoAtivo.cd_id)}
-                  lojaDestino={getLoja(pedidoAtivo.loja_destino_id)}
-                />
+                <div className="space-y-6">
+                  <CupomConferencia
+                    pedido={pedidoAtivo}
+                    cd={getLoja(pedidoAtivo.cd_id)}
+                    lojaDestino={getLoja(pedidoAtivo.loja_destino_id)}
+                  />
+                  <CupomTermico
+                    pedido={pedidoAtivo}
+                    cd={getLoja(pedidoAtivo.cd_id)}
+                    lojaDestino={getLoja(pedidoAtivo.loja_destino_id)}
+                  />
+                </div>
               )}
             </div>
           )}

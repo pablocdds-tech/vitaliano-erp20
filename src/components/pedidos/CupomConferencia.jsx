@@ -57,7 +57,7 @@ export default function CupomConferencia({ pedido, cd, lojaDestino }) {
       <div className="flex justify-end">
         <Button onClick={handlePrint} variant="outline" className="gap-2">
           <Printer className="w-4 h-4" />
-          Imprimir Cupom
+          Impressão A4 🖨️
         </Button>
       </div>
 
