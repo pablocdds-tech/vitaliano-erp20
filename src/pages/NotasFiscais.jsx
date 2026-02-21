@@ -21,6 +21,7 @@ import {
   Loader2, Sparkles, Trash2, Search, PackagePlus, Warehouse, ShoppingCart,
   Store
 } from 'lucide-react';
+import ImportarNFModal from '@/components/nf/ImportarNFModal';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { processarEntrada } from '@/components/services/estoqueService';
