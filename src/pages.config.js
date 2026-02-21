@@ -83,6 +83,7 @@ import TemplatesContagem from './pages/TemplatesContagem';
 import Usuarios from './pages/Usuarios';
 import Vendas from './pages/Vendas';
 import AgenteFiscal from './pages/AgenteFiscal';
+import AgenteConciliacao from './pages/AgenteConciliacao';
 import __Layout from './Layout.jsx';
 
 
@@ -123,6 +124,7 @@ export const PAGES = {
     "Usuarios": Usuarios,
     "Vendas": Vendas,
     "AgenteFiscal": AgenteFiscal,
+    "AgenteConciliacao": AgenteConciliacao,
 }
 
 export const pagesConfig = {
