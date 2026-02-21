@@ -890,6 +890,20 @@ export default function NotasFiscais() {
         </DialogContent>
       </Dialog>
 
+      {/* ── Modal Importar NF (Gemini) ───────────────────────────────────────── */}
+      <ImportarNFModal
+        open={importarModalOpen}
+        onClose={() => setImportarModalOpen(false)}
+        fornecedores={fornecedores}
+        lojas={lojas}
+        onConfirm={(dadosExtraidos) => {
+          setFormData(prev => ({ ...prev, ...dadosExtraidos }));
+          setImportarModalOpen(false);
+          // abre o modal principal já com dados preenchidos
+          setModalOpen(true);
+        }}
+      />
+
       {/* Modal de novo produto inline */}
       <NovoProdutoModal
         open={novoProdutoForIdx !== null}
