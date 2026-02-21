@@ -148,12 +148,12 @@ export default function RegistrarPagamentoModal({ open, onClose, conta, contasBa
       if (totalLinhas <= 0) throw new Error('Total pago deve ser maior que zero');
 
       const empresa = await getEmpresaAtiva();
-      const jaFoi = conta.valor_pago || 0;
+      const jaFoi = contaFresca.valor_pago || 0;
       const novoTotalPago = jaFoi + totalLinhas;
-      const novoStatus = novoTotalPago >= (conta.valor_original - 0.01) ? 'pago' : 'parcial';
+      const novoStatus = novoTotalPago >= (contaFresca.valor_original - 0.01) ? 'pago' : 'parcial';
 
       // Salva linhas de pagamento no campo pagamentos da conta
-      const pagamentosExistentes = conta.pagamentos || [];
+      const pagamentosExistentes = contaFresca.pagamentos || [];
       const novaLinhas = linhas.map(l => ({
         tipo_origem: l.tipo_origem,
         origem_id: l.origem_id,
@@ -162,11 +162,11 @@ export default function RegistrarPagamentoModal({ open, onClose, conta, contasBa
         data: dataPagamento,
       }));
 
-      await base44.entities.ContaPagar.update(conta.id, {
+      await base44.entities.ContaPagar.update(contaFresca.id, {
         status: novoStatus,
         data_pagamento: dataPagamento,
         valor_pago: novoTotalPago,
-        observacoes: observacao || conta.observacoes,
+        observacoes: observacao || contaFresca.observacoes,
         pagamentos: [...pagamentosExistentes, ...novaLinhas],
       });
 
