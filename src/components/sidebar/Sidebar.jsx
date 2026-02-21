@@ -4,7 +4,6 @@ import { createPageUrl } from '@/utils';
 import { cn } from '@/lib/utils';
 import Logo from '../ui-custom/Logo';
 import {
-  FileText as FileTextIcon,
   LayoutDashboard,
   Building2,
   Smartphone,
