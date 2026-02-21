@@ -135,6 +135,13 @@ export default function RegistrarPagamentoModal({ open, onClose, conta, contasBa
   const mutation = useMutation({
     mutationFn: async () => {
       if (!conta) throw new Error('Conta não encontrada');
+
+      // Idempotência: busca estado fresco do banco
+      const contaFresca = (await base44.entities.ContaPagar.filter({ id: conta.id }))[0];
+      if (!contaFresca) throw new Error('Conta não encontrada no banco de dados.');
+      if (contaFresca.status === 'pago') throw new Error('Esta conta já está paga. Atualize a página.');
+      if (contaFresca.status === 'cancelado') throw new Error('Esta conta foi cancelada.');
+
       if (linhas.some(l => !l.origem_id || !l.valor || parseFloat(l.valor) <= 0)) {
         throw new Error('Preencha todas as origens e valores');
       }
