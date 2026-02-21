@@ -81,6 +81,7 @@ import Relatorios from './pages/Relatorios';
 import TemplatesContagem from './pages/TemplatesContagem';
 import Usuarios from './pages/Usuarios';
 import Vendas from './pages/Vendas';
+import AssistenteERP from './pages/AssistenteERP';
 import __Layout from './Layout.jsx';
 
 
@@ -119,6 +120,7 @@ export const PAGES = {
     "TemplatesContagem": TemplatesContagem,
     "Usuarios": Usuarios,
     "Vendas": Vendas,
+    "AssistenteERP": AssistenteERP,
 }
 
 export const pagesConfig = {
