@@ -109,7 +109,6 @@ const menuGroups = [
     items: [
       { icon: Sparkles, label: 'Assistente ERP', href: 'AssistenteERP' },
       { icon: FileText, label: 'Agente Fiscal', href: 'AgenteFiscal' },
-
       { icon: Bot, label: 'IA Executora', href: 'IAExecutora' },
       { icon: Users, label: 'Usuários', href: 'Usuarios' },
       { icon: Settings, label: 'Configurações', href: 'Configuracoes' },
