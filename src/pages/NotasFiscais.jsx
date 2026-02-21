@@ -629,7 +629,16 @@ export default function NotasFiscais() {
                 </div>
                 <div className="space-y-1">
                   <Label>Faturado para *</Label>
-                  <Input value={formData.faturado_para_nome} onChange={e => setFormData({ ...formData, faturado_para_nome: e.target.value })} placeholder="NB / Praça / Pablo PF..." />
+                  <Select value={formData.faturado_para_id || '__none__'} onValueChange={v => {
+                    const loja = lojas.find(l => l.id === v);
+                    setFormData({ ...formData, faturado_para_id: v === '__none__' ? '' : v, faturado_para_nome: loja?.nome || '', loja_id: cd?.id || '' });
+                  }}>
+                    <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__none__">Selecione...</SelectItem>
+                      {lojas.map(l => <SelectItem key={l.id} value={l.id}>{l.nome}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
             )}
