@@ -57,6 +57,7 @@ import Configuracoes from './pages/Configuracoes';
 import ContagemTarefa from './pages/ContagemTarefa';
 import Contagens from './pages/Contagens';
 import ContasBancarias from './pages/ContasBancarias';
+import ContasPagar from './pages/ContasPagar';
 import ContasReceber from './pages/ContasReceber';
 import DRE from './pages/DRE';
 import Dashboard from './pages/Dashboard';
@@ -69,18 +70,17 @@ import Lojas from './pages/Lojas';
 import Manutencao from './pages/Manutencao';
 import Movimentacoes from './pages/Movimentacoes';
 import MovimentacoesBancarias from './pages/MovimentacoesBancarias';
+import NotasFiscais from './pages/NotasFiscais';
 import Notificacoes from './pages/Notificacoes';
 import Onboarding from './pages/Onboarding';
 import PDVMobile from './pages/PDVMobile';
+import PedidosInternos from './pages/PedidosInternos';
 import Producao from './pages/Producao';
 import Produtos from './pages/Produtos';
 import Relatorios from './pages/Relatorios';
 import TemplatesContagem from './pages/TemplatesContagem';
 import Usuarios from './pages/Usuarios';
 import Vendas from './pages/Vendas';
-import PedidosInternos from './pages/PedidosInternos';
-import ContasPagar from './pages/ContasPagar';
-import NotasFiscais from './pages/NotasFiscais';
 import __Layout from './Layout.jsx';
 
 
@@ -95,6 +95,7 @@ export const PAGES = {
     "ContagemTarefa": ContagemTarefa,
     "Contagens": Contagens,
     "ContasBancarias": ContasBancarias,
+    "ContasPagar": ContasPagar,
     "ContasReceber": ContasReceber,
     "DRE": DRE,
     "Dashboard": Dashboard,
@@ -107,18 +108,17 @@ export const PAGES = {
     "Manutencao": Manutencao,
     "Movimentacoes": Movimentacoes,
     "MovimentacoesBancarias": MovimentacoesBancarias,
+    "NotasFiscais": NotasFiscais,
     "Notificacoes": Notificacoes,
     "Onboarding": Onboarding,
     "PDVMobile": PDVMobile,
+    "PedidosInternos": PedidosInternos,
     "Producao": Producao,
     "Produtos": Produtos,
     "Relatorios": Relatorios,
     "TemplatesContagem": TemplatesContagem,
     "Usuarios": Usuarios,
     "Vendas": Vendas,
-    "PedidosInternos": PedidosInternos,
-    "ContasPagar": ContasPagar,
-    "NotasFiscais": NotasFiscais,
 }
 
 export const pagesConfig = {

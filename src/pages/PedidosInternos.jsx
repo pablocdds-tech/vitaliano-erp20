@@ -159,9 +159,27 @@ export default function PedidosInternos() {
       render: (v) => <StatusBadge status={v} />
     },
     {
-      key: 'created_by',
-      label: 'Criado por',
-      render: (v) => <span className="text-xs text-slate-400 truncate max-w-[120px] block">{v || '-'}</span>
+      key: 'id',
+      label: '',
+      render: (v, row) => row.status === 'draft' ? (
+        <Button
+          size="sm"
+          className="bg-emerald-600 hover:bg-emerald-700 gap-1.5 h-8"
+          disabled={confirmarMutation.isPending || !!confirmandoId}
+          onClick={(e) => {
+            e.stopPropagation();
+            confirmarMutation.mutate(row.id);
+          }}
+        >
+          <CheckCircle2 className="w-3.5 h-3.5" />
+          {confirmandoId === row.id ? 'Confirmando...' : 'Confirmar'}
+        </Button>
+      ) : row.status === 'confirmado' ? (
+        <span className="flex items-center gap-1.5 text-xs text-emerald-600 font-medium">
+          <CheckCircle2 className="w-3.5 h-3.5" />
+          Confirmado
+        </span>
+      ) : null
     }
   ];
 
@@ -211,7 +229,6 @@ export default function PedidosInternos() {
             <SelectItem value="todos">Todos status</SelectItem>
             <SelectItem value="draft">Rascunho</SelectItem>
             <SelectItem value="confirmado">Confirmado</SelectItem>
-            <SelectItem value="cancelado">Cancelado</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -236,10 +253,6 @@ export default function PedidosInternos() {
           onRowClick={(row) => { setPedidoDetalhe(row); setMostrarCupom(false); }}
           rowActions={(row) => {
             const actions = [{ label: 'Ver detalhes', icon: Eye, onClick: () => { setPedidoDetalhe(row); setMostrarCupom(false); } }];
-            if (row.status === 'draft') {
-              actions.push({ label: 'Confirmar pedido', icon: CheckCircle2, onClick: () => confirmarMutation.mutate(row.id) });
-              actions.push({ label: 'Cancelar', icon: XCircle, onClick: () => cancelarMutation.mutate(row.id), destructive: true });
-            }
             if (row.status === 'confirmado') {
               actions.push({ label: 'Ver cupom', icon: FileText, onClick: () => { setPedidoDetalhe(row); setMostrarCupom(true); } });
             }
