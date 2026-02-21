@@ -18,7 +18,7 @@ import {
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { toast } from 'sonner';
-import { confirmarPedidoInterno, cancelarPedidoInterno } from '@/components/services/pedidoInternoService';
+import { confirmarPedidoInterno } from '@/components/services/pedidoInternoService';
 import { getEmpresaAtiva } from '@/components/services/tenantService';
 import PedidoForm from '@/components/pedidos/PedidoForm';
 import CupomConferencia from '@/components/pedidos/CupomConferencia';
@@ -99,16 +99,6 @@ export default function PedidosInternos() {
       toast.error(e.message || 'Erro ao confirmar pedido', { id: 'confirmar' });
       setConfirmandoId(null);
     },
-  });
-
-  const cancelarMutation = useMutation({
-    mutationFn: (id) => cancelarPedidoInterno(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['pedidos-internos'] });
-      setPedidoDetalhe(null);
-      toast.success('Pedido cancelado.');
-    },
-    onError: (e) => toast.error(e.message || 'Erro ao cancelar'),
   });
 
   const pedidosFiltrados = pedidos.filter(p => {
