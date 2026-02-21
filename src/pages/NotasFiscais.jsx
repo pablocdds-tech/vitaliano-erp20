@@ -627,22 +627,9 @@ export default function NotasFiscais() {
                   <Warehouse className="w-4 h-4 shrink-0" />
                   <span>Esta compra gerará <strong>entrada de estoque no CD</strong> e uma Conta a Pagar.</span>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1">
-                    <Label>CD de Destino *</Label>
-                    <Select value={formData.loja_id || '__none__'} onValueChange={v => setFormData({ ...formData, loja_id: v === '__none__' ? '' : v })}>
-                      <SelectTrigger><SelectValue placeholder="Selecione o CD..." /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="__none__">Selecione...</SelectItem>
-                        {lojas.filter(l => l.tipo === 'cd').map(l => <SelectItem key={l.id} value={l.id}>{l.nome}</SelectItem>)}
-                        {lojasLojas.map(l => <SelectItem key={l.id} value={l.id}>{l.nome}</SelectItem>)}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-1">
-                    <Label>Faturado para</Label>
-                    <Input value={formData.faturado_para_nome} onChange={e => setFormData({ ...formData, faturado_para_nome: e.target.value })} placeholder="NB / Praça / Pablo PF..." />
-                  </div>
+                <div className="space-y-1">
+                  <Label>Faturado para *</Label>
+                  <Input value={formData.faturado_para_nome} onChange={e => setFormData({ ...formData, faturado_para_nome: e.target.value })} placeholder="NB / Praça / Pablo PF..." />
                 </div>
               </div>
             )}
