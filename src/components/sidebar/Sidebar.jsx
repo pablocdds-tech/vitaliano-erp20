@@ -19,6 +19,7 @@ import {
   Settings,
   Users,
   Bot,
+  Sparkles,
   ChevronDown,
   Store,
   Truck,
