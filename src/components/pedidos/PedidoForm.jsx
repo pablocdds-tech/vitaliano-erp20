@@ -9,11 +9,11 @@ import { formatMoney } from '@/components/ui-custom/MoneyDisplay';
 import { Plus, Trash2, Package } from 'lucide-react';
 import { format } from 'date-fns';
 
-export default function PedidoForm({ onSave, onCancel, saving }) {
-  const [lojaDestinoId, setLojaDestinoId] = useState('');
-  const [data, setData] = useState(format(new Date(), 'yyyy-MM-dd'));
-  const [observacoes, setObservacoes] = useState('');
-  const [itens, setItens] = useState([]);
+export default function PedidoForm({ onSave, onCancel, saving, pedidoInicial }) {
+  const [lojaDestinoId, setLojaDestinoId] = useState(pedidoInicial?.loja_destino_id || '');
+  const [data, setData] = useState(pedidoInicial?.data || format(new Date(), 'yyyy-MM-dd'));
+  const [observacoes, setObservacoes] = useState(pedidoInicial?.observacoes || '');
+  const [itens, setItens] = useState(pedidoInicial?.itens || []);
   const [search, setSearch] = useState('');
 
   const { data: lojas = [] } = useQuery({
@@ -198,7 +198,7 @@ export default function PedidoForm({ onSave, onCancel, saving }) {
       <div className="flex justify-end gap-3 pt-2">
         <Button variant="outline" onClick={onCancel}>Cancelar</Button>
         <Button onClick={handleSave} disabled={saving}>
-          {saving ? 'Salvando...' : 'Salvar como Rascunho'}
+          {saving ? 'Salvando...' : (pedidoInicial ? 'Salvar Alterações' : 'Salvar como Rascunho')}
         </Button>
       </div>
     </div>
