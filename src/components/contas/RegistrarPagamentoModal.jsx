@@ -17,39 +17,62 @@ import { toast } from 'sonner';
 import { formatMoney } from '@/components/ui-custom/MoneyDisplay';
 import { getEmpresaAtiva } from '@/components/services/tenantService';
 
-// Cria lançamento no banco virtual reduzindo dívida da loja com o CD
+/**
+ * Abate dívida no banco virtual quando a loja paga uma conta do CD com dinheiro real.
+ *
+ * REGRA DE DOMÍNIO:
+ * - Quando o CD faz um pedido interno para a loja, a loja fica DEVENDO ao CD (saldo da loja diminui).
+ * - Quando a loja paga um boleto/despesa DO CD com dinheiro real, a loja MERECE CRÉDITO
+ *   (sua dívida com o CD diminui).
+ *
+ * Portanto:
+ * - loja_origem_id = CD (quem está recebendo o abatimento da sua conta)
+ * - loja_destino_id = loja (quem pagou e recebe crédito)
+ * - Saldo loja: AUMENTA (+valor) → dívida diminui
+ * - Saldo CD: DIMINUI (-valor) → crédito do CD com as lojas diminui
+ */
 async function abaterDividaBancoVirtual({ empresa_id, loja_id, cd_id, valor, descricao, conta_id }) {
   if (!loja_id || !cd_id || loja_id === cd_id) return;
 
-  // Busca saldo atual da loja
-  const lojaAtual = await base44.entities.Loja.filter({ id: loja_id });
-  const loja = lojaAtual[0];
-  if (!loja) return;
+  // Busca saldos atuais frescos
+  const [lojaArr, cdArr] = await Promise.all([
+    base44.entities.Loja.filter({ id: loja_id }),
+    base44.entities.Loja.filter({ id: cd_id }),
+  ]);
+  const loja = lojaArr[0];
+  const cd = cdArr[0];
+  if (!loja || !cd) return;
 
-  const cdAtual = await base44.entities.Loja.filter({ id: cd_id });
-  const cd = cdAtual[0];
-  if (!cd) return;
+  const saldoLojaAnterior = loja.saldo_banco_virtual || 0;
+  const saldoCdAnterior = cd.saldo_banco_virtual || 0;
 
-  // Cria movimentação aprovada diretamente (pagamento real já foi feito)
+  // Cria movimentação: CD "paga" a loja (abatimento)
   await base44.entities.BancoVirtual.create({
     empresa_id,
-    loja_origem_id: loja_id,
-    loja_destino_id: cd_id,
-    tipo: 'pagamento_boleto_cd',
+    loja_origem_id: cd_id,        // CD é a "origem" — está devolvendo crédito
+    loja_destino_id: loja_id,     // Loja é o "destino" — recebe crédito
+    tipo: 'transferencia',
     valor,
-    descricao: descricao || 'Abatimento de dívida via pagamento de conta',
+    descricao: descricao || `Abatimento de dívida — loja pagou despesa do CD`,
+    documento_referencia: conta_id,
+    saldo_origem_anterior: saldoCdAnterior,
+    saldo_origem_posterior: saldoCdAnterior - valor,
+    saldo_destino_anterior: saldoLojaAnterior,
+    saldo_destino_posterior: saldoLojaAnterior + valor,
     status: 'aprovado',
     data_aprovacao: new Date().toISOString(),
-    referencia_conta_pagar_id: conta_id,
+    aprovado_por: 'sistema',
   });
 
-  // Atualiza saldos imediatamente
-  await base44.entities.Loja.update(loja_id, {
-    saldo_banco_virtual: (loja.saldo_banco_virtual || 0) - valor,
-  });
-  await base44.entities.Loja.update(cd_id, {
-    saldo_banco_virtual: (cd.saldo_banco_virtual || 0) + valor,
-  });
+  // Efetivar saldos: loja GANHA crédito (+), CD PERDE crédito (-)
+  await Promise.all([
+    base44.entities.Loja.update(loja_id, {
+      saldo_banco_virtual: saldoLojaAnterior + valor,
+    }),
+    base44.entities.Loja.update(cd_id, {
+      saldo_banco_virtual: saldoCdAnterior - valor,
+    }),
+  ]);
 }
 
 export default function RegistrarPagamentoModal({ open, onClose, conta, contasBancarias, cofres, lojas }) {

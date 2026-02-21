@@ -292,6 +292,28 @@ export default function ContasPagar() {
         const vencida = value === 'pendente' && row.data_vencimento && isAfter(hoje, new Date(row.data_vencimento + 'T23:59:59'));
         return <StatusBadge status={vencida ? 'vencido' : value} />;
       }
+    },
+    {
+      key: 'id',
+      label: '',
+      render: (_, row) => {
+        if (row.status === 'pago') return (
+          <span className="flex items-center gap-1.5 text-xs text-emerald-600 font-medium whitespace-nowrap">
+            <CheckCircle2 className="w-3.5 h-3.5" /> Pago ✅
+          </span>
+        );
+        if (row.status === 'cancelado') return null;
+        return (
+          <Button
+            size="sm"
+            className="bg-indigo-600 hover:bg-indigo-700 gap-1.5 h-8 whitespace-nowrap"
+            onClick={(e) => { e.stopPropagation(); setPagamentoModal(row); }}
+          >
+            <BanknoteIcon className="w-3.5 h-3.5" />
+            Pagar 💳
+          </Button>
+        );
+      }
     }
   ];
 
