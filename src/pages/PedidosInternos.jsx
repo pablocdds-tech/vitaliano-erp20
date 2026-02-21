@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Card, CardContent } from '@/components/ui/card';
 import {
-  ShoppingBag, Plus, CheckCircle2, XCircle, Eye, Package,
+  ShoppingBag, Plus, CheckCircle2, Eye, Package,
   Building2, Store, ArrowRight, FileText, AlertTriangle
 } from 'lucide-react';
 import { format } from 'date-fns';
@@ -290,27 +290,18 @@ export default function PedidosInternos() {
                   <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
                   <div className="flex-1">
                     <p className="text-sm font-medium text-amber-800">Pedido em rascunho</p>
-                    <p className="text-xs text-amber-600">Confirme para gerar movimentos de estoque e banco virtual.</p>
+                    <p className="text-xs text-amber-600">Confirme para gerar movimentos de estoque e débito no banco virtual.</p>
                   </div>
-                  <div className="flex gap-2">
-                    <Button
-                      type="button"
-                      size="sm"
-                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); confirmarMutation.mutate(pedidoAtivo.id); }}
-                      disabled={confirmarMutation.isPending || !!confirmandoId}
-                      className="bg-emerald-600 hover:bg-emerald-700"
-                    >
-                      <CheckCircle2 className="w-4 h-4 mr-1" />
-                      {confirmarMutation.isPending ? 'Confirmando...' : 'Confirmar'}
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="destructive"
-                      onClick={() => cancelarMutation.mutate(pedidoAtivo.id)}
-                    >
-                      <XCircle className="w-4 h-4 mr-1" /> Cancelar
-                    </Button>
-                  </div>
+                  <Button
+                    type="button"
+                    size="sm"
+                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); confirmarMutation.mutate(pedidoAtivo.id); }}
+                    disabled={confirmarMutation.isPending || !!confirmandoId}
+                    className="bg-emerald-600 hover:bg-emerald-700 gap-1.5"
+                  >
+                    <CheckCircle2 className="w-4 h-4" />
+                    {confirmarMutation.isPending ? 'Confirmando...' : 'Confirmar'}
+                  </Button>
                 </div>
               )}
 
