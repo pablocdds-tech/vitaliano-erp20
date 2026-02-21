@@ -91,6 +91,7 @@ Regras importantes:
             temperature: 0.1,
             topP: 0.95,
             maxOutputTokens: 4096,
+            response_mime_type: "application/json",
           },
         }),
       }
