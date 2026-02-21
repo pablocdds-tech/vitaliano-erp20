@@ -10,15 +10,13 @@ import EmptyState from '@/components/ui-custom/EmptyState';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Card, CardContent } from '@/components/ui/card';
 import {
-  ShoppingBag, Plus, CheckCircle2, Eye, Package,
+  ShoppingBag, Plus, CheckCircle2, Eye, Package, Pencil, XCircle,
   Building2, Store, ArrowRight, FileText, AlertTriangle
 } from 'lucide-react';
 import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
 import { toast } from 'sonner';
-import { confirmarPedidoInterno } from '@/components/services/pedidoInternoService';
+import { confirmarPedidoInterno, cancelarPedidoInterno } from '@/components/services/pedidoInternoService';
 import { getEmpresaAtiva } from '@/components/services/tenantService';
 import PedidoForm from '@/components/pedidos/PedidoForm';
 import CupomConferencia from '@/components/pedidos/CupomConferencia';
@@ -26,10 +24,12 @@ import CupomConferencia from '@/components/pedidos/CupomConferencia';
 export default function PedidosInternos() {
   const queryClient = useQueryClient();
   const [modalNovo, setModalNovo] = useState(false);
+  const [modalEditar, setModalEditar] = useState(null); // pedido being edited
   const [pedidoDetalhe, setPedidoDetalhe] = useState(null);
   const [mostrarCupom, setMostrarCupom] = useState(false);
   const [filtroLoja, setFiltroLoja] = useState('todos');
   const [filtroStatus, setFiltroStatus] = useState('todos');
+  const [confirmandoId, setConfirmandoId] = useState(null);
 
   const { data: pedidos = [], isLoading } = useQuery({
     queryKey: ['pedidos-internos'],
@@ -43,8 +43,9 @@ export default function PedidosInternos() {
 
   const cd = lojas.find(l => l.tipo === 'cd');
   const lojasDestino = lojas.filter(l => l.tipo === 'loja');
-
   const getLoja = (id) => lojas.find(l => l.id === id);
+
+  // --- MUTATIONS ---
 
   const criarMutation = useMutation({
     mutationFn: async (dados) => {
@@ -59,39 +60,57 @@ export default function PedidosInternos() {
     onError: (e) => toast.error(e.message || 'Erro ao criar pedido'),
   });
 
-  const [confirmandoId, setConfirmandoId] = useState(null);
+  const editarMutation = useMutation({
+    mutationFn: async ({ id, dados }) => {
+      return base44.entities.PedidoInterno.update(id, dados);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['pedidos-internos'] });
+      setModalEditar(null);
+      setPedidoDetalhe(null);
+      toast.success('Pedido atualizado.');
+    },
+    onError: (e) => toast.error(e.message || 'Erro ao editar pedido'),
+  });
+
+  const cancelarMutation = useMutation({
+    mutationFn: (id) => cancelarPedidoInterno(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['pedidos-internos'] });
+      setPedidoDetalhe(null);
+      toast.success('Pedido cancelado.');
+    },
+    onError: (e) => toast.error(e.message || 'Erro ao cancelar'),
+  });
 
   const confirmarMutation = useMutation({
     mutationFn: async (pedidoId) => {
-      // Guard duplo clique
       if (confirmandoId) throw new Error('Já há uma confirmação em andamento.');
       setConfirmandoId(pedidoId);
-
-      console.log('[CONFIRMAR_CLICK]', { pedidoId });
       toast.loading('Confirmando pedido…', { id: 'confirmar' });
 
-      // Busca pedido completo com itens (fonte da verdade do banco)
+      // Busca pedido completo do banco (fonte da verdade)
       const lista = await base44.entities.PedidoInterno.filter({ id: pedidoId });
       const pedidoCompleto = lista[0];
       if (!pedidoCompleto) throw new Error('Pedido não encontrado.');
-      if (pedidoCompleto.status !== 'draft') throw new Error(`Pedido já está com status "${pedidoCompleto.status}". Não é possível confirmar.`);
-      if (!pedidoCompleto.itens || pedidoCompleto.itens.length === 0) throw new Error('Pedido sem itens — não é possível confirmar.');
+      if (pedidoCompleto.status !== 'draft') throw new Error(`Pedido já está com status "${pedidoCompleto.status}".`);
+      if (!pedidoCompleto.itens || pedidoCompleto.itens.length === 0) throw new Error('Pedido sem itens.');
 
-      console.log('[CONFIRMAR_BEFORE_API]', { itensCount: pedidoCompleto.itens.length, valor: pedidoCompleto.valor_total });
-
+      // Busca lojas frescas do banco para saldos corretos
+      const lojasFrescas = await base44.entities.Loja.list('nome');
       const user = await base44.auth.me();
-      return confirmarPedidoInterno(pedidoCompleto, lojas, user);
+      return confirmarPedidoInterno(pedidoCompleto, lojasFrescas, user);
     },
     onSuccess: (result) => {
-      console.log('[CONFIRMAR_SUCCESS]', result);
-      toast.success('Pedido confirmado! Estoque e banco virtual atualizados.', { id: 'confirmar' });
+      toast.success('Pedido confirmado! Débito gerado no banco virtual.', { id: 'confirmar' });
       queryClient.invalidateQueries({ queryKey: ['pedidos-internos'] });
       queryClient.invalidateQueries({ queryKey: ['lojas'] });
       queryClient.invalidateQueries({ queryKey: ['banco-virtual'] });
       queryClient.invalidateQueries({ queryKey: ['movimentacoes-estoque'] });
       queryClient.invalidateQueries({ queryKey: ['estoque'] });
-      // Atualiza local imediatamente sem esperar refetch
-      setPedidoDetalhe(prev => prev ? { ...prev, status: 'confirmado', confirmado_por: result?.confirmado_por, data_confirmacao: result?.data_confirmacao } : prev);
+      // Atualiza detalhe local e mostra cupom automaticamente
+      setPedidoDetalhe(prev => prev ? { ...prev, ...result, status: 'confirmado' } : null);
+      setMostrarCupom(true);
       setConfirmandoId(null);
     },
     onError: (e) => {
@@ -100,6 +119,8 @@ export default function PedidosInternos() {
       setConfirmandoId(null);
     },
   });
+
+  // --- FILTERS ---
 
   const pedidosFiltrados = pedidos.filter(p => {
     const lojaOk = filtroLoja === 'todos' || p.loja_destino_id === filtroLoja;
@@ -110,6 +131,8 @@ export default function PedidosInternos() {
   const totalDraft = pedidos.filter(p => p.status === 'draft').length;
   const totalConfirmados = pedidos.filter(p => p.status === 'confirmado').length;
   const valorMes = pedidos.filter(p => p.status === 'confirmado' && p.data >= format(new Date(), 'yyyy-MM-01')).reduce((s, p) => s + (p.valor_total || 0), 0);
+
+  // --- TABLE COLUMNS ---
 
   const columns = [
     {
@@ -173,8 +196,7 @@ export default function PedidosInternos() {
     }
   ];
 
-  // pedidoAtivo: prioriza o estado local (pedidoDetalhe) para refletir mudanças imediatas
-  // mas merge com dados da lista (sem sobrescrever itens, que só existem no detalhe)
+  // Merge para manter itens quando abre detalhe
   const pedidoAtivo = pedidoDetalhe
     ? { ...(pedidos.find(p => p.id === pedidoDetalhe.id) || {}), ...pedidoDetalhe }
     : null;
@@ -219,6 +241,7 @@ export default function PedidosInternos() {
             <SelectItem value="todos">Todos status</SelectItem>
             <SelectItem value="draft">Rascunho</SelectItem>
             <SelectItem value="confirmado">Confirmado</SelectItem>
+            <SelectItem value="cancelado">Cancelado</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -243,6 +266,10 @@ export default function PedidosInternos() {
           onRowClick={(row) => { setPedidoDetalhe(row); setMostrarCupom(false); }}
           rowActions={(row) => {
             const actions = [{ label: 'Ver detalhes', icon: Eye, onClick: () => { setPedidoDetalhe(row); setMostrarCupom(false); } }];
+            if (row.status === 'draft') {
+              actions.push({ label: 'Editar pedido', icon: Pencil, onClick: () => setModalEditar(row) });
+              actions.push({ label: 'Cancelar pedido', icon: XCircle, onClick: () => cancelarMutation.mutate(row.id), destructive: true });
+            }
             if (row.status === 'confirmado') {
               actions.push({ label: 'Ver cupom', icon: FileText, onClick: () => { setPedidoDetalhe(row); setMostrarCupom(true); } });
             }
@@ -271,41 +298,79 @@ export default function PedidosInternos() {
         </DialogContent>
       </Dialog>
 
+      {/* Modal editar pedido */}
+      <Dialog open={!!modalEditar} onOpenChange={(open) => { if (!open) setModalEditar(null); }}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Pencil className="w-5 h-5 text-amber-500" />
+              Editar Pedido
+            </DialogTitle>
+          </DialogHeader>
+          {modalEditar && (
+            <PedidoForm
+              pedidoInicial={modalEditar}
+              onSave={(dados) => editarMutation.mutate({ id: modalEditar.id, dados })}
+              onCancel={() => setModalEditar(null)}
+              saving={editarMutation.isPending}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+
       {/* Modal detalhe/cupom */}
       <Dialog open={!!pedidoDetalhe} onOpenChange={(open) => { if (!open) setPedidoDetalhe(null); }}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Package className="w-5 h-5" />
-              Pedido #{pedidoAtivo?.id.slice(-8).toUpperCase()}
+              Pedido #{pedidoAtivo?.id?.slice(-8).toUpperCase()}
               {pedidoAtivo && <StatusBadge status={pedidoAtivo.status} />}
             </DialogTitle>
           </DialogHeader>
 
           {pedidoAtivo && (
             <div className="space-y-4">
-              {/* Ações */}
+              {/* Ações para rascunho */}
               {pedidoAtivo.status === 'draft' && (
                 <div className="flex gap-2 p-3 bg-amber-50 border border-amber-200 rounded-lg">
                   <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
                   <div className="flex-1">
                     <p className="text-sm font-medium text-amber-800">Pedido em rascunho</p>
-                    <p className="text-xs text-amber-600">Confirme para gerar movimentos de estoque e débito no banco virtual.</p>
+                    <p className="text-xs text-amber-600">Confirme para gerar débito no banco virtual e movimentar estoque.</p>
                   </div>
-                  <Button
-                    type="button"
-                    size="sm"
-                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); confirmarMutation.mutate(pedidoAtivo.id); }}
-                    disabled={confirmarMutation.isPending || !!confirmandoId}
-                    className="bg-emerald-600 hover:bg-emerald-700 gap-1.5"
-                  >
-                    <CheckCircle2 className="w-4 h-4" />
-                    {confirmarMutation.isPending ? 'Confirmando...' : 'Confirmar'}
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => { setPedidoDetalhe(null); setModalEditar(pedidoAtivo); }}
+                      className="gap-1.5"
+                    >
+                      <Pencil className="w-3.5 h-3.5" /> Editar
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={() => cancelarMutation.mutate(pedidoAtivo.id)}
+                      disabled={cancelarMutation.isPending}
+                      className="gap-1.5"
+                    >
+                      <XCircle className="w-3.5 h-3.5" /> Cancelar
+                    </Button>
+                    <Button
+                      size="sm"
+                      onClick={() => confirmarMutation.mutate(pedidoAtivo.id)}
+                      disabled={confirmarMutation.isPending || !!confirmandoId}
+                      className="bg-emerald-600 hover:bg-emerald-700 gap-1.5"
+                    >
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      {confirmarMutation.isPending ? 'Confirmando...' : 'Confirmar'}
+                    </Button>
+                  </div>
                 </div>
               )}
 
-              {/* Alternância detalhe / cupom */}
+              {/* Tabs detalhe / cupom para confirmados */}
               {pedidoAtivo.status === 'confirmado' && (
                 <div className="flex gap-2">
                   <Button size="sm" variant={!mostrarCupom ? 'default' : 'outline'} onClick={() => setMostrarCupom(false)}>
@@ -314,6 +379,14 @@ export default function PedidosInternos() {
                   <Button size="sm" variant={mostrarCupom ? 'default' : 'outline'} onClick={() => setMostrarCupom(true)}>
                     <FileText className="w-4 h-4 mr-1" /> Cupom de Conferência
                   </Button>
+                </div>
+              )}
+
+              {/* Cancelado banner */}
+              {pedidoAtivo.status === 'cancelado' && (
+                <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
+                  <XCircle className="w-5 h-5 text-red-500" />
+                  <p className="text-sm font-medium text-red-700">Este pedido foi cancelado.</p>
                 </div>
               )}
 
@@ -337,6 +410,18 @@ export default function PedidosInternos() {
                       <span className="text-slate-500">Criado por:</span>
                       <p className="font-medium text-xs">{pedidoAtivo.created_by || '-'}</p>
                     </div>
+                    {pedidoAtivo.confirmado_por && (
+                      <div>
+                        <span className="text-slate-500">Confirmado por:</span>
+                        <p className="font-medium text-xs">{pedidoAtivo.confirmado_por}</p>
+                      </div>
+                    )}
+                    {pedidoAtivo.data_confirmacao && (
+                      <div>
+                        <span className="text-slate-500">Confirmado em:</span>
+                        <p className="font-medium text-xs">{format(new Date(pedidoAtivo.data_confirmacao), 'dd/MM/yyyy HH:mm')}</p>
+                      </div>
+                    )}
                   </div>
 
                   {/* Itens */}
