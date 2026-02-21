@@ -698,6 +698,23 @@ export default function NotasFiscais() {
                 </Select>
               </div>
               <div className="space-y-1">
+                <Label>Faturado para</Label>
+                {formData.tipo_lancamento === 'compra_cd' ? (
+                  <Select value={formData.faturado_para_id || '__none__'} onValueChange={v => {
+                    const loja = lojas.find(l => l.id === v);
+                    setFormData({ ...formData, faturado_para_id: v === '__none__' ? '' : v, faturado_para_nome: loja?.nome || '', loja_id: cd?.id || '' });
+                  }}>
+                    <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__none__">Selecione...</SelectItem>
+                      {lojas.map(l => <SelectItem key={l.id} value={l.id}>{l.nome}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <Input value={formData.faturado_para_nome} onChange={e => setFormData({ ...formData, faturado_para_nome: e.target.value })} placeholder="NB / Praça / Pablo PF..." />
+                )}
+              </div>
+              <div className="space-y-1">
                 <Label>Número da NF *</Label>
                 <Input value={formData.numero} onChange={e => setFormData({ ...formData, numero: e.target.value })} placeholder="000001" required />
               </div>
