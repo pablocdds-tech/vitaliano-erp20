@@ -48,6 +48,7 @@
  * The mainPage value must match a key in the PAGES object exactly.
  */
 import AdminSaaS from './pages/AdminSaaS';
+import AssistenteERP from './pages/AssistenteERP';
 import AuditoriaDodia from './pages/AuditoriaDodia';
 import BancoVirtual from './pages/BancoVirtual';
 import Categorias from './pages/Categorias';
@@ -81,12 +82,13 @@ import Relatorios from './pages/Relatorios';
 import TemplatesContagem from './pages/TemplatesContagem';
 import Usuarios from './pages/Usuarios';
 import Vendas from './pages/Vendas';
-import AssistenteERP from './pages/AssistenteERP';
+import AgenteFiscal from './pages/AgenteFiscal';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
     "AdminSaaS": AdminSaaS,
+    "AssistenteERP": AssistenteERP,
     "AuditoriaDodia": AuditoriaDodia,
     "BancoVirtual": BancoVirtual,
     "Categorias": Categorias,
@@ -120,7 +122,7 @@ export const PAGES = {
     "TemplatesContagem": TemplatesContagem,
     "Usuarios": Usuarios,
     "Vendas": Vendas,
-    "AssistenteERP": AssistenteERP,
+    "AgenteFiscal": AgenteFiscal,
 }
 
 export const pagesConfig = {
