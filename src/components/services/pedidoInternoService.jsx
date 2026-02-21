@@ -37,6 +37,7 @@ export async function confirmarPedidoInterno(pedido, lojas, user) {
   // 1. Movimentações de estoque REAIS para cada item
   for (const item of pedido.itens) {
     // Saída do CD — atualiza Estoque do CD e cria MovimentacaoEstoque
+    // permitir_negativo=true pois CD pode distribuir mesmo sem entrada formal registrada
     await processarSaida({
       empresa_id,
       loja_id: pedido.cd_id,
@@ -46,6 +47,7 @@ export async function confirmarPedidoInterno(pedido, lojas, user) {
       documento_tipo: 'transferencia',
       documento_id: pedido.id,
       observacao: `Pedido interno ${pedidoRef} → ${lojaDestino.nome}`,
+      permitir_negativo: true,
     });
 
     // Entrada na loja destino — atualiza Estoque da loja e custo médio

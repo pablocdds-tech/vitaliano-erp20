@@ -101,6 +101,7 @@ export async function processarSaida({
   documento_tipo = 'ajuste_manual',
   documento_id = null,
   observacao = '',
+  permitir_negativo = false,
 }) {
   if (!empresa_id) throw new Error('[estoqueService] empresa_id é obrigatório');
   if (!loja_id) throw new Error('[estoqueService] loja_id é obrigatório');
@@ -111,8 +112,8 @@ export async function processarSaida({
   const estoque = await obterOuCriarEstoque(empresa_id, loja_id, produto_id);
   const qtdAtual = estoque.quantidade || 0;
 
-  // ✅ REGRA: bloquear estoque negativo
-  if (qtdAtual < quantidade) {
+  // Bloquear estoque negativo (exceto transferências CD→Loja onde o CD pode não ter entrada formal)
+  if (!permitir_negativo && qtdAtual < quantidade) {
     throw new Error(
       `[estoqueService] Estoque insuficiente. Disponível: ${qtdAtual}, Solicitado: ${quantidade}`
     );
