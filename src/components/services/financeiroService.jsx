@@ -11,7 +11,12 @@ import { base44 } from '@/api/base44Client';
 
 /**
  * Cria conta(s) a pagar a partir do lançamento de uma Nota Fiscal.
- * Se a NF tiver parcelas, cria uma conta por parcela.
+ * Suporta fluxo CD (estoque) e Compra Direta Loja (financeiro-only).
+ *
+ * Para Compra Direta Loja:
+ *   - loja_id na CP = loja_responsavel_id (a loja que vai pagar)
+ *   - credor_nome = faturado_para_nome || loja faturada
+ *   - categoria_dre_id propagada para classificação DRE/CMV
  */
 export async function criarContasPagarNF({ empresa_id, loja_id, fornecedor_id, nota }) {
   if (!empresa_id) throw new Error('[financeiroService] empresa_id é obrigatório');
@@ -21,51 +26,70 @@ export async function criarContasPagarNF({ empresa_id, loja_id, fornecedor_id, n
   const primeiroVenc = nota.primeiro_vencimento || nota.data_entrada || nota.data_emissao;
   const baseDesc = `NF ${nota.numero || 'S/N'}/${nota.serie || '1'}`;
 
+  // Para compra direta loja, a loja_id da CP é a responsável (quem paga)
+  const lojaIdConta = nota.tipo_lancamento === 'compra_direta_loja'
+    ? (nota.loja_responsavel_id || loja_id)
+    : loja_id;
+
+  const extraFields = {
+    categoria_dre_id: nota.categoria_dre_id || null,
+    credor_nome: nota.faturado_para_nome || null,
+    tipo_lancamento_nf: nota.tipo_lancamento || 'compra_cd',
+  };
+
+  const formaBase = nota.forma_pagamento || 'boleto';
+
+  const criarUmaConta = async ({ descricao, data_vencimento, valor_original, parcela_atual, total_parcelas }) => {
+    await base44.entities.ContaPagar.create({
+      empresa_id,
+      loja_id: lojaIdConta,
+      fornecedor_id: fornecedor_id || null,
+      descricao,
+      documento_tipo: nota.documento_tipo || 'nota_fiscal',
+      documento_numero: nota.numero,
+      documento_id: nota.id,
+      data_emissao: nota.data_emissao,
+      data_vencimento,
+      valor_original,
+      forma_pagamento: formaBase,
+      status: 'pendente',
+      parcela_atual: parcela_atual ?? 1,
+      total_parcelas: total_parcelas ?? 1,
+      ...extraFields,
+    });
+  };
+
   if (numParcelas > 1 && primeiroVenc) {
-    // Gera parcelas mensais
     const vlrParcela = parseFloat((nota.valor_total / numParcelas).toFixed(2));
     const diff = parseFloat((nota.valor_total - vlrParcela * numParcelas).toFixed(2));
     for (let i = 0; i < numParcelas; i++) {
       const vencDate = new Date(primeiroVenc + 'T12:00:00');
       vencDate.setMonth(vencDate.getMonth() + i);
-      const vencimento = vencDate.toISOString().slice(0, 10);
-      const valor = i === numParcelas - 1 ? vlrParcela + diff : vlrParcela;
-      await base44.entities.ContaPagar.create({
-        empresa_id, loja_id, fornecedor_id,
+      await criarUmaConta({
         descricao: `${baseDesc} - Parcela ${i + 1}/${numParcelas}`,
-        documento_tipo: 'nota_fiscal',
-        documento_numero: nota.numero,
-        documento_id: nota.id,
-        data_emissao: nota.data_emissao,
-        data_vencimento: vencimento,
-        valor_original: valor,
-        forma_pagamento: 'boleto',
-        status: 'pendente',
+        data_vencimento: vencDate.toISOString().slice(0, 10),
+        valor_original: i === numParcelas - 1 ? vlrParcela + diff : vlrParcela,
         parcela_atual: i + 1,
         total_parcelas: numParcelas,
       });
     }
-  } else if (nota.parcelas && nota.parcelas.length > 0) {
-    for (const parcela of nota.parcelas) {
-      await base44.entities.ContaPagar.create({
-        empresa_id, loja_id, fornecedor_id,
-        descricao: `${baseDesc} - Parcela ${parcela.numero}/${nota.parcelas.length}`,
-        documento_tipo: 'nota_fiscal', documento_numero: nota.numero, documento_id: nota.id,
-        data_emissao: nota.data_emissao, data_vencimento: parcela.vencimento,
-        valor_original: parcela.valor, forma_pagamento: 'boleto', status: 'pendente',
-        parcela_atual: parcela.numero, total_parcelas: nota.parcelas.length,
+  } else if (nota.parcelas?.length > 0) {
+    for (const p of nota.parcelas) {
+      await criarUmaConta({
+        descricao: `${baseDesc} - Parcela ${p.numero}/${nota.parcelas.length}`,
+        data_vencimento: p.vencimento,
+        valor_original: p.valor,
+        parcela_atual: p.numero,
+        total_parcelas: nota.parcelas.length,
       });
     }
   } else {
-    await base44.entities.ContaPagar.create({
-      empresa_id, loja_id, fornecedor_id,
+    await criarUmaConta({
       descricao: baseDesc,
-      documento_tipo: 'nota_fiscal', documento_numero: nota.numero, documento_id: nota.id,
-      data_emissao: nota.data_emissao,
       data_vencimento: primeiroVenc,
       valor_original: nota.valor_total,
-      forma_pagamento: 'boleto', status: 'pendente',
-      parcela_atual: 1, total_parcelas: 1,
+      parcela_atual: 1,
+      total_parcelas: 1,
     });
   }
 }
