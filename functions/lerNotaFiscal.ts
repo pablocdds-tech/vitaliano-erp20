@@ -21,53 +21,15 @@ Deno.serve(async (req) => {
 
     const prompt = `Você é um especialista em leitura de notas fiscais brasileiras.
 Analise a imagem desta nota fiscal e extraia TODOS os dados disponíveis.
-Retorne APENAS um JSON válido, sem markdown, sem explicações, somente o JSON puro.
-
-O JSON deve seguir exatamente esta estrutura:
-{
-  "fornecedor": {
-    "razao_social": "string ou null",
-    "nome_fantasia": "string ou null",
-    "cnpj": "string (somente números) ou null",
-    "inscricao_estadual": "string ou null",
-    "endereco": "string ou null"
-  },
-  "numero": "string ou null",
-  "serie": "string ou null",
-  "chave_acesso": "string (44 dígitos, somente números) ou null",
-  "data_emissao": "string no formato YYYY-MM-DD ou null",
-  "data_vencimento": "string no formato YYYY-MM-DD ou null",
-  "forma_pagamento": "boleto | pix | transferencia | dinheiro | cartao | cheque | null",
-  "itens": [
-    {
-      "descricao": "string",
-      "codigo": "string ou null",
-      "ncm": "string ou null",
-      "cfop": "string ou null",
-      "unidade": "string ou null",
-      "quantidade": number,
-      "valor_unitario": number,
-      "subtotal": number
-    }
-  ],
-  "valor_produtos": number ou null,
-  "valor_frete": number ou null,
-  "valor_desconto": number ou null,
-  "valor_ipi": number ou null,
-  "valor_icms": number ou null,
-  "valor_total": number ou null,
-  "num_parcelas": number ou null,
-  "observacoes": "string ou null"
-}
+Retorne o JSON conforme a estrutura solicitada.
 
 Regras importantes:
-- Valores monetários devem ser números (ex: 150.50, não "R$ 150,50")
+- Valores monetários devem ser números (ex: 150.50)
 - Datas no formato YYYY-MM-DD
-- CNPJ e chave de acesso somente dígitos, sem pontos ou traços
-- Se não encontrar um campo, use null
-- Para itens, extraia TODOS os itens da nota
-- Se houver dúvida entre dois valores para o total, prefira o "Valor Total da Nota"`;
+- CNPJ e chave de acesso somente dígitos
+- Se não encontrar um campo, use null`;
 
+    // CORREÇÃO: Usando a rota do modelo estável gemini-2.5-flash
     const geminiRes = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
       {
@@ -90,7 +52,8 @@ Regras importantes:
           generationConfig: {
             temperature: 0.1,
             topP: 0.95,
-            maxOutputTokens: 4096,
+            maxOutputTokens: 8192,
+            // Força a saída a ser um JSON estruturado
             response_mime_type: "application/json",
           },
         }),
@@ -99,21 +62,19 @@ Regras importantes:
 
     if (!geminiRes.ok) {
       const err = await geminiRes.text();
+      // Se der 404 aqui, verifique se a GEMINI_API_KEY está correta e ativa no Google AI Studio
       return Response.json({ error: `Erro na API Gemini: ${err}` }, { status: 502 });
     }
 
     const geminiData = await geminiRes.json();
     const rawText = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text || '';
 
-    // Limpa markdown caso venha envolvido em ```json ... ```
-    const cleaned = rawText.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
-
     let parsed;
     try {
-      parsed = JSON.parse(cleaned);
+      parsed = JSON.parse(rawText);
     } catch {
       return Response.json({
-        error: 'Não foi possível interpretar o retorno do Gemini como JSON',
+        error: 'Erro ao processar JSON retornado pela IA',
         raw: rawText,
       }, { status: 422 });
     }
