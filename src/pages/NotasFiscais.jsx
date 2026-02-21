@@ -18,7 +18,8 @@ import {
 } from "@/components/ui/select";
 import {
   FileText, Plus, Upload, Eye, CheckCircle2, Bot, Building2,
-  Loader2, Sparkles, Trash2, Search, PackagePlus
+  Loader2, Sparkles, Trash2, Search, PackagePlus, Warehouse, ShoppingCart,
+  Store
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
@@ -28,6 +29,7 @@ import { getEmpresaAtiva } from '@/components/services/tenantService';
 
 const UNIDADES = ['un', 'kg', 'g', 'l', 'ml', 'cx', 'pc', 'fd'];
 
+// ─── Modal de novo produto inline ────────────────────────────────────────────
 function NovoProdutoModal({ open, onClose, categorias, onSave }) {
   const [form, setForm] = useState({ nome: '', categoria_id: '', unidade_medida: 'un', tipo: 'insumo' });
   const queryClient = useQueryClient();
@@ -93,6 +95,7 @@ function NovoProdutoModal({ open, onClose, categorias, onSave }) {
   );
 }
 
+// ─── Linha de item ─────────────────────────────────────────────────────────
 function ItemRow({ item, idx, produtos, onUpdate, onRemove, onAddProduto }) {
   const [search, setSearch] = useState('');
   const [showSearch, setShowSearch] = useState(false);
@@ -103,12 +106,7 @@ function ItemRow({ item, idx, produtos, onUpdate, onRemove, onAddProduto }) {
     : [];
 
   const selectProd = (p) => {
-    onUpdate(idx, {
-      produto_id: p.id,
-      descricao_nf: p.nome,
-      custo_unitario: p.custo_medio || 0,
-      subtotal: item.quantidade * (p.custo_medio || 0),
-    });
+    onUpdate(idx, { produto_id: p.id, descricao_nf: p.nome, custo_unitario: p.custo_medio || 0, subtotal: item.quantidade * (p.custo_medio || 0) });
     setShowSearch(false);
     setSearch('');
   };
@@ -123,7 +121,6 @@ function ItemRow({ item, idx, produtos, onUpdate, onRemove, onAddProduto }) {
 
   return (
     <div className="grid grid-cols-12 gap-2 items-start border-b pb-3 last:border-0">
-      {/* Produto */}
       <div className="col-span-5 space-y-1 relative">
         {produtoSelecionado ? (
           <div className="flex items-center gap-2 p-2 border rounded-md bg-slate-50 dark:bg-slate-800">
@@ -134,13 +131,7 @@ function ItemRow({ item, idx, produtos, onUpdate, onRemove, onAddProduto }) {
           <div className="relative">
             <div className="relative">
               <Search className="absolute left-2.5 top-2.5 w-3.5 h-3.5 text-slate-400" />
-              <Input
-                className="pl-7 text-xs h-8"
-                placeholder="Buscar produto..."
-                value={search}
-                onChange={e => { setSearch(e.target.value); setShowSearch(true); }}
-                onFocus={() => setShowSearch(true)}
-              />
+              <Input className="pl-7 text-xs h-8" placeholder="Buscar produto..." value={search} onChange={e => { setSearch(e.target.value); setShowSearch(true); }} onFocus={() => setShowSearch(true)} />
             </div>
             {showSearch && search.length >= 2 && (
               <div className="absolute z-50 mt-1 w-full bg-white dark:bg-slate-900 border rounded-lg shadow-lg max-h-40 overflow-y-auto">
@@ -159,19 +150,15 @@ function ItemRow({ item, idx, produtos, onUpdate, onRemove, onAddProduto }) {
         )}
         <Input className="text-xs h-7" placeholder="Descrição na NF" value={item.descricao_nf || ''} onChange={e => update('descricao_nf', e.target.value)} />
       </div>
-      {/* Qtd */}
       <div className="col-span-2">
         <Input type="number" className="text-xs h-8" value={item.quantidade} min="0.001" step="0.001" onChange={e => update('quantidade', parseFloat(e.target.value) || 0)} />
       </div>
-      {/* Custo Unit */}
       <div className="col-span-2">
         <Input type="number" className="text-xs h-8" value={item.custo_unitario} min="0" step="0.01" onChange={e => update('custo_unitario', parseFloat(e.target.value) || 0)} />
       </div>
-      {/* Subtotal */}
       <div className="col-span-2 flex items-center">
         <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">{formatMoney(item.subtotal || 0)}</span>
       </div>
-      {/* Remove */}
       <div className="col-span-1 flex items-center">
         <button type="button" onClick={() => onRemove(idx)} className="text-red-400 hover:text-red-600">
           <Trash2 className="w-4 h-4" />
@@ -181,61 +168,131 @@ function ItemRow({ item, idx, produtos, onUpdate, onRemove, onAddProduto }) {
   );
 }
 
+// ─── Seletor de Tipo de Lançamento ────────────────────────────────────────
+function TipoLancamentoSelector({ value, onChange }) {
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <button
+        type="button"
+        onClick={() => onChange('compra_cd')}
+        className={`flex items-start gap-3 p-4 rounded-xl border-2 text-left transition-all ${
+          value === 'compra_cd'
+            ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20'
+            : 'border-slate-200 dark:border-slate-700 hover:border-slate-300'
+        }`}
+      >
+        <Warehouse className={`w-6 h-6 mt-0.5 shrink-0 ${value === 'compra_cd' ? 'text-indigo-600' : 'text-slate-400'}`} />
+        <div>
+          <p className={`font-semibold text-sm ${value === 'compra_cd' ? 'text-indigo-700 dark:text-indigo-300' : 'text-slate-700 dark:text-slate-300'}`}>
+            Compra para CD
+          </p>
+          <p className="text-xs text-slate-500 mt-0.5">Gera entrada de estoque no CD + Conta a Pagar</p>
+        </div>
+      </button>
+
+      <button
+        type="button"
+        onClick={() => onChange('compra_direta_loja')}
+        className={`flex items-start gap-3 p-4 rounded-xl border-2 text-left transition-all ${
+          value === 'compra_direta_loja'
+            ? 'border-amber-500 bg-amber-50 dark:bg-amber-900/20'
+            : 'border-slate-200 dark:border-slate-700 hover:border-slate-300'
+        }`}
+      >
+        <ShoppingCart className={`w-6 h-6 mt-0.5 shrink-0 ${value === 'compra_direta_loja' ? 'text-amber-600' : 'text-slate-400'}`} />
+        <div>
+          <p className={`font-semibold text-sm ${value === 'compra_direta_loja' ? 'text-amber-700 dark:text-amber-300' : 'text-slate-700 dark:text-slate-300'}`}>
+            Compra Direta Loja
+          </p>
+          <p className="text-xs text-slate-500 mt-0.5">Financeiro/DRE apenas — SEM estoque no CD</p>
+        </div>
+      </button>
+    </div>
+  );
+}
+
+// ─── Página principal ─────────────────────────────────────────────────────
 export default function NotasFiscais() {
   const queryClient = useQueryClient();
   const [modalOpen, setModalOpen] = useState(false);
   const [viewModal, setViewModal] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [processing, setProcessing] = useState(false);
-  const [novoProdutoForIdx, setNovoProdutoForIdx] = useState(null); // idx do item que vai receber o novo produto
+  const [novoProdutoForIdx, setNovoProdutoForIdx] = useState(null);
+  const [lancando, setLancando] = useState(false);
+  // Filtros
+  const [filtroTipo, setFiltroTipo] = useState('todos');
+  const [filtroLoja, setFiltroLoja] = useState('todas');
 
   const emptyForm = {
-    loja_id: '', fornecedor_id: '', numero: '', serie: '1',
-    data_emissao: format(new Date(), 'yyyy-MM-dd'), data_entrada: format(new Date(), 'yyyy-MM-dd'),
+    tipo_lancamento: 'compra_cd',
+    loja_id: '',             // para CD: é o CD; para direta: loja responsável
+    loja_responsavel_id: '', // sempre = loja que gerou a despesa
+    faturado_para_id: '',    // loja/entidade faturada (opcional — ID)
+    faturado_para_nome: '',  // nome livre caso não seja loja cadastrada
+    categoria_dre_id: '',
+    fornecedor_id: '',
+    numero: '', serie: '1',
+    data_emissao: format(new Date(), 'yyyy-MM-dd'),
+    data_entrada: format(new Date(), 'yyyy-MM-dd'),
     valor_total: 0, chave_acesso: '',
     itens: [],
-    // parcelamento para CP gerada
-    num_parcelas: 1, primeiro_vencimento: format(new Date(), 'yyyy-MM-dd'),
+    num_parcelas: 1,
+    primeiro_vencimento: format(new Date(), 'yyyy-MM-dd'),
     forma_pagamento: 'boleto',
+    documento_tipo: 'nota_fiscal',
+    lancado_no_pdv: false,
+    observacoes: '',
   };
   const [formData, setFormData] = useState(emptyForm);
 
   const { data: notas = [], isLoading } = useQuery({
     queryKey: ['notas-fiscais'],
-    queryFn: () => base44.entities.NotaFiscal.list('-created_date', 50)
+    queryFn: () => base44.entities.NotaFiscal.list('-created_date', 100)
   });
   const { data: lojas = [] } = useQuery({ queryKey: ['lojas'], queryFn: () => base44.entities.Loja.list() });
   const { data: fornecedores = [] } = useQuery({ queryKey: ['fornecedores'], queryFn: () => base44.entities.Fornecedor.list() });
   const { data: produtos = [] } = useQuery({ queryKey: ['produtos'], queryFn: () => base44.entities.Produto.list() });
   const { data: categorias = [] } = useQuery({ queryKey: ['categorias'], queryFn: () => base44.entities.Categoria.list() });
+  const { data: categoriasDRE = [] } = useQuery({ queryKey: ['categorias-dre'], queryFn: () => base44.entities.CategoriaDRE.list() });
+
+  const cd = lojas.find(l => l.tipo === 'cd');
+  const lojasLojas = lojas.filter(l => l.tipo !== 'cd');
 
   const createMutation = useMutation({
     mutationFn: async (data) => {
       const empresa = await getEmpresaAtiva();
-      // Calcula valor_total a partir dos itens, se houver
       const total = data.itens?.length > 0
         ? data.itens.reduce((s, i) => s + (i.subtotal || 0), 0)
         : data.valor_total;
-      return base44.entities.NotaFiscal.create({ ...data, empresa_id: empresa.id, valor_total: total, status: 'pendente' });
+      // loja_id armazenada: para CD = CD, para direta = loja_responsavel_id
+      const lojaIdFinal = data.tipo_lancamento === 'compra_cd'
+        ? (data.loja_id || cd?.id)
+        : data.loja_responsavel_id;
+      return base44.entities.NotaFiscal.create({
+        ...data,
+        empresa_id: empresa.id,
+        loja_id: lojaIdFinal,
+        valor_total: total,
+        status: 'pendente',
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notas-fiscais'] });
       setModalOpen(false);
       setFormData(emptyForm);
-      toast.success('Nota fiscal cadastrada! Clique em "Lançar" para dar entrada no estoque.');
+      toast.success('NF cadastrada! Clique em "Lançar" para processar.');
     },
     onError: (e) => toast.error('Erro ao cadastrar: ' + e.message),
   });
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }) => base44.entities.NotaFiscal.update(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notas-fiscais'] });
-      toast.success('Nota fiscal atualizada!');
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['notas-fiscais'] }),
     onError: (e) => toast.error('Erro: ' + e.message),
   });
 
+  // ── Upload XML / IA ──────────────────────────────────────────────────────
   const handleFileUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -272,41 +329,41 @@ export default function NotasFiscais() {
           subtotal: i.valor_total || 0,
         })),
       }));
-      toast.success('Nota processada pela IA! Vincule os produtos aos itens.');
+      toast.success('Nota processada pela IA! Vincule os produtos e escolha o tipo de lançamento.');
     }
   };
 
-  const [lancando, setLancando] = useState(false);
-
+  // ── Lançar NF ────────────────────────────────────────────────────────────
   const handleLancar = async (nota) => {
-    // Guard: impede duplo lançamento
-    if (nota.status === 'lancada') {
-      toast.info('Esta nota já foi lançada.');
-      return;
-    }
+    if (nota.status === 'lancada') { toast.info('Esta nota já foi lançada.'); return; }
     if (lancando) return;
     setLancando(true);
     try {
       const empresa = await getEmpresaAtiva();
-      // Marca como lançada PRIMEIRO para idempotência
       await updateMutation.mutateAsync({ id: nota.id, data: { status: 'lancada' } });
 
-      if (nota.itens?.length > 0) {
+      const tipoLancamento = nota.tipo_lancamento || 'compra_cd';
+
+      // Fluxo A: Compra CD → gera estoque no CD
+      if (tipoLancamento === 'compra_cd' && nota.itens?.length > 0) {
+        const lojaEstoque = nota.loja_id; // deve ser o CD
         for (const item of nota.itens) {
           if (!item.produto_id || !item.quantidade) continue;
           await processarEntrada({
             empresa_id: empresa.id,
-            loja_id: nota.loja_id,
+            loja_id: lojaEstoque,
             produto_id: item.produto_id,
             quantidade: item.quantidade,
-            custo_unitario: item.custo_unitario || item.valor_unitario || 0,
+            custo_unitario: item.custo_unitario || 0,
             documento_tipo: 'nota_fiscal',
             documento_id: nota.id,
             observacao: `Entrada via NF ${nota.numero}/${nota.serie || '1'}`,
           });
         }
       }
+      // Fluxo B: Compra Direta Loja → NÃO gera estoque
 
+      // Ambos os fluxos: gera Conta(s) a Pagar
       await criarContasPagarNF({
         empresa_id: empresa.id,
         loja_id: nota.loja_id,
@@ -316,7 +373,11 @@ export default function NotasFiscais() {
 
       queryClient.invalidateQueries({ queryKey: ['contas-pagar'] });
       queryClient.invalidateQueries({ queryKey: ['estoque'] });
-      toast.success('Nota lançada! Estoque e conta a pagar atualizados.');
+
+      const msg = tipoLancamento === 'compra_cd'
+        ? 'NF lançada! Estoque do CD e conta a pagar atualizados.'
+        : 'NF lançada! Conta a pagar gerada. Nenhum estoque movimentado no CD.';
+      toast.success(msg);
     } catch (err) {
       toast.error('Erro ao lançar: ' + err.message);
     } finally {
@@ -325,25 +386,17 @@ export default function NotasFiscais() {
   };
 
   const handleConferir = async (nota) => {
-    if (nota.status !== 'pendente') {
-      toast.info('Esta nota já foi conferida.');
-      return;
-    }
+    if (nota.status !== 'pendente') { toast.info('Esta nota já foi conferida.'); return; }
     await updateMutation.mutateAsync({ id: nota.id, data: { status: 'conferida' } });
+    toast.success('Nota conferida!');
   };
 
-  const addItem = () => {
-    setFormData(prev => ({
-      ...prev,
-      itens: [...prev.itens, { produto_id: '', descricao_nf: '', quantidade: 1, custo_unitario: 0, subtotal: 0 }]
-    }));
-  };
+  const addItem = () => setFormData(prev => ({ ...prev, itens: [...prev.itens, { produto_id: '', descricao_nf: '', quantidade: 1, custo_unitario: 0, subtotal: 0 }] }));
 
   const updateItem = (idx, patch) => {
     setFormData(prev => {
       const itens = prev.itens.map((it, i) => i === idx ? { ...it, ...patch } : it);
-      const valor_total = itens.reduce((s, i) => s + (i.subtotal || 0), 0);
-      return { ...prev, itens, valor_total };
+      return { ...prev, itens, valor_total: itens.reduce((s, i) => s + (i.subtotal || 0), 0) };
     });
   };
 
@@ -356,12 +409,7 @@ export default function NotasFiscais() {
 
   const handleNovoProdutoSalvo = (prod) => {
     if (novoProdutoForIdx !== null) {
-      updateItem(novoProdutoForIdx, {
-        produto_id: prod.id,
-        descricao_nf: prod.nome,
-        custo_unitario: 0,
-        subtotal: 0,
-      });
+      updateItem(novoProdutoForIdx, { produto_id: prod.id, descricao_nf: prod.nome, custo_unitario: 0, subtotal: 0 });
       setNovoProdutoForIdx(null);
     }
   };
@@ -369,13 +417,31 @@ export default function NotasFiscais() {
   const getLoja = (id) => lojas.find(l => l.id === id);
   const getFornecedor = (id) => fornecedores.find(f => f.id === id);
 
+  // Validação do formulário
+  const canSubmit = () => {
+    if (!formData.numero) return false;
+    if (formData.tipo_lancamento === 'compra_cd') {
+      return !!formData.loja_id;
+    }
+    // compra_direta_loja
+    return !!(formData.loja_responsavel_id && formData.categoria_dre_id && formData.primeiro_vencimento);
+  };
+
+  // Filtros aplicados
+  const notasFiltradas = notas.filter(n => {
+    const okTipo = filtroTipo === 'todos' || n.tipo_lancamento === filtroTipo || (!n.tipo_lancamento && filtroTipo === 'compra_cd');
+    const okLoja = filtroLoja === 'todas' || n.loja_id === filtroLoja || n.loja_responsavel_id === filtroLoja;
+    return okTipo && okLoja;
+  });
+
+  // ── Colunas ───────────────────────────────────────────────────────────────
   const columns = [
     {
       key: 'numero', label: 'NF', sortable: true,
       render: (value, row) => (
         <div className="flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-blue-50 dark:bg-blue-900/20">
-            <FileText className="w-4 h-4 text-blue-600" />
+          <div className={`p-2 rounded-lg ${row.tipo_lancamento === 'compra_direta_loja' ? 'bg-amber-50 dark:bg-amber-900/20' : 'bg-blue-50 dark:bg-blue-900/20'}`}>
+            <FileText className={`w-4 h-4 ${row.tipo_lancamento === 'compra_direta_loja' ? 'text-amber-600' : 'text-blue-600'}`} />
           </div>
           <div>
             <p className="font-medium text-slate-800 dark:text-white">{value || '(manual)'}</p>
@@ -385,35 +451,59 @@ export default function NotasFiscais() {
       )
     },
     {
-      key: 'fornecedor_id', label: 'Fornecedor',
-      render: (value) => {
-        const f = getFornecedor(value);
-        return f ? <div className="flex items-center gap-2 text-sm"><Building2 className="w-4 h-4 text-slate-400" />{f.nome_fantasia || f.razao_social}</div> : <span className="text-slate-400 text-sm">—</span>;
+      key: 'tipo_lancamento', label: 'Tipo',
+      render: (v) => {
+        const isLoja = v === 'compra_direta_loja';
+        return (
+          <span className={`inline-flex items-center gap-1.5 text-xs font-medium px-2 py-1 rounded-full ${isLoja ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300' : 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300'}`}>
+            {isLoja ? <ShoppingCart className="w-3 h-3" /> : <Warehouse className="w-3 h-3" />}
+            {isLoja ? 'Loja Direta' : 'CD'}
+          </span>
+        );
       }
     },
-    { key: 'loja_id', label: 'Loja', render: (v) => getLoja(v)?.nome || '-' },
-    { key: 'data_entrada', label: 'Entrada', sortable: true, render: (v) => v ? format(new Date(v + 'T12:00:00'), 'dd/MM/yyyy') : '-' },
+    {
+      key: 'fornecedor_id', label: 'Fornecedor',
+      render: (value, row) => {
+        const f = getFornecedor(value);
+        const nome = f ? (f.nome_fantasia || f.razao_social) : (row.faturado_para_nome || '—');
+        return <div className="flex items-center gap-2 text-sm"><Building2 className="w-3.5 h-3.5 text-slate-400 shrink-0" /><span>{nome}</span></div>;
+      }
+    },
+    {
+      key: 'loja_id', label: 'Loja Responsável',
+      render: (v, row) => {
+        const loja = getLoja(row.loja_responsavel_id || v);
+        return loja ? <div className="flex items-center gap-1.5 text-sm"><Store className="w-3.5 h-3.5 text-slate-400" />{loja.nome}</div> : <span className="text-slate-400">—</span>;
+      }
+    },
+    {
+      key: 'faturado_para_nome', label: 'Faturado para',
+      render: (v, row) => {
+        const loja = getLoja(row.faturado_para_id);
+        return <span className="text-sm text-slate-600">{loja?.nome || v || '—'}</span>;
+      }
+    },
+    { key: 'data_entrada', label: 'Entrada', sortable: true, render: (v) => v ? format(new Date(v + 'T12:00:00'), 'dd/MM/yy') : '-' },
     { key: 'valor_total', label: 'Total', sortable: true, render: (v) => <MoneyDisplay value={v || 0} size="sm" /> },
-    { key: 'status', label: 'Status', sortable: true, render: (v) => <StatusBadge status={v} /> },
+    { key: 'status', label: 'Status', render: (v) => <StatusBadge status={v} /> },
   ];
 
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Notas Fiscais"
-        subtitle="Gerencie suas notas fiscais de entrada"
+        title="Notas Fiscais / Compras"
+        subtitle="Compras CD (estoque) e Compras Diretas Loja (financeiro)"
         icon={FileText}
         breadcrumbs={[{ label: 'Dashboard', href: 'Dashboard' }, { label: 'Notas Fiscais' }]}
         actions={
-          <div className="flex gap-2">
-            <Button onClick={() => { setFormData(emptyForm); setModalOpen(true); }} className="gap-2">
-              <Plus className="w-4 h-4" /> Nova NF
-            </Button>
-          </div>
+          <Button onClick={() => { setFormData(emptyForm); setModalOpen(true); }} className="gap-2">
+            <Plus className="w-4 h-4" /> Nova NF
+          </Button>
         }
       />
 
-      {/* Resumo */}
+      {/* KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
           { label: 'Pendentes', color: 'amber', status: 'pendente' },
@@ -435,19 +525,47 @@ export default function NotasFiscais() {
         <Card className="border-slate-200 dark:border-slate-800">
           <CardContent className="p-4 flex items-center justify-between">
             <div>
-              <p className="text-xs text-slate-500">Processadas IA</p>
-              <p className="text-2xl font-bold text-purple-600">{notas.filter(n => n.processada_ia).length}</p>
+              <p className="text-xs text-slate-500">Compra Direta Loja</p>
+              <p className="text-2xl font-bold text-amber-600">{notas.filter(n => n.tipo_lancamento === 'compra_direta_loja').length}</p>
             </div>
-            <div className="p-2 rounded-lg bg-purple-100 dark:bg-purple-900/30"><Bot className="w-5 h-5 text-purple-600" /></div>
+            <div className="p-2 rounded-lg bg-amber-100 dark:bg-amber-900/30"><ShoppingCart className="w-5 h-5 text-amber-600" /></div>
           </CardContent>
         </Card>
+      </div>
+
+      {/* Filtros */}
+      <div className="flex flex-wrap gap-3 items-center">
+        <div className="flex items-center gap-2">
+          <Label className="text-xs text-slate-500 whitespace-nowrap">Tipo:</Label>
+          <Select value={filtroTipo} onValueChange={setFiltroTipo}>
+            <SelectTrigger className="h-8 text-xs w-40"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="todos">Todos</SelectItem>
+              <SelectItem value="compra_cd">CD (com estoque)</SelectItem>
+              <SelectItem value="compra_direta_loja">Loja Direta</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="flex items-center gap-2">
+          <Label className="text-xs text-slate-500 whitespace-nowrap">Loja:</Label>
+          <Select value={filtroLoja} onValueChange={setFiltroLoja}>
+            <SelectTrigger className="h-8 text-xs w-40"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="todas">Todas</SelectItem>
+              {lojas.map(l => <SelectItem key={l.id} value={l.id}>{l.nome}</SelectItem>)}
+            </SelectContent>
+          </Select>
+        </div>
+        {(filtroTipo !== 'todos' || filtroLoja !== 'todas') && (
+          <Button variant="ghost" size="sm" className="h-8 text-xs" onClick={() => { setFiltroTipo('todos'); setFiltroLoja('todas'); }}>Limpar filtros</Button>
+        )}
       </div>
 
       {notas.length === 0 && !isLoading ? (
         <EmptyState icon={FileText} title="Nenhuma nota fiscal" description="Cadastre manualmente ou importe XMLs." actionLabel="Nova NF" onAction={() => setModalOpen(true)} />
       ) : (
         <DataTable
-          columns={columns} data={notas} loading={isLoading}
+          columns={columns} data={notasFiltradas} loading={isLoading}
           searchPlaceholder="Buscar notas..." emptyIcon={FileText} emptyTitle="Nenhuma nota"
           onRowClick={(row) => setViewModal(row)}
           rowActions={(row) => [
@@ -458,13 +576,24 @@ export default function NotasFiscais() {
         />
       )}
 
-      {/* Modal de Cadastro */}
+      {/* ── Modal de Cadastro ─────────────────────────────────────────────── */}
       <Dialog open={modalOpen} onOpenChange={(v) => { setModalOpen(v); if (!v) setFormData(emptyForm); }}>
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader><DialogTitle>Nova Nota Fiscal</DialogTitle></DialogHeader>
+          <DialogHeader>
+            <DialogTitle>Nova Nota Fiscal / Compra</DialogTitle>
+          </DialogHeader>
 
-          <form onSubmit={(e) => { e.preventDefault(); createMutation.mutate(formData); }} className="space-y-5">
-            {/* Upload XML */}
+          <form onSubmit={(e) => e.preventDefault()} className="space-y-5">
+            {/* Tipo de Lançamento */}
+            <div className="space-y-2">
+              <Label className="text-sm font-semibold">Tipo de Lançamento *</Label>
+              <TipoLancamentoSelector
+                value={formData.tipo_lancamento}
+                onChange={v => setFormData({ ...formData, tipo_lancamento: v })}
+              />
+            </div>
+
+            {/* Upload XML / IA */}
             <div className="border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl p-4 text-center">
               <input type="file" accept=".xml,.pdf" onChange={handleFileUpload} className="hidden" id="xml-upload" disabled={uploading || processing} />
               <label htmlFor="xml-upload" className="cursor-pointer">
@@ -491,18 +620,77 @@ export default function NotasFiscais() {
               <div className="flex-1 border-t border-slate-200" />
             </div>
 
-            {/* Dados Principais */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <Label>Loja / CD *</Label>
-                <Select value={formData.loja_id || '__none__'} onValueChange={v => setFormData({ ...formData, loja_id: v === '__none__' ? '' : v })}>
-                  <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="__none__">Selecione...</SelectItem>
-                    {lojas.map(l => <SelectItem key={l.id} value={l.id}>{l.nome}</SelectItem>)}
-                  </SelectContent>
-                </Select>
+            {/* ── FLUXO A: Compra CD ── */}
+            {formData.tipo_lancamento === 'compra_cd' && (
+              <div className="space-y-4">
+                <div className="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-700 rounded-lg p-3 text-xs text-indigo-700 dark:text-indigo-300 flex items-center gap-2">
+                  <Warehouse className="w-4 h-4 shrink-0" />
+                  <span>Esta compra gerará <strong>entrada de estoque no CD</strong> e uma Conta a Pagar.</span>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <Label>CD de Destino *</Label>
+                    <Select value={formData.loja_id || '__none__'} onValueChange={v => setFormData({ ...formData, loja_id: v === '__none__' ? '' : v })}>
+                      <SelectTrigger><SelectValue placeholder="Selecione o CD..." /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="__none__">Selecione...</SelectItem>
+                        {lojas.filter(l => l.tipo === 'cd').map(l => <SelectItem key={l.id} value={l.id}>{l.nome}</SelectItem>)}
+                        {lojasLojas.map(l => <SelectItem key={l.id} value={l.id}>{l.nome}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-1">
+                    <Label>Faturado para</Label>
+                    <Input value={formData.faturado_para_nome} onChange={e => setFormData({ ...formData, faturado_para_nome: e.target.value })} placeholder="NB / Praça / Pablo PF..." />
+                  </div>
+                </div>
               </div>
+            )}
+
+            {/* ── FLUXO B: Compra Direta Loja ── */}
+            {formData.tipo_lancamento === 'compra_direta_loja' && (
+              <div className="space-y-4">
+                <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-lg p-3 text-xs text-amber-700 dark:text-amber-300 flex items-center gap-2">
+                  <ShoppingCart className="w-4 h-4 shrink-0" />
+                  <span>Compra direta da loja. <strong>Nenhum estoque será movimentado no CD.</strong> Gera AP + DRE/CMV para a loja.</span>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <Label>Loja Responsável *</Label>
+                    <Select value={formData.loja_responsavel_id || '__none__'} onValueChange={v => setFormData({ ...formData, loja_responsavel_id: v === '__none__' ? '' : v })}>
+                      <SelectTrigger><SelectValue placeholder="Qual loja fez a compra?" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="__none__">Selecione...</SelectItem>
+                        {lojas.map(l => <SelectItem key={l.id} value={l.id}>{l.nome}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-1">
+                    <Label>Faturado para *</Label>
+                    <Input value={formData.faturado_para_nome} onChange={e => setFormData({ ...formData, faturado_para_nome: e.target.value })} placeholder="NB / Praça / Pablo PF..." />
+                  </div>
+                  <div className="space-y-1">
+                    <Label>Categoria DRE/CMV *</Label>
+                    <Select value={formData.categoria_dre_id || '__none__'} onValueChange={v => setFormData({ ...formData, categoria_dre_id: v === '__none__' ? '' : v })}>
+                      <SelectTrigger><SelectValue placeholder="CMV > Compra Direta..." /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="__none__">Selecione...</SelectItem>
+                        {categoriasDRE.map(c => <SelectItem key={c.id} value={c.id}>{c.nome}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-1 flex flex-col justify-end">
+                    <div className="flex items-center gap-2 h-9 px-3 border rounded-md bg-white dark:bg-slate-900 cursor-pointer" onClick={() => setFormData(p => ({ ...p, lancado_no_pdv: !p.lancado_no_pdv }))}>
+                      <input type="checkbox" checked={formData.lancado_no_pdv} readOnly className="w-4 h-4" />
+                      <label className="text-sm cursor-pointer">Lançado no PDV da loja</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Dados comuns */}
+            <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1">
                 <Label>Fornecedor</Label>
                 <Select value={formData.fornecedor_id || '__none__'} onValueChange={v => setFormData({ ...formData, fornecedor_id: v === '__none__' ? '' : v })}>
@@ -514,8 +702,8 @@ export default function NotasFiscais() {
                 </Select>
               </div>
               <div className="space-y-1">
-                <Label>Número da NF</Label>
-                <Input value={formData.numero} onChange={e => setFormData({ ...formData, numero: e.target.value })} placeholder="000001" />
+                <Label>Número da NF *</Label>
+                <Input value={formData.numero} onChange={e => setFormData({ ...formData, numero: e.target.value })} placeholder="000001" required />
               </div>
               <div className="space-y-1">
                 <Label>Série</Label>
@@ -531,20 +719,23 @@ export default function NotasFiscais() {
               </div>
             </div>
 
-            {/* Itens da Nota */}
+            {/* Itens (só obrigatório para CD, opcional para direta) */}
             <div className="space-y-3">
-              <Label className="text-base font-semibold">Itens da Nota</Label>
-
+              <div className="flex items-center justify-between">
+                <Label className="text-base font-semibold">
+                  Itens da Nota
+                  {formData.tipo_lancamento === 'compra_direta_loja' && <span className="ml-2 text-xs font-normal text-slate-400">(opcional — só para referência)</span>}
+                </Label>
+              </div>
               {formData.itens.length === 0 ? (
                 <div className="border-2 border-dashed border-slate-200 rounded-lg p-6 text-center">
-                  <p className="text-sm text-slate-400 mb-3">Nenhum item adicionado. Clique em "Adicionar Item" ou importe via XML.</p>
+                  <p className="text-sm text-slate-400 mb-3">Nenhum item. Clique em "Adicionar Item" ou importe XML.</p>
                   <Button type="button" variant="outline" size="sm" onClick={addItem} className="gap-1 mx-auto">
                     <Plus className="w-3.5 h-3.5" /> Adicionar Item
                   </Button>
                 </div>
               ) : (
                 <div className="border rounded-lg p-3 space-y-3">
-                  {/* Header */}
                   <div className="grid grid-cols-12 gap-2 text-xs font-medium text-slate-500 uppercase pb-1 border-b">
                     <div className="col-span-5">Produto / Descrição NF</div>
                     <div className="col-span-2">Qtd</div>
@@ -553,29 +744,29 @@ export default function NotasFiscais() {
                     <div className="col-span-1"></div>
                   </div>
                   {formData.itens.map((item, idx) => (
-                    <ItemRow
-                      key={idx} item={item} idx={idx}
-                      produtos={produtos}
-                      onUpdate={updateItem}
-                      onRemove={removeItem}
-                      onAddProduto={(i) => setNovoProdutoForIdx(i)}
-                    />
+                    <ItemRow key={idx} item={item} idx={idx} produtos={produtos} onUpdate={updateItem} onRemove={removeItem} onAddProduto={(i) => setNovoProdutoForIdx(i)} />
                   ))}
-                  {/* Total + botão Adicionar na mesma linha */}
                   <div className="flex items-center justify-between pt-2 border-t">
                     <Button type="button" variant="outline" size="sm" onClick={addItem} className="gap-1">
                       <Plus className="w-3.5 h-3.5" /> Adicionar Item
                     </Button>
                     <div className="text-right">
                       <p className="text-xs text-slate-500 uppercase">Total da NF</p>
-                      <p className="text-xl font-bold text-slate-800 dark:text-white">{formatMoney(formData.valor_total)}</p>
+                      <p className="text-xl font-bold">{formatMoney(formData.valor_total)}</p>
                     </div>
                   </div>
                 </div>
               )}
+              {/* Se não tem itens mas tem tipo direta, permite digitar valor total manualmente */}
+              {formData.itens.length === 0 && (
+                <div className="space-y-1">
+                  <Label>Valor Total da NF (R$)</Label>
+                  <Input type="number" min="0.01" step="0.01" value={formData.valor_total || ''} onChange={e => setFormData({ ...formData, valor_total: parseFloat(e.target.value) || 0 })} placeholder="0,00" />
+                </div>
+              )}
             </div>
 
-            {/* Conta a pagar — parcelamento + forma de pagamento */}
+            {/* Conta a Pagar */}
             <div className="border rounded-lg p-4 bg-slate-50 dark:bg-slate-800/50 space-y-3">
               <p className="text-sm font-medium text-slate-700 dark:text-slate-300">Conta a Pagar gerada ao Lançar</p>
               <div className="grid grid-cols-2 gap-4">
@@ -594,25 +785,12 @@ export default function NotasFiscais() {
                   </Select>
                 </div>
                 <div className="space-y-1">
-                  <Label>1º Vencimento</Label>
+                  <Label>1º Vencimento {formData.tipo_lancamento === 'compra_direta_loja' ? '*' : ''}</Label>
                   <Input type="date" value={formData.primeiro_vencimento} onChange={e => setFormData({ ...formData, primeiro_vencimento: e.target.value })} />
                 </div>
                 <div className="space-y-1">
                   <Label>Número de Parcelas</Label>
                   <Input type="number" min="1" max="48" value={formData.num_parcelas} onChange={e => setFormData({ ...formData, num_parcelas: parseInt(e.target.value) || 1 })} />
-                </div>
-                <div className="space-y-1">
-                  <Label>Tipo de Documento</Label>
-                  <Select value={formData.documento_tipo || 'nota_fiscal'} onValueChange={v => setFormData({ ...formData, documento_tipo: v })}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="nota_fiscal">Nota Fiscal</SelectItem>
-                      <SelectItem value="boleto">Boleto</SelectItem>
-                      <SelectItem value="fatura">Fatura</SelectItem>
-                      <SelectItem value="contrato">Contrato</SelectItem>
-                      <SelectItem value="outros">Outros</SelectItem>
-                    </SelectContent>
-                  </Select>
                 </div>
               </div>
               <p className="text-xs text-slate-400">Ao clicar em "Lançar" na lista, será criada(s) a(s) conta(s) a pagar automaticamente.</p>
@@ -622,8 +800,9 @@ export default function NotasFiscais() {
               <Button type="button" variant="outline" onClick={() => setModalOpen(false)}>Cancelar</Button>
               <Button
                 type="button"
-                disabled={createMutation.isPending || !formData.loja_id || formData.loja_id === '__none__'}
+                disabled={createMutation.isPending || !canSubmit()}
                 onClick={() => createMutation.mutate(formData)}
+                className={formData.tipo_lancamento === 'compra_direta_loja' ? 'bg-amber-600 hover:bg-amber-700' : ''}
               >
                 {createMutation.isPending ? 'Salvando...' : 'Cadastrar NF'}
               </Button>
@@ -632,10 +811,19 @@ export default function NotasFiscais() {
         </DialogContent>
       </Dialog>
 
-      {/* Modal de Visualização */}
+      {/* ── Modal de Visualização ──────────────────────────────────────────── */}
       <Dialog open={!!viewModal} onOpenChange={() => setViewModal(null)}>
         <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
-          <DialogHeader><DialogTitle>Nota Fiscal {viewModal?.numero || '(manual)'}</DialogTitle></DialogHeader>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-3">
+              Nota Fiscal {viewModal?.numero || '(manual)'}
+              {viewModal?.tipo_lancamento === 'compra_direta_loja' ? (
+                <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">Loja Direta</span>
+              ) : (
+                <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700">CD</span>
+              )}
+            </DialogTitle>
+          </DialogHeader>
           {viewModal && (
             <div className="space-y-5">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -643,6 +831,18 @@ export default function NotasFiscais() {
                 <div><p className="text-xs text-slate-500">Data Emissão</p><p className="font-medium">{viewModal.data_emissao ? format(new Date(viewModal.data_emissao + 'T12:00:00'), 'dd/MM/yyyy') : '-'}</p></div>
                 <div><p className="text-xs text-slate-500">Valor Total</p><MoneyDisplay value={viewModal.valor_total || 0} size="lg" /></div>
                 <div><p className="text-xs text-slate-500">Status</p><StatusBadge status={viewModal.status} /></div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                {viewModal.loja_responsavel_id && (
+                  <div><p className="text-xs text-slate-500">Loja Responsável</p><p className="font-medium">{getLoja(viewModal.loja_responsavel_id)?.nome || '-'}</p></div>
+                )}
+                {viewModal.faturado_para_nome && (
+                  <div><p className="text-xs text-slate-500">Faturado para</p><p className="font-medium">{viewModal.faturado_para_nome}</p></div>
+                )}
+                {viewModal.tipo_lancamento === 'compra_direta_loja' && (
+                  <div><p className="text-xs text-slate-500">Lançado no PDV</p><p className="font-medium">{viewModal.lancado_no_pdv ? '✅ Sim' : '❌ Não'}</p></div>
+                )}
               </div>
 
               {viewModal.itens?.length > 0 && (
@@ -663,8 +863,8 @@ export default function NotasFiscais() {
                           <tr key={idx} className="border-t">
                             <td className="p-3">{item.descricao_nf || item.descricao}</td>
                             <td className="p-3 text-right">{item.quantidade}</td>
-                            <td className="p-3 text-right"><MoneyDisplay value={item.custo_unitario || item.valor_unitario || 0} size="xs" /></td>
-                            <td className="p-3 text-right"><MoneyDisplay value={item.subtotal || item.valor_total || 0} size="xs" /></td>
+                            <td className="p-3 text-right"><MoneyDisplay value={item.custo_unitario || 0} size="xs" /></td>
+                            <td className="p-3 text-right"><MoneyDisplay value={item.subtotal || 0} size="xs" /></td>
                           </tr>
                         ))}
                       </tbody>
@@ -680,8 +880,12 @@ export default function NotasFiscais() {
                   </Button>
                 )}
                 {viewModal.status === 'conferida' && (
-                  <Button onClick={() => { handleLancar(viewModal); setViewModal(null); }}>
-                    <CheckCircle2 className="w-4 h-4 mr-2" /> Lançar no Sistema
+                  <Button
+                    onClick={() => { handleLancar(viewModal); setViewModal(null); }}
+                    className={viewModal.tipo_lancamento === 'compra_direta_loja' ? 'bg-amber-600 hover:bg-amber-700' : ''}
+                  >
+                    <CheckCircle2 className="w-4 h-4 mr-2" />
+                    {viewModal.tipo_lancamento === 'compra_direta_loja' ? 'Lançar (Financeiro-Only)' : 'Lançar no Sistema'}
                   </Button>
                 )}
               </DialogFooter>
