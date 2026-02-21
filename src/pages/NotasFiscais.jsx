@@ -595,26 +595,20 @@ export default function NotasFiscais() {
               />
             </div>
 
-            {/* Upload XML / IA */}
-            <div className="border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl p-4 text-center">
-              <input type="file" accept=".xml,.pdf" onChange={handleFileUpload} className="hidden" id="xml-upload" disabled={uploading || processing} />
-              <label htmlFor="xml-upload" className="cursor-pointer">
-                {uploading || processing ? (
-                  <div className="flex flex-col items-center gap-2">
-                    <Loader2 className="w-7 h-7 text-purple-600 animate-spin" />
-                    <p className="text-sm text-slate-600">{uploading ? 'Enviando...' : 'Processando com IA...'}</p>
-                  </div>
-                ) : (
-                  <div className="flex items-center justify-center gap-3">
-                    <div className="p-2 rounded-lg bg-purple-100 dark:bg-purple-900/30"><Sparkles className="w-5 h-5 text-purple-600" /></div>
-                    <div className="text-left">
-                      <p className="font-medium text-sm text-slate-800 dark:text-white">Importar XML / PDF com IA</p>
-                      <p className="text-xs text-slate-500">Clique para selecionar o arquivo</p>
-                    </div>
-                  </div>
-                )}
-              </label>
-            </div>
+            {/* Importar NF por imagem/PDF via Gemini */}
+            <button
+              type="button"
+              onClick={() => setImportarModalOpen(true)}
+              className="w-full border-2 border-dashed border-indigo-300 hover:border-indigo-500 hover:bg-indigo-50/50 dark:border-indigo-700 dark:hover:bg-indigo-900/20 rounded-xl p-4 flex items-center gap-3 transition-all"
+            >
+              <div className="p-2 rounded-lg bg-indigo-100 dark:bg-indigo-900/30 shrink-0">
+                <Upload className="w-5 h-5 text-indigo-600" />
+              </div>
+              <div className="text-left">
+                <p className="font-medium text-sm text-slate-800 dark:text-white">Importar Nota Fiscal</p>
+                <p className="text-xs text-slate-500">Envie uma imagem ou PDF — os dados serão extraídos e preenchidos automaticamente</p>
+              </div>
+            </button>
 
             <div className="relative flex items-center gap-3">
               <div className="flex-1 border-t border-slate-200" />
