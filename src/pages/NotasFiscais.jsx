@@ -216,6 +216,7 @@ function TipoLancamentoSelector({ value, onChange }) {
 export default function NotasFiscais() {
   const queryClient = useQueryClient();
   const [modalOpen, setModalOpen] = useState(false);
+  const [importarModalOpen, setImportarModalOpen] = useState(false);
   const [viewModal, setViewModal] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [processing, setProcessing] = useState(false);
