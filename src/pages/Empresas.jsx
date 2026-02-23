@@ -41,7 +41,8 @@ export default function Empresas() {
 
   const { data: empresas = [], isLoading } = useQuery({
     queryKey: ['empresas'],
-    queryFn: () => base44.entities.Empresa.list()
+    queryFn: () => base44.entities.Empresa.list(),
+    enabled: isSuperAdmin
   });
 
   const createMutation = useMutation({
