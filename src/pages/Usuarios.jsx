@@ -63,6 +63,16 @@ export default function Usuarios() {
     onError: () => toast.error('Erro ao atualizar')
   });
 
+  const salvarPermissoesMutation = useMutation({
+    mutationFn: ({ id, paginas }) => base44.entities.User.update(id, { paginas_permitidas: paginas }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['usuarios'] });
+      setPermissoesUser(null);
+      toast.success('Permissões salvas!');
+    },
+    onError: () => toast.error('Erro ao salvar permissões')
+  });
+
   const resetForm = () => {
     setFormData({ email: '', role: 'user' });
     setEditingItem(null);
