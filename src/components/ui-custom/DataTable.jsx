@@ -233,7 +233,7 @@ export default function DataTable({
                     onBulkDelete && selectedIds.has(row.id) && 'bg-red-50/60 dark:bg-red-900/10'
                   )}
                 >
-                  {onBulkDelete && (
+                  {(onBulkDelete || bulkActions) && (
                     <td className="px-4 py-3.5" onClick={e => e.stopPropagation()}>
                       <Checkbox
                         checked={selectedIds.has(row.id)}
