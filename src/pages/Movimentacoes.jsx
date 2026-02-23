@@ -178,8 +178,22 @@ export default function Movimentacoes() {
         ]}
       />
 
-      {/* KPIs */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      {/* Tabs */}
+      <Tabs defaultValue="movimentacoes" className="w-full">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="movimentacoes" className="gap-2">
+            <ArrowLeftRight className="w-4 h-4" />
+            Movimentações
+          </TabsTrigger>
+          <TabsTrigger value="ajustes" className="gap-2">
+            <BarChart3 className="w-4 h-4" />
+            Ajuste de Saldos
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="movimentacoes" className="space-y-6">
+          {/* KPIs */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <KPICard
           title="Total Movimentações"
           value={movimentacoesFiltradas.length}
