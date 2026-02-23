@@ -44,18 +44,12 @@ export default function Dashboard() {
   const [empresa_id, setEmpresa_id] = useState(null);
 
   useEffect(() => {
-    // Recuperar empresa_id do contexto do usuário
     async function getEmpresaId() {
       try {
         const user = await base44.auth.me();
-        // Assumindo que empresa_id está salvo no usuário
-        setEmpresa_id(user.empresa_id);
+        setEmpresa_id(user.empresa_id || null);
       } catch {
-        // Usar primeira empresa disponível como fallback
-        const empresas = await base44.entities.Empresa.list();
-        if (empresas.length > 0) {
-          setEmpresa_id(empresas[0].id);
-        }
+        setEmpresa_id(null);
       }
     }
     getEmpresaId();
