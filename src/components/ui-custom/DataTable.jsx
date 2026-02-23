@@ -230,7 +230,7 @@ export default function DataTable({
                   className={cn(
                     'transition-colors',
                     onRowClick && 'cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50',
-                    onBulkDelete && selectedIds.has(row.id) && 'bg-red-50/60 dark:bg-red-900/10'
+                    (onBulkDelete || bulkActions) && selectedIds.has(row.id) && 'bg-indigo-50/60 dark:bg-indigo-900/10'
                   )}
                 >
                   {(onBulkDelete || bulkActions) && (
