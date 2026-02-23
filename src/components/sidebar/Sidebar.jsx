@@ -84,10 +84,9 @@ const menuGroups = [
       { icon: TrendingDown, label: 'Passivos & Planejamento', href: 'Passivos' },
       { icon: PiggyBank, label: 'Banco Virtual', href: 'BancoVirtual' },
       { icon: FileBarChart, label: 'DRE Gerencial', href: 'DRE' },
-      { icon: Landmark, label: 'Contas Bancárias', href: 'ContasBancarias' },
+      { icon: Landmark, label: 'Contas & Cofres', href: 'ContasBancarias' },
       { icon: Receipt, label: 'Movimentações Bancárias', href: 'MovimentacoesBancarias' },
-      { icon: ClipboardCheck, label: 'Auditoria do Dia', href: 'AuditoriaDodia' },
-      { icon: Vault, label: 'Cofres', href: 'Cofres' }
+      { icon: ClipboardCheck, label: 'Auditoria do Dia', href: 'AuditoriaDodia' }
     ]
   },
   {
