@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { MoneyDisplay } from '@/components/ui-custom/MoneyDisplay';
+import MoneyDisplay from '@/components/ui-custom/MoneyDisplay';
 import { AlertCircle, DollarSign, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
 
