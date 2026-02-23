@@ -203,7 +203,7 @@ export default function Sidebar({ collapsed, onToggle }) {
                 </Link>
               ))}
             </div>
-          </div>
+            </div>
           );
         })}
       </nav>
