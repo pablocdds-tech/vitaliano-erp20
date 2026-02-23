@@ -52,6 +52,7 @@ function gerarParcelas(valor, numParcelas, primeiroVencimento, intervalo = 'mens
 
 export default function ContasPagar() {
   const queryClient = useQueryClient();
+  const { empresa_id } = useTenant();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [pagamentoModal, setPagamentoModal] = useState(null); // conta sendo paga
