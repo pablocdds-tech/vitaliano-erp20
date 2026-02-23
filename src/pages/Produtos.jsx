@@ -343,19 +343,24 @@ export default function Produtos() {
           emptyIcon={Package}
           emptyTitle="Nenhum produto encontrado"
           onBulkDelete={handleBulkDelete}
+          bulkActions={(ids, clearSelection) => (
+            <Button
+              size="sm"
+              variant="outline"
+              className="gap-1.5"
+              onClick={() => { setEdicaoLoteIds(ids); setEdicaoLoteOpen(true); }}
+            >
+              <Layers className="w-3.5 h-3.5" />
+              Editar em Lote
+            </Button>
+          )}
           filterBar={
             <div className="flex gap-2 flex-wrap">
-              <Select value={filtroCategoria} onValueChange={setFiltroCategoria}>
-                <SelectTrigger className="h-9 w-40 text-xs">
-                  <SelectValue placeholder="Categoria" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={null}>Todas categorias</SelectItem>
-                  {categorias.map(c => (
-                    <SelectItem key={c.id} value={c.id}>{c.nome}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <CategoriaMultiFilter
+                categorias={categorias}
+                selected={filtroCategorias}
+                onChange={setFiltroCategorias}
+              />
               <Select value={filtroStatus} onValueChange={setFiltroStatus}>
                 <SelectTrigger className="h-9 w-32 text-xs">
                   <SelectValue placeholder="Status" />
