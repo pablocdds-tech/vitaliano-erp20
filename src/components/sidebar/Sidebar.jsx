@@ -133,8 +133,9 @@ export default function Sidebar({ collapsed, onToggle }) {
 
   const filterItems = (items) => {
     return items.filter(item => {
-      // AdminSaaS só para superadmin
+      // AdminSaaS e Empresas: só para superadmin
       if (item.href === 'AdminSaaS') return isSuperAdmin;
+      if (item.href === 'Empresas') return isSuperAdmin;
       // Usuários: só admin ou superadmin
       if (item.href === 'Usuarios') return isAdmin || isSuperAdmin;
       // Filtro de páginas permitidas para usuários comuns
