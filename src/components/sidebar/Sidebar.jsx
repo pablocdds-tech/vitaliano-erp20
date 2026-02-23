@@ -161,7 +161,10 @@ export default function Sidebar({ collapsed, onToggle }) {
       </div>
 
       <nav className="p-3 h-[calc(100vh-64px)] overflow-y-auto scrollbar-thin">
-        {menuGroups.map((group) => (
+        {menuGroups.map((group) => {
+          const visibleItems = filterItems(group.items);
+          if (visibleItems.length === 0) return null;
+          return (
           <div key={group.label} className="mb-4">
             <button
               onClick={() => toggleGroup(group.label)}
@@ -178,7 +181,7 @@ export default function Sidebar({ collapsed, onToggle }) {
               'space-y-0.5 mt-1',
               expandedGroups[group.label] && 'hidden'
             )}>
-              {group.items.map((item) => (
+              {visibleItems.map((item) => (
                 <Link
                   key={item.href}
                   to={createPageUrl(item.href)}
