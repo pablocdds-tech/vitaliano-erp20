@@ -204,7 +204,8 @@ export default function Sidebar({ collapsed, onToggle }) {
               ))}
             </div>
           </div>
-        ))}
+          );
+        })}
       </nav>
     </aside>
   );
