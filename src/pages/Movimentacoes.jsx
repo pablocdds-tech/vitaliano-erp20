@@ -224,150 +224,156 @@ export default function Movimentacoes() {
         />
       </div>
 
-      {/* Filtros */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-        <Select value={lojaFiltro} onValueChange={setLojaFiltro}>
-          <SelectTrigger>
-            <SelectValue placeholder="Todas as lojas" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Todas as lojas</SelectItem>
-            {lojas.map((loja) => (
-              <SelectItem key={loja.id} value={loja.id}>{loja.nome}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+          {/* Filtros */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+            <Select value={lojaFiltro} onValueChange={setLojaFiltro}>
+              <SelectTrigger>
+                <SelectValue placeholder="Todas as lojas" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todas as lojas</SelectItem>
+                {lojas.map((loja) => (
+                  <SelectItem key={loja.id} value={loja.id}>{loja.nome}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
-        <Select value={tipoFiltro} onValueChange={setTipoFiltro}>
-          <SelectTrigger>
-            <SelectValue placeholder="Todos os tipos" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Todos os tipos</SelectItem>
-            <SelectItem value="entrada">Entrada</SelectItem>
-            <SelectItem value="saida">Saída</SelectItem>
-            <SelectItem value="ajuste">Ajuste</SelectItem>
-            <SelectItem value="transferencia">Transferência</SelectItem>
-            <SelectItem value="producao">Produção</SelectItem>
-            <SelectItem value="perda">Perda</SelectItem>
-            <SelectItem value="contagem">Contagem</SelectItem>
-          </SelectContent>
-        </Select>
+            <Select value={tipoFiltro} onValueChange={setTipoFiltro}>
+              <SelectTrigger>
+                <SelectValue placeholder="Todos os tipos" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos os tipos</SelectItem>
+                <SelectItem value="entrada">Entrada</SelectItem>
+                <SelectItem value="saida">Saída</SelectItem>
+                <SelectItem value="ajuste">Ajuste</SelectItem>
+                <SelectItem value="transferencia">Transferência</SelectItem>
+                <SelectItem value="producao">Produção</SelectItem>
+                <SelectItem value="perda">Perda</SelectItem>
+                <SelectItem value="contagem">Contagem</SelectItem>
+              </SelectContent>
+            </Select>
 
-        <div>
-          <Input
-            type="date"
-            value={dataInicio}
-            onChange={(e) => setDataInicio(e.target.value)}
+            <div>
+              <Input
+                type="date"
+                value={dataInicio}
+                onChange={(e) => setDataInicio(e.target.value)}
+              />
+            </div>
+
+            <div>
+              <Input
+                type="date"
+                value={dataFim}
+                onChange={(e) => setDataFim(e.target.value)}
+              />
+            </div>
+          </div>
+
+          {/* Tabela */}
+          <DataTable
+            columns={columns}
+            data={movimentacoesFiltradas}
+            loading={isLoading}
+            searchPlaceholder="Buscar movimentações..."
+            emptyIcon={ArrowLeftRight}
+            emptyTitle="Nenhuma movimentação encontrada"
+            onRowClick={(row) => setViewModal(row)}
           />
-        </div>
 
-        <div>
-          <Input
-            type="date"
-            value={dataFim}
-            onChange={(e) => setDataFim(e.target.value)}
-          />
-        </div>
-      </div>
-
-      {/* Tabela */}
-      <DataTable
-        columns={columns}
-        data={movimentacoesFiltradas}
-        loading={isLoading}
-        searchPlaceholder="Buscar movimentações..."
-        emptyIcon={ArrowLeftRight}
-        emptyTitle="Nenhuma movimentação encontrada"
-        onRowClick={(row) => setViewModal(row)}
-      />
-
-      {/* Modal de Detalhes */}
-      <Dialog open={!!viewModal} onOpenChange={() => setViewModal(null)}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Detalhes da Movimentação</DialogTitle>
-          </DialogHeader>
-          
-          {viewModal && (() => {
-            const produto = getProduto(viewModal.produto_id);
-            const loja = getLoja(viewModal.loja_id);
-            const lojaDestino = getLoja(viewModal.loja_destino_id);
-            const config = tipoIcons[viewModal.tipo] || tipoIcons.ajuste;
-            const Icon = config.icon;
-            
-            return (
-              <div className="space-y-4">
-                <div className={`flex items-center gap-3 p-4 rounded-lg ${config.bg}`}>
-                  <Icon className={`w-6 h-6 ${config.color}`} />
-                  <div>
-                    <p className="font-semibold capitalize">{viewModal.tipo?.replace(/_/g, ' ')}</p>
-                    <p className="text-xs text-slate-600">
-                      {format(new Date(viewModal.created_date), "dd/MM/yyyy 'às' HH:mm")}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-xs text-slate-500">Produto</p>
-                    <p className="font-medium">{produto?.nome || '-'}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-slate-500">Loja</p>
-                    <p className="font-medium">{loja?.nome || '-'}</p>
-                  </div>
-                  {lojaDestino && (
-                    <div>
-                      <p className="text-xs text-slate-500">Loja Destino</p>
-                      <p className="font-medium">{lojaDestino.nome}</p>
-                    </div>
-                  )}
-                  <div>
-                    <p className="text-xs text-slate-500">Quantidade</p>
-                    <p className={`text-2xl font-bold ${viewModal.quantidade > 0 ? 'text-emerald-600' : 'text-red-600'}`}>
-                      {viewModal.quantidade > 0 ? '+' : ''}{viewModal.quantidade || 0}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-slate-500">Quantidade Anterior</p>
-                    <p className="font-medium">{viewModal.quantidade_anterior || 0}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-slate-500">Quantidade Posterior</p>
-                    <p className="font-medium">{viewModal.quantidade_posterior || 0}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-slate-500">Custo Unitário</p>
-                    <MoneyDisplay value={viewModal.custo_unitario || 0} />
-                  </div>
-                  <div>
-                    <p className="text-xs text-slate-500">Custo Total</p>
-                    <MoneyDisplay value={viewModal.custo_total || 0} />
-                  </div>
-                  {viewModal.documento_tipo && (
-                    <div className="col-span-2">
-                      <p className="text-xs text-slate-500">Documento</p>
-                      <div className="flex items-center gap-2 mt-1">
-                        <StatusBadge status={viewModal.documento_tipo} />
-                        {viewModal.documento_id && (
-                          <span className="text-sm text-slate-600">ID: {viewModal.documento_id.substring(0, 8)}...</span>
-                        )}
+          {/* Modal de Detalhes */}
+          <Dialog open={!!viewModal} onOpenChange={() => setViewModal(null)}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Detalhes da Movimentação</DialogTitle>
+              </DialogHeader>
+              
+              {viewModal && (() => {
+                const produto = getProduto(viewModal.produto_id);
+                const loja = getLoja(viewModal.loja_id);
+                const lojaDestino = getLoja(viewModal.loja_destino_id);
+                const config = tipoIcons[viewModal.tipo] || tipoIcons.ajuste;
+                const Icon = config.icon;
+                
+                return (
+                  <div className="space-y-4">
+                    <div className={`flex items-center gap-3 p-4 rounded-lg ${config.bg}`}>
+                      <Icon className={`w-6 h-6 ${config.color}`} />
+                      <div>
+                        <p className="font-semibold capitalize">{viewModal.tipo?.replace(/_/g, ' ')}</p>
+                        <p className="text-xs text-slate-600">
+                          {format(new Date(viewModal.created_date), "dd/MM/yyyy 'às' HH:mm")}
+                        </p>
                       </div>
                     </div>
-                  )}
-                  {viewModal.observacao && (
-                    <div className="col-span-2">
-                      <p className="text-xs text-slate-500">Observação</p>
-                      <p className="text-sm text-slate-600 mt-1">{viewModal.observacao}</p>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-xs text-slate-500">Produto</p>
+                        <p className="font-medium">{produto?.nome || '-'}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-slate-500">Loja</p>
+                        <p className="font-medium">{loja?.nome || '-'}</p>
+                      </div>
+                      {lojaDestino && (
+                        <div>
+                          <p className="text-xs text-slate-500">Loja Destino</p>
+                          <p className="font-medium">{lojaDestino.nome}</p>
+                        </div>
+                      )}
+                      <div>
+                        <p className="text-xs text-slate-500">Quantidade</p>
+                        <p className={`text-2xl font-bold ${viewModal.quantidade > 0 ? 'text-emerald-600' : 'text-red-600'}`}>
+                          {viewModal.quantidade > 0 ? '+' : ''}{viewModal.quantidade || 0}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-slate-500">Quantidade Anterior</p>
+                        <p className="font-medium">{viewModal.quantidade_anterior || 0}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-slate-500">Quantidade Posterior</p>
+                        <p className="font-medium">{viewModal.quantidade_posterior || 0}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-slate-500">Custo Unitário</p>
+                        <MoneyDisplay value={viewModal.custo_unitario || 0} />
+                      </div>
+                      <div>
+                        <p className="text-xs text-slate-500">Custo Total</p>
+                        <MoneyDisplay value={viewModal.custo_total || 0} />
+                      </div>
+                      {viewModal.documento_tipo && (
+                        <div className="col-span-2">
+                          <p className="text-xs text-slate-500">Documento</p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <StatusBadge status={viewModal.documento_tipo} />
+                            {viewModal.documento_id && (
+                              <span className="text-sm text-slate-600">ID: {viewModal.documento_id.substring(0, 8)}...</span>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                      {viewModal.observacao && (
+                        <div className="col-span-2">
+                          <p className="text-xs text-slate-500">Observação</p>
+                          <p className="text-sm text-slate-600 mt-1">{viewModal.observacao}</p>
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
-              </div>
-            );
-          })()}
-        </DialogContent>
-      </Dialog>
+                  </div>
+                );
+              })()}
+            </DialogContent>
+          </Dialog>
+        </TabsContent>
+
+        <TabsContent value="ajustes">
+          <AjusteSaldosTab />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
