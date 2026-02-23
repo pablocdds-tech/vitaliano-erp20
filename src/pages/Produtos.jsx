@@ -57,25 +57,26 @@ export default function Produtos() {
   });
 
   const { data: produtos = [], isLoading } = useQuery({
-    queryKey: ['produtos'],
-    queryFn: () => base44.entities.Produto.list()
+    queryKey: ['produtos', empresa_id],
+    queryFn: () => empresa_id ? base44.entities.Produto.filter({ empresa_id }) : [],
+    enabled: !!empresa_id
   });
 
   const { data: categorias = [] } = useQuery({
-    queryKey: ['categorias'],
-    queryFn: () => base44.entities.Categoria.list()
+    queryKey: ['categorias', empresa_id],
+    queryFn: () => empresa_id ? base44.entities.Categoria.filter({ empresa_id }) : [],
+    enabled: !!empresa_id
   });
 
   // Movimentações dos últimos 30 dias para custo médio real
   const { data: movimentacoes30d = [] } = useQuery({
-    queryKey: ['movimentacoes-30d'],
-    queryFn: () => base44.entities.MovimentacaoEstoque.filter({
-      tipo: 'entrada'
-    })
+    queryKey: ['movimentacoes-30d', empresa_id],
+    queryFn: () => empresa_id ? base44.entities.MovimentacaoEstoque.filter({ empresa_id, tipo: 'entrada' }) : [],
+    enabled: !!empresa_id
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.Produto.create(data),
+    mutationFn: (data) => base44.entities.Produto.create({ ...data, empresa_id }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['produtos'] });
       setModalOpen(false);
