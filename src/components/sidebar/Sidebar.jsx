@@ -129,10 +129,20 @@ export default function Sidebar({ collapsed, onToggle }) {
 
   const paginasPermitidas = currentUser?.paginas_permitidas;
   const isAdmin = currentUser?.role === 'admin';
+  const isSuperAdmin = currentUser?.role === 'superadmin';
 
   const filterItems = (items) => {
-    if (isAdmin || !paginasPermitidas || paginasPermitidas.length === 0) return items;
-    return items.filter(item => paginasPermitidas.includes(item.href));
+    return items.filter(item => {
+      // AdminSaaS só para superadmin
+      if (item.href === 'AdminSaaS') return isSuperAdmin;
+      // Usuários: só admin ou superadmin
+      if (item.href === 'Usuarios') return isAdmin || isSuperAdmin;
+      // Filtro de páginas permitidas para usuários comuns
+      if (!isAdmin && !isSuperAdmin && paginasPermitidas && paginasPermitidas.length > 0) {
+        return paginasPermitidas.includes(item.href);
+      }
+      return true;
+    });
   };
 
   const [expandedGroups, setExpandedGroups] = React.useState(
