@@ -37,7 +37,8 @@ import {
   Landmark,
   Vault,
   ShoppingBag,
-  Shield
+  Shield,
+  TrendingDown
 } from 'lucide-react';
 
 const menuGroups = [
