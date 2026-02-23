@@ -48,6 +48,12 @@ Deno.serve(async (req) => {
       dueDate.setMonth(dueDate.getMonth() + i);
       const dueDateStr = dueDate.toISOString().split('T')[0];
 
+      // Determinar valor da parcela: customInstallments ou fixed
+      let installmentValue = parseFloat(liability.installment_value || 0);
+      if (hasVariableInstallments && customInstallments && customInstallments[i]) {
+        installmentValue = parseFloat(customInstallments[i]);
+      }
+
       const descricao = `Parcela ${i + 1}/${total} - ${liability.title}`;
 
       // Criar conta a pagar
