@@ -24,6 +24,7 @@ import { toast } from 'sonner';
 import { formatMoney } from '@/components/ui-custom/MoneyDisplay';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { Textarea } from '@/components/ui/textarea';
 
 // ─── Helpers ─────────────────────────────────────────────────────
 const fmt = (v) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v || 0);
