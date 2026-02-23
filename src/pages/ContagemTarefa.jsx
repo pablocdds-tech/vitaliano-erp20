@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
-import { useMutation } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ClipboardList, CheckCircle2, Package, Loader2, AlertCircle, Play } from 'lucide-react';
@@ -8,60 +7,73 @@ import { toast } from 'sonner';
 import { format } from 'date-fns';
 
 export default function ContagemTarefa() {
-  // Suporta HashRouter (#/ContagemTarefa?token=xxx) e path direto (/ContagemTarefa?token=xxx)
   const getToken = () => {
-    // Tenta hash primeiro
     const hash = window.location.hash;
     if (hash.includes('?')) {
       const p = new URLSearchParams(hash.split('?')[1]);
       if (p.get('token')) return p.get('token');
     }
-    // Fallback: search string normal
     return new URLSearchParams(window.location.search).get('token');
   };
   const token = getToken();
 
   const [tarefa, setTarefa] = useState(null);
-  const [contagem, setContagem] = useState(null);
+  const [loja, setLoja] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [itens, setItens] = useState([]);
   const [finalizado, setFinalizado] = useState(false);
   const [iniciado, setIniciado] = useState(false);
-  const [loja, setLoja] = useState(null);
+  const [salvando, setSalvando] = useState(false);
 
   useEffect(() => {
-    if (!token) { setError('Token inválido ou não encontrado na URL.'); setLoading(false); return; }
-    (async () => {
-      try {
-        const res = await base44.entities.TarefaContagem.filter({ token });
-        if (!res.length) { setError('Tarefa não encontrada. Verifique o link.'); setLoading(false); return; }
-        const t = res[0];
-        if (t.status === 'finalizado') { setFinalizado(true); setTarefa(t); setLoading(false); return; }
-
-        // Busca contagem e loja em paralelo
-        const [cRes, lojaRes] = await Promise.all([
-          t.contagem_id ? base44.entities.Contagem.filter({ id: t.contagem_id }) : Promise.resolve([]),
-          t.loja_id ? base44.entities.Loja.filter({ id: t.loja_id }) : Promise.resolve([]),
-        ]);
-
-        setContagem(cRes[0] || null);
-        setLoja(lojaRes[0] || null);
-        setTarefa(t);
-        setItens((t.itens || []).map(i => ({
-          ...i,
-          // Esconde quantidade_sistema do funcionário (só aparece no admin)
-          quantidade_sistema: undefined,
-          quantidade_contada: i.quantidade_contada != null ? i.quantidade_contada : '',
-        })));
-        if (t.status === 'em_andamento') setIniciado(true);
-        setLoading(false);
-      } catch (e) {
-        setError('Erro ao carregar tarefa: ' + e.message);
-        setLoading(false);
-      }
-    })();
+    if (!token) {
+      setError('Token inválido ou não encontrado na URL.');
+      setLoading(false);
+      return;
+    }
+    carregarTarefa();
   }, [token]);
+
+  const carregarTarefa = async () => {
+    setLoading(true);
+    try {
+      const res = await base44.entities.TarefaContagem.filter({ token });
+      if (!res.length) {
+        setError('Tarefa não encontrada. Verifique o link.');
+        setLoading(false);
+        return;
+      }
+      const t = res[0];
+      setTarefa(t);
+
+      if (t.status === 'finalizado') {
+        setFinalizado(true);
+        setLoading(false);
+        return;
+      }
+
+      if (t.status === 'em_andamento') {
+        setIniciado(true);
+      }
+
+      // Carregar loja
+      if (t.loja_id) {
+        const lojaRes = await base44.entities.Loja.filter({ id: t.loja_id });
+        setLoja(lojaRes[0] || null);
+      }
+
+      // Montar itens — esconder quantidade_sistema do funcionário
+      setItens((t.itens || []).map(i => ({
+        ...i,
+        quantidade_contada: i.quantidade_contada != null ? i.quantidade_contada : '',
+      })));
+      setLoading(false);
+    } catch (e) {
+      setError('Erro ao carregar tarefa: ' + e.message);
+      setLoading(false);
+    }
+  };
 
   const updateQtd = (idx, val) => {
     setItens(prev => prev.map((it, i) => i === idx ? { ...it, quantidade_contada: val } : it));
@@ -71,16 +83,18 @@ export default function ContagemTarefa() {
     setItens(prev => prev.map((it, i) => i === idx ? { ...it, observacao: val } : it));
   };
 
-  const salvarMutation = useMutation({
-    mutationFn: async ({ finalizar }) => {
+  const salvar = async (finalizar) => {
+    setSalvando(true);
+    try {
       const itensPreenchidos = itens.filter(i => i.quantidade_contada !== '' && i.quantidade_contada !== null);
-      const novoStatus = finalizar ? 'finalizado' : 'em_andamento';
 
-      // Busca quantidade_sistema original do banco (não enviamos para o funcionário no state)
-      const tarefaAtual = await base44.entities.TarefaContagem.filter({ id: tarefa.id });
-      const itensOriginais = tarefaAtual[0]?.itens || [];
+      // Recuperar quantidade_sistema original do banco
+      const tarefaAtual = (await base44.entities.TarefaContagem.filter({ id: tarefa.id }))[0];
+      const itensOriginais = tarefaAtual?.itens || [];
       const sistemaMap = {};
       itensOriginais.forEach(i => { if (i.produto_id) sistemaMap[i.produto_id] = i.quantidade_sistema; });
+
+      const novoStatus = finalizar ? 'finalizado' : 'em_andamento';
 
       await base44.entities.TarefaContagem.update(tarefa.id, {
         itens: itens.map(i => ({
@@ -96,27 +110,38 @@ export default function ContagemTarefa() {
         ...(finalizar ? { finalizado_em: new Date().toISOString() } : {}),
       });
 
-      // Atualiza status da Contagem pai
+      // Atualizar contagem pai
       if (tarefa.contagem_id) {
         if (finalizar) {
           const todasTarefas = await base44.entities.TarefaContagem.filter({ contagem_id: tarefa.contagem_id });
           const todasFinalizadas = todasTarefas.every(t => t.id === tarefa.id ? true : t.status === 'finalizado');
           await base44.entities.Contagem.update(tarefa.contagem_id, {
+            itens_contados: itensPreenchidos.length,
             status: todasFinalizadas ? 'aguardando_conferencia' : 'em_contagem',
           });
         } else {
-          const contagemAtual = await base44.entities.Contagem.filter({ id: tarefa.contagem_id });
-          if (contagemAtual[0] && ['aberta', 'pendente'].includes(contagemAtual[0].status)) {
+          const contagemRes = await base44.entities.Contagem.filter({ id: tarefa.contagem_id });
+          const cont = contagemRes[0];
+          if (cont && ['aberta', 'pendente'].includes(cont.status)) {
             await base44.entities.Contagem.update(tarefa.contagem_id, { status: 'em_contagem' });
           }
         }
       }
 
-      if (finalizar) setFinalizado(true);
-      else toast.success('Progresso salvo!');
-    },
-    onError: e => toast.error('Erro ao salvar: ' + e.message),
-  });
+      if (finalizar) {
+        setFinalizado(true);
+      } else {
+        setIniciado(true);
+        toast.success('Progresso salvo!');
+      }
+    } catch (e) {
+      toast.error('Erro ao salvar: ' + e.message);
+    } finally {
+      setSalvando(false);
+    }
+  };
+
+  // --- TELAS ---
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center bg-slate-50">
@@ -155,7 +180,7 @@ export default function ContagemTarefa() {
   const preenchidos = itens.filter(i => i.quantidade_contada !== '' && i.quantidade_contada !== null).length;
   const pct = itens.length > 0 ? Math.round((preenchidos / itens.length) * 100) : 0;
 
-  // Tela de boas-vindas antes de iniciar
+  // Tela de início
   if (!iniciado) return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 to-slate-100 px-4">
       <div className="max-w-sm w-full bg-white rounded-2xl shadow-lg p-8 text-center space-y-5">
@@ -189,7 +214,7 @@ export default function ContagemTarefa() {
         </p>
         <Button
           className="w-full h-12 text-base gap-2 bg-indigo-600 hover:bg-indigo-700"
-          onClick={() => setIniciado(true)}
+          onClick={() => { setIniciado(true); salvar(false); }}
         >
           <Play className="w-5 h-5" />
           Iniciar Contagem
@@ -198,9 +223,10 @@ export default function ContagemTarefa() {
     </div>
   );
 
+  // Tela de contagem
   return (
     <div className="min-h-screen bg-slate-50">
-      {/* Header */}
+      {/* Header fixo */}
       <div className="bg-white border-b sticky top-0 z-10 px-4 py-4 shadow-sm">
         <div className="max-w-lg mx-auto">
           <div className="flex items-center gap-3 mb-2">
@@ -216,7 +242,6 @@ export default function ContagemTarefa() {
               </p>
             </div>
           </div>
-          {/* Progress bar */}
           <div className="flex items-center gap-3">
             <div className="flex-1 bg-slate-100 rounded-full h-2">
               <div className="bg-indigo-500 h-2 rounded-full transition-all" style={{ width: `${pct}%` }} />
@@ -229,7 +254,7 @@ export default function ContagemTarefa() {
       {/* Itens */}
       <div className="max-w-lg mx-auto px-4 py-4 space-y-3 pb-32">
         <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
-          ⚠️ Preencha a quantidade física que você contou. Não consulte o sistema — conte fisicamente!
+          ⚠️ Preencha a quantidade física que você contou. Não consulte o sistema!
         </p>
 
         {itens.map((item, idx) => (
@@ -252,9 +277,10 @@ export default function ContagemTarefa() {
                 min="0"
                 step="0.001"
                 className="flex-1 h-12 text-lg font-semibold text-center"
-                placeholder="0,000"
+                placeholder="0"
                 value={item.quantidade_contada}
                 onChange={e => updateQtd(idx, e.target.value)}
+                inputMode="decimal"
               />
               <span className="text-sm text-slate-500 shrink-0">{item.unidade_medida || 'un'}</span>
             </div>
@@ -274,23 +300,23 @@ export default function ContagemTarefa() {
           <Button
             variant="outline"
             className="flex-1"
-            disabled={salvarMutation.isPending}
-            onClick={() => salvarMutation.mutate({ finalizar: false })}
+            disabled={salvando}
+            onClick={() => salvar(false)}
           >
-            Salvar Rascunho
+            {salvando ? 'Salvando...' : 'Salvar Rascunho'}
           </Button>
           <Button
             className="flex-1 bg-emerald-600 hover:bg-emerald-700 gap-2"
-            disabled={salvarMutation.isPending || preenchidos === 0}
+            disabled={salvando || preenchidos === 0}
             onClick={() => {
               if (preenchidos < itens.length) {
-                if (!window.confirm(`Você preencheu ${preenchidos} de ${itens.length} itens. Deseja finalizar mesmo assim?`)) return;
+                if (!window.confirm(`Você preencheu ${preenchidos} de ${itens.length} itens. Finalizar mesmo assim?`)) return;
               }
-              salvarMutation.mutate({ finalizar: true });
+              salvar(true);
             }}
           >
             <CheckCircle2 className="w-4 h-4" />
-            {salvarMutation.isPending ? 'Salvando...' : 'Finalizar Contagem'}
+            {salvando ? 'Salvando...' : 'Finalizar Contagem'}
           </Button>
         </div>
       </div>
