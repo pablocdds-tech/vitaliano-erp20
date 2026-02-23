@@ -120,6 +120,20 @@ const menuGroups = [
 
 export default function Sidebar({ collapsed, onToggle }) {
   const location = useLocation();
+  const [currentUser, setCurrentUser] = React.useState(null);
+
+  React.useEffect(() => {
+    base44.auth.me().then(setCurrentUser).catch(() => {});
+  }, []);
+
+  const paginasPermitidas = currentUser?.paginas_permitidas;
+  const isAdmin = currentUser?.role === 'admin';
+
+  const filterItems = (items) => {
+    if (isAdmin || !paginasPermitidas || paginasPermitidas.length === 0) return items;
+    return items.filter(item => paginasPermitidas.includes(item.href));
+  };
+
   const [expandedGroups, setExpandedGroups] = React.useState(
     Object.fromEntries(menuGroups.map(g => [g.label, false]))
   );
