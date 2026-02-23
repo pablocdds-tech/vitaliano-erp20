@@ -50,6 +50,11 @@ function ContasBancariasTab() {
     queryFn: () => base44.entities.TransacaoBancaria.list('-data', 1000)
   });
 
+  const { data: cofresDisponiveis = [] } = useQuery({
+    queryKey: ['cofres'],
+    queryFn: () => base44.entities.Cofre.list()
+  });
+
   const calcularSaldoAtual = (contaId) => {
     const saldoInicial = contas.find(c => c.id === contaId)?.saldo_inicial || 0;
     return saldoInicial + transacoes
