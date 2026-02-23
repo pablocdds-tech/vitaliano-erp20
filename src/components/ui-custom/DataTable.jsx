@@ -144,28 +144,33 @@ export default function DataTable({
         </div>
 
         {/* Bulk action bar */}
-        {onBulkDelete && selectedIds.size > 0 && (
-          <div className="flex items-center gap-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl px-4 py-2.5">
-            <span className="text-sm font-medium text-red-700 dark:text-red-400">
+        {(onBulkDelete || bulkActions) && selectedIds.size > 0 && (
+          <div className="flex items-center gap-3 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-xl px-4 py-2.5 flex-wrap">
+            <span className="text-sm font-medium text-indigo-700 dark:text-indigo-400">
               {selectedIds.size} {selectedIds.size === 1 ? 'item selecionado' : 'itens selecionados'}
             </span>
-            <Button
-              size="sm"
-              variant="destructive"
-              className="ml-auto gap-1.5"
-              onClick={handleBulkDelete}
-            >
-              <Trash2 className="w-3.5 h-3.5" />
-              Excluir selecionados
-            </Button>
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={() => setSelectedIds(new Set())}
-              className="text-red-600"
-            >
-              Cancelar
-            </Button>
+            <div className="flex items-center gap-2 ml-auto flex-wrap">
+              {typeof bulkActions === 'function' ? bulkActions([...selectedIds], () => setSelectedIds(new Set())) : bulkActions}
+              {onBulkDelete && (
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  className="gap-1.5"
+                  onClick={handleBulkDelete}
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  Excluir
+                </Button>
+              )}
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => setSelectedIds(new Set())}
+                className="text-slate-600"
+              >
+                Cancelar
+              </Button>
+            </div>
           </div>
         )}
       </div>
