@@ -586,6 +586,14 @@ export default function Produtos() {
           </form>
         </DialogContent>
       </Dialog>
+      <EdicaoLoteModal
+        open={edicaoLoteOpen}
+        onClose={setEdicaoLoteOpen}
+        ids={edicaoLoteIds}
+        categorias={categorias}
+        onSubmit={handleBulkEdit}
+        loading={salvandoLote}
+      />
     </div>
   );
 }
