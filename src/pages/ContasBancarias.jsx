@@ -568,6 +568,10 @@ export default function ContasBancarias() {
         <TabsContent value="cofres" className="mt-4">
           <CofresTab />
         </TabsContent>
+
+        <TabsContent value="movimentacoes" className="mt-4">
+          <MovimentacoesTab />
+        </TabsContent>
       </Tabs>
     </div>
   );
