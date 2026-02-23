@@ -189,6 +189,19 @@ export default function NovoPassivoModal({ open, onClose, onSuccess, lojas }) {
             <Label>Primeiro Vencimento *</Label>
             <Input type="date" value={form.first_due_date} onChange={e => set('first_due_date', e.target.value)} />
           </div>
+          {form.has_variable_installments && (
+            <div className="md:col-span-2 space-y-1">
+              <Label>Valores das Parcelas (JSON) *</Label>
+              <p className="text-xs text-slate-500 mb-1">Array com {form.total_installments || '?'} valores: [1000, 1050, 1000, ...]</p>
+              <Textarea 
+                rows={3} 
+                placeholder='[1000, 1050, 1000, 1000, 1000]'
+                value={installmentsInput} 
+                onChange={e => setInstallmentsInput(e.target.value)} 
+                className="font-mono text-sm"
+              />
+            </div>
+          )}
           <div className="md:col-span-2 space-y-1">
             <Label>Observações</Label>
             <Textarea rows={2} value={form.notes} onChange={e => set('notes', e.target.value)} />
