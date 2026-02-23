@@ -7,9 +7,11 @@ import StatusBadge from '@/components/ui-custom/StatusBadge';
 import MoneyDisplay from '@/components/ui-custom/MoneyDisplay';
 import EmptyState from '@/components/ui-custom/EmptyState';
 import KPICard from '@/components/ui-custom/KPICard';
+import OperacaoContaModal from '@/components/contas/OperacaoContaModal';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
@@ -17,15 +19,22 @@ import {
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { CreditCard, Plus, Pencil, Trash2, Wallet, Vault } from 'lucide-react';
+import { CreditCard, Plus, Pencil, Trash2, Wallet, Vault, ArrowRightLeft, ArrowDownToLine, ArrowUpFromLine, ChevronDown, ChevronUp } from 'lucide-react';
 import { toast } from 'sonner';
 import { formatMoney } from '@/components/ui-custom/MoneyDisplay';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 
-// ─── Contas Bancárias ────────────────────────────────────────────
+// ─── Helpers ─────────────────────────────────────────────────────
+const fmt = (v) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v || 0);
+
+// ─── Contas Bancárias + Extrato ──────────────────────────────────
 function ContasBancariasTab() {
   const queryClient = useQueryClient();
   const [modalOpen, setModalOpen] = useState(false);
+  const [operacaoOpen, setOperacaoOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
+  const [extratoContaId, setExtratoContaId] = useState(null);
   const [formData, setFormData] = useState({
     nome: '', banco: '', agencia: '', conta: '', tipo: 'corrente', saldo_inicial: '', status: 'ativo'
   });
@@ -42,12 +51,9 @@ function ContasBancariasTab() {
 
   const calcularSaldoAtual = (contaId) => {
     const saldoInicial = contas.find(c => c.id === contaId)?.saldo_inicial || 0;
-    const transacoesAccount = transacoes.filter(t => t.conta_bancaria_id === contaId);
-    return saldoInicial + transacoesAccount.reduce((sum, t) => {
-      if (t.tipo === 'credito') return sum + (t.valor || 0);
-      if (t.tipo === 'debito') return sum - Math.abs(t.valor || 0);
-      return sum;
-    }, 0);
+    return saldoInicial + transacoes
+      .filter(t => t.conta_bancaria_id === contaId)
+      .reduce((sum, t) => t.tipo === 'credito' ? sum + (t.valor || 0) : sum - Math.abs(t.valor || 0), 0);
   };
 
   const createMutation = useMutation({
@@ -65,6 +71,11 @@ function ContasBancariasTab() {
   const deleteMutation = useMutation({
     mutationFn: (id) => base44.entities.ContaBancaria.delete(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['contasBancarias'] })
+  });
+
+  const deleteTransacaoMutation = useMutation({
+    mutationFn: (id) => base44.entities.TransacaoBancaria.delete(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['transacoesBancarias'] })
   });
 
   const resetForm = () => {
@@ -86,44 +97,123 @@ function ContasBancariasTab() {
   };
 
   const totalSaldo = contas.reduce((sum, c) => sum + calcularSaldoAtual(c.id), 0);
+  const extratoConta = extratoContaId ? contas.find(c => c.id === extratoContaId) : null;
+  const extratoTransacoes = extratoContaId
+    ? [...transacoes.filter(t => t.conta_bancaria_id === extratoContaId)].sort((a, b) => b.data?.localeCompare(a.data))
+    : [];
 
-  const columns = [
-    {
-      key: 'nome', label: 'Conta', sortable: true,
-      render: (value, row) => (
-        <div>
-          <p className="font-medium text-slate-800">{value}</p>
-          <p className="text-xs text-slate-500">{row.banco} • {row.agencia}/{row.conta}</p>
-        </div>
-      )
-    },
-    { key: 'tipo', label: 'Tipo', render: (v) => <span className="text-sm capitalize">{v?.replace(/_/g, ' ')}</span> },
-    { key: 'saldo_inicial', label: 'Saldo Inicial', render: (v) => <MoneyDisplay value={v} size="sm" /> },
-    { key: 'id', label: 'Saldo Atual', render: (id) => <MoneyDisplay value={calcularSaldoAtual(id)} size="sm" colorize /> },
-    { key: 'status', label: 'Status', render: (v) => <StatusBadge status={v} size="sm" /> }
-  ];
+  const getTipoIcon = (tipo, categoria) => {
+    if (categoria === 'transferencia') return <ArrowRightLeft className="w-4 h-4 text-blue-500" />;
+    if (tipo === 'credito') return <ArrowDownToLine className="w-4 h-4 text-green-500" />;
+    return <ArrowUpFromLine className="w-4 h-4 text-red-500" />;
+  };
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <div className="grid grid-cols-2 gap-4 flex-1">
+      {/* KPIs + botão */}
+      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+        <div className="grid grid-cols-2 gap-4 flex-1 w-full">
           <KPICard title="Saldo Total" value={formatMoney(totalSaldo)} icon={Wallet} variant="success" subtitle={`${contas.length} contas`} />
           <KPICard title="Contas Ativas" value={contas.filter(c => c.status === 'ativo').length} icon={CreditCard} variant="info" />
         </div>
-        <Button onClick={() => { resetForm(); setModalOpen(true); }} className="gap-2 ml-4">
-          <Plus className="w-4 h-4" /> Nova Conta
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => setOperacaoOpen(true)} className="gap-2 whitespace-nowrap">
+            <ArrowRightLeft className="w-4 h-4" /> Operação
+          </Button>
+          <Button onClick={() => { resetForm(); setModalOpen(true); }} className="gap-2 whitespace-nowrap">
+            <Plus className="w-4 h-4" /> Nova Conta
+          </Button>
+        </div>
       </div>
 
+      {/* Lista de contas com extrato expansível */}
       {contas.length === 0 && !isLoading ? (
         <EmptyState icon={CreditCard} title="Nenhuma conta" description="Cadastre suas contas bancárias." actionLabel="Criar" onAction={() => setModalOpen(true)} />
       ) : (
-        <DataTable columns={columns} data={contas} loading={isLoading} searchPlaceholder="Buscar conta..." rowActions={(row) => [
-          { label: 'Editar', icon: Pencil, onClick: () => handleEdit(row) },
-          { label: 'Excluir', icon: Trash2, onClick: () => deleteMutation.mutate(row.id), destructive: true }
-        ]} />
+        <div className="border border-slate-200 rounded-xl overflow-hidden bg-white">
+          <table className="w-full text-sm">
+            <thead className="bg-slate-50 border-b">
+              <tr>
+                <th className="text-left px-4 py-3 text-slate-600 font-medium w-8"></th>
+                <th className="text-left px-4 py-3 text-slate-600 font-medium">Conta</th>
+                <th className="text-left px-4 py-3 text-slate-600 font-medium">Tipo</th>
+                <th className="text-right px-4 py-3 text-slate-600 font-medium">Saldo Inicial</th>
+                <th className="text-right px-4 py-3 text-slate-600 font-medium">Saldo Atual</th>
+                <th className="text-center px-4 py-3 text-slate-600 font-medium">Status</th>
+                <th className="px-4 py-3 w-24"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {contas.map(conta => {
+                const isOpen = extratoContaId === conta.id;
+                const saldo = calcularSaldoAtual(conta.id);
+                const movsConta = transacoes.filter(t => t.conta_bancaria_id === conta.id);
+                return (
+                  <React.Fragment key={conta.id}>
+                    <tr className={`border-b hover:bg-slate-50 cursor-pointer ${isOpen ? 'bg-blue-50' : ''}`} onClick={() => setExtratoContaId(isOpen ? null : conta.id)}>
+                      <td className="px-4 py-3 text-slate-400">
+                        {isOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                      </td>
+                      <td className="px-4 py-3">
+                        <p className="font-medium text-slate-800">{conta.nome}</p>
+                        <p className="text-xs text-slate-500">{conta.banco} • {conta.agencia}/{conta.conta}</p>
+                      </td>
+                      <td className="px-4 py-3 capitalize text-slate-600">{conta.tipo?.replace(/_/g, ' ')}</td>
+                      <td className="px-4 py-3 text-right"><MoneyDisplay value={conta.saldo_inicial} size="sm" /></td>
+                      <td className="px-4 py-3 text-right"><MoneyDisplay value={saldo} size="sm" colorize /></td>
+                      <td className="px-4 py-3 text-center"><StatusBadge status={conta.status} size="sm" /></td>
+                      <td className="px-4 py-3" onClick={e => e.stopPropagation()}>
+                        <div className="flex gap-1 justify-end">
+                          <Button size="sm" variant="ghost" onClick={() => handleEdit(conta)}><Pencil className="w-3.5 h-3.5" /></Button>
+                          <Button size="sm" variant="ghost" className="text-red-500" onClick={() => deleteMutation.mutate(conta.id)}><Trash2 className="w-3.5 h-3.5" /></Button>
+                        </div>
+                      </td>
+                    </tr>
+
+                    {/* Extrato inline */}
+                    {isOpen && (
+                      <tr>
+                        <td colSpan={7} className="bg-blue-50 px-6 py-4 border-b">
+                          <p className="text-xs font-semibold text-blue-700 mb-3 uppercase tracking-wide">
+                            Extrato — {conta.nome} ({movsConta.length} lançamentos)
+                          </p>
+                          {extratoTransacoes.length === 0 ? (
+                            <p className="text-sm text-slate-400 py-2">Nenhum lançamento registrado.</p>
+                          ) : (
+                            <div className="space-y-1 max-h-60 overflow-y-auto">
+                              {extratoTransacoes.map(t => (
+                                <div key={t.id} className="flex items-center justify-between bg-white rounded-lg px-3 py-2 text-sm border border-slate-100">
+                                  <div className="flex items-center gap-3">
+                                    {getTipoIcon(t.tipo, t.categoria)}
+                                    <div>
+                                      <p className="font-medium text-slate-700">{t.descricao || (t.tipo === 'credito' ? 'Crédito' : 'Débito')}</p>
+                                      <p className="text-xs text-slate-400">{t.data ? format(new Date(t.data + 'T00:00:00'), "dd 'de' MMM yyyy", { locale: ptBR }) : '-'}</p>
+                                    </div>
+                                  </div>
+                                  <div className="flex items-center gap-3">
+                                    <span className={`font-bold ${t.tipo === 'credito' ? 'text-green-600' : 'text-red-600'}`}>
+                                      {t.tipo === 'credito' ? '+' : '-'}{fmt(t.valor)}
+                                    </span>
+                                    <Button size="sm" variant="ghost" className="text-red-400 h-6 w-6 p-0" onClick={() => deleteTransacaoMutation.mutate(t.id)}>
+                                      <Trash2 className="w-3 h-3" />
+                                    </Button>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                    )}
+                  </React.Fragment>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       )}
 
+      {/* Modal nova conta */}
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
         <DialogContent className="max-w-lg w-[95vw] sm:w-full max-h-[90vh] overflow-y-auto">
           <DialogHeader><DialogTitle>{editingItem ? 'Editar' : 'Nova Conta'}</DialogTitle></DialogHeader>
@@ -165,6 +255,9 @@ function ContasBancariasTab() {
           </form>
         </DialogContent>
       </Dialog>
+
+      {/* Modal de operação */}
+      <OperacaoContaModal open={operacaoOpen} onClose={() => setOperacaoOpen(false)} contas={contas} />
     </div>
   );
 }
@@ -194,12 +287,9 @@ function CofresTab() {
   const calcularSaldoCofre = (cofreId) => {
     const cofre = cofres.find(c => c.id === cofreId);
     const saldoInicial = cofre?.saldo_inicial || 0;
-    const movs = movimentacoes.filter(m => m.cofre_id === cofreId);
-    return saldoInicial + movs.reduce((sum, m) => {
-      if (m.tipo === 'entrada') return sum + (m.valor || 0);
-      if (m.tipo === 'saida') return sum - Math.abs(m.valor || 0);
-      return sum;
-    }, 0);
+    return saldoInicial + movimentacoes
+      .filter(m => m.cofre_id === cofreId)
+      .reduce((sum, m) => m.tipo === 'entrada' ? sum + (m.valor || 0) : sum - Math.abs(m.valor || 0), 0);
   };
 
   const createMutation = useMutation({
@@ -325,7 +415,7 @@ export default function ContasBancarias() {
     <div className="space-y-6">
       <PageHeader
         title="Contas Bancárias & Cofres"
-        subtitle="Acompanhe saldos bancários e cofres em um só lugar"
+        subtitle="Saldos, extratos, transferências, depósitos e saques em um só lugar"
         icon={CreditCard}
         breadcrumbs={[{ label: 'Dashboard', href: 'Dashboard' }, { label: 'Financeiro' }, { label: 'Contas & Cofres' }]}
       />
