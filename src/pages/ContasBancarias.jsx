@@ -605,6 +605,49 @@ function CofresTab() {
         </div>
       )}
 
+      {/* Modal Transferência entre Cofres */}
+      <Dialog open={transCofreOpen} onOpenChange={setTransCofreOpen}>
+        <DialogContent className="max-w-md w-[95vw]">
+          <DialogHeader><DialogTitle className="flex items-center gap-2"><ArrowRightLeft className="w-5 h-5 text-blue-500" />Transferência entre Cofres</DialogTitle></DialogHeader>
+          <form onSubmit={e => { e.preventDefault(); if (!transForm.cofre_origem_id || !transForm.cofre_destino_id || !transForm.valor) { toast.error('Preencha todos os campos'); return; } if (transForm.cofre_origem_id === transForm.cofre_destino_id) { toast.error('Origem e destino devem ser diferentes'); return; } transCofreMutation.mutate(transForm); }} className="space-y-4">
+            <div className="space-y-2">
+              <Label>Cofre origem *</Label>
+              <Select value={transForm.cofre_origem_id} onValueChange={v => setTransForm({ ...transForm, cofre_origem_id: v })}>
+                <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
+                <SelectContent>{cofres.filter(c => c.status === 'ativo').map(c => <SelectItem key={c.id} value={c.id}>{c.nome}</SelectItem>)}</SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>Cofre destino *</Label>
+              <Select value={transForm.cofre_destino_id} onValueChange={v => setTransForm({ ...transForm, cofre_destino_id: v })}>
+                <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
+                <SelectContent>{cofres.filter(c => c.status === 'ativo' && c.id !== transForm.cofre_origem_id).map(c => <SelectItem key={c.id} value={c.id}>{c.nome}</SelectItem>)}</SelectContent>
+              </Select>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Valor *</Label>
+                <Input type="number" step="0.01" min="0.01" placeholder="0,00" value={transForm.valor} onChange={e => setTransForm({ ...transForm, valor: e.target.value })} required />
+              </div>
+              <div className="space-y-2">
+                <Label>Data *</Label>
+                <Input type="date" value={transForm.data} onChange={e => setTransForm({ ...transForm, data: e.target.value })} required />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Motivo</Label>
+              <Input placeholder="Descrição opcional..." value={transForm.motivo} onChange={e => setTransForm({ ...transForm, motivo: e.target.value })} />
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setTransCofreOpen(false)}>Cancelar</Button>
+              <Button type="submit" disabled={transCofreMutation.isPending} className="bg-blue-600 hover:bg-blue-700 gap-2">
+                {transCofreMutation.isPending && <Loader2 className="w-4 h-4 animate-spin" />}Confirmar Transferência
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
         <DialogContent className="max-w-lg w-[95vw] sm:w-full max-h-[90vh] overflow-y-auto">
           <DialogHeader><DialogTitle>{editingItem ? 'Editar Cofre' : 'Novo Cofre'}</DialogTitle></DialogHeader>
