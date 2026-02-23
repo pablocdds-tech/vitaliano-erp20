@@ -186,20 +186,18 @@ export default function Cofres() {
                 </Select>
               </div>
             )}
-            {!editingItem && (
-              <div className="space-y-2">
-                <Label>Saldo Inicial *</Label>
-                <Input 
-                  type="number" 
-                  step="0.01"
-                  min="0"
-                  value={formData.saldo_atual} 
-                  onChange={e => setFormData({ ...formData, saldo_atual: parseFloat(e.target.value) || 0 })} 
-                  required 
-                  placeholder="0,00"
-                />
-              </div>
-            )}
+            <div className="space-y-2">
+              <Label>Saldo Inicial *</Label>
+              <Input 
+                type="number" 
+                step="0.01"
+                min="0"
+                value={formData.saldo_atual} 
+                onChange={e => setFormData({ ...formData, saldo_atual: parseFloat(e.target.value) || 0 })} 
+                required 
+                placeholder="0,00"
+              />
+            </div>
             <div className="space-y-2">
               <Label>Status</Label>
               <Select value={formData.status} onValueChange={v => setFormData({ ...formData, status: v })}>
