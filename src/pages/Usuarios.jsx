@@ -123,6 +123,15 @@ export default function Usuarios() {
           size="sm"
         />
       )
+    },
+    {
+      key: 'paginas_permitidas',
+      label: 'Permissões',
+      render: (v, row) => {
+        if (row.role === 'admin') return <span className="text-xs text-emerald-600 font-medium">Acesso total</span>;
+        const count = (v || []).length;
+        return <span className="text-xs text-slate-500">{count} página{count !== 1 ? 's' : ''} liberada{count !== 1 ? 's' : ''}</span>;
+      }
     }
   ];
 
