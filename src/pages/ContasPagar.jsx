@@ -79,33 +79,39 @@ export default function ContasPagar() {
   const [formData, setFormData] = useState(emptyForm);
 
   const { data: contas = [], isLoading } = useQuery({
-    queryKey: ['contas-pagar'],
-    queryFn: () => base44.entities.ContaPagar.list('-data_vencimento')
+    queryKey: ['contas-pagar', empresa_id],
+    queryFn: () => empresa_id ? base44.entities.ContaPagar.filter({ empresa_id }, '-data_vencimento') : [],
+    enabled: !!empresa_id
   });
 
   const { data: lojas = [] } = useQuery({
-    queryKey: ['lojas'],
-    queryFn: () => base44.entities.Loja.list()
+    queryKey: ['lojas', empresa_id],
+    queryFn: () => empresa_id ? base44.entities.Loja.filter({ empresa_id }) : [],
+    enabled: !!empresa_id
   });
 
   const { data: fornecedores = [] } = useQuery({
-    queryKey: ['fornecedores'],
-    queryFn: () => base44.entities.Fornecedor.list()
+    queryKey: ['fornecedores', empresa_id],
+    queryFn: () => empresa_id ? base44.entities.Fornecedor.filter({ empresa_id }) : [],
+    enabled: !!empresa_id
   });
 
   const { data: categoriasDRE = [] } = useQuery({
-    queryKey: ['categorias-dre'],
-    queryFn: () => base44.entities.CategoriaDRE.list()
+    queryKey: ['categorias-dre', empresa_id],
+    queryFn: () => empresa_id ? base44.entities.CategoriaDRE.filter({ empresa_id }) : [],
+    enabled: !!empresa_id
   });
 
   const { data: contasBancarias = [] } = useQuery({
-    queryKey: ['contas-bancarias'],
-    queryFn: () => base44.entities.ContaBancaria.filter({ status: 'ativo' })
+    queryKey: ['contas-bancarias', empresa_id],
+    queryFn: () => empresa_id ? base44.entities.ContaBancaria.filter({ empresa_id, status: 'ativo' }) : [],
+    enabled: !!empresa_id
   });
 
   const { data: cofres = [] } = useQuery({
-    queryKey: ['cofres'],
-    queryFn: () => base44.entities.Cofre.filter({ status: 'ativo' })
+    queryKey: ['cofres', empresa_id],
+    queryFn: () => empresa_id ? base44.entities.Cofre.filter({ empresa_id, status: 'ativo' }) : [],
+    enabled: !!empresa_id
   });
 
   const createMutation = useMutation({
