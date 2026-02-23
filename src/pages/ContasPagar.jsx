@@ -453,7 +453,7 @@ export default function ContasPagar() {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Valor Total (R$) *</Label>
-                <Input type="number" value={formData.valor_original} onChange={e => setFormData({ ...formData, valor_original: e.target.value })} min="0.01" step="0.01" required />
+                <Input type="number" value={formData.valor_original} onChange={e => setFormData({ ...formData, valor_original: e.target.value })} min="0.01" step="0.01" />
               </div>
               <div className="space-y-2">
                 <Label>Forma de Pagamento</Label>
