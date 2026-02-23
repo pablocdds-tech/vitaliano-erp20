@@ -400,6 +400,8 @@ function CofresTab() {
   const [editingItem, setEditingItem] = useState(null);
   const [formData, setFormData] = useState({ nome: '', tipo: 'loja', loja_id: '', status: 'ativo' });
 
+  const [extratoCofreId, setExtratoCofreId] = useState(null);
+
   const { data: cofres = [], isLoading } = useQuery({
     queryKey: ['cofres'],
     queryFn: () => base44.entities.Cofre.list()
@@ -412,7 +414,12 @@ function CofresTab() {
 
   const { data: movimentacoes = [] } = useQuery({
     queryKey: ['movimentacoesCofre'],
-    queryFn: () => base44.entities.MovimentacaoCofre.list('-created_date', 1000)
+    queryFn: () => base44.entities.MovimentacaoCofre.list('-data', 1000)
+  });
+
+  const deleteMov = useMutation({
+    mutationFn: (id) => base44.entities.MovimentacaoCofre.delete(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['movimentacoesCofre'] })
   });
 
   const calcularSaldoCofre = (cofreId) => {
@@ -457,29 +464,20 @@ function CofresTab() {
   const getLojaName = (id) => lojas.find(l => l.id === id)?.nome || '-';
   const totalCofres = cofres.reduce((sum, c) => sum + calcularSaldoCofre(c.id), 0);
 
-  const columns = [
-    {
-      key: 'nome', label: 'Cofre', sortable: true,
-      render: (value, row) => (
-        <div>
-          <p className="font-medium text-slate-800">{value}</p>
-          <p className="text-xs text-slate-500">{row.tipo === 'central' ? 'Central' : getLojaName(row.loja_id)}</p>
-        </div>
-      )
-    },
-    { key: 'tipo', label: 'Tipo', render: (v) => <span className="text-sm capitalize">{v === 'central' ? 'Central' : 'Loja'}</span> },
-    { key: 'id', label: 'Saldo Atual', render: (id) => <MoneyDisplay value={calcularSaldoCofre(id)} size="sm" colorize /> },
-    { key: 'status', label: 'Status', render: (v) => <StatusBadge status={v} size="sm" /> }
-  ];
+  const getMovIcon = (tipo) => {
+    if (tipo === 'entrada') return <ArrowDownToLine className="w-4 h-4 text-green-500" />;
+    if (tipo === 'saida') return <ArrowUpFromLine className="w-4 h-4 text-red-500" />;
+    return <ArrowRightLeft className="w-4 h-4 text-blue-500" />;
+  };
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <div className="grid grid-cols-2 gap-4 flex-1">
+      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+        <div className="grid grid-cols-2 gap-4 flex-1 w-full">
           <KPICard title="Total em Cofres" value={formatMoney(totalCofres)} icon={Vault} variant="warning" subtitle={`${cofres.length} cofres`} />
           <KPICard title="Cofres Ativos" value={cofres.filter(c => c.status === 'ativo').length} icon={Vault} variant="info" />
         </div>
-        <Button onClick={() => { resetForm(); setModalOpen(true); }} className="gap-2 ml-4">
+        <Button onClick={() => { resetForm(); setModalOpen(true); }} className="gap-2 whitespace-nowrap">
           <Plus className="w-4 h-4" /> Novo Cofre
         </Button>
       </div>
@@ -487,10 +485,85 @@ function CofresTab() {
       {cofres.length === 0 && !isLoading ? (
         <EmptyState icon={Vault} title="Nenhum cofre" description="Cadastre seus cofres de loja e central." actionLabel="Criar" onAction={() => setModalOpen(true)} />
       ) : (
-        <DataTable columns={columns} data={cofres} loading={isLoading} searchPlaceholder="Buscar cofre..." rowActions={(row) => [
-          { label: 'Editar', icon: Pencil, onClick: () => handleEdit(row) },
-          { label: 'Excluir', icon: Trash2, onClick: () => deleteMutation.mutate(row.id), destructive: true }
-        ]} />
+        <div className="border border-slate-200 rounded-xl overflow-hidden bg-white">
+          <table className="w-full text-sm">
+            <thead className="bg-slate-50 border-b">
+              <tr>
+                <th className="text-left px-4 py-3 text-slate-600 font-medium w-8"></th>
+                <th className="text-left px-4 py-3 text-slate-600 font-medium">Cofre</th>
+                <th className="text-left px-4 py-3 text-slate-600 font-medium">Tipo</th>
+                <th className="text-right px-4 py-3 text-slate-600 font-medium">Saldo Inicial</th>
+                <th className="text-right px-4 py-3 text-slate-600 font-medium">Saldo Atual</th>
+                <th className="text-center px-4 py-3 text-slate-600 font-medium">Status</th>
+                <th className="px-4 py-3 w-24"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {cofres.map(cofre => {
+                const isOpen = extratoCofreId === cofre.id;
+                const saldo = calcularSaldoCofre(cofre.id);
+                const movsCofre = [...movimentacoes.filter(m => m.cofre_id === cofre.id)].sort((a, b) => b.data?.localeCompare(a.data));
+                return (
+                  <React.Fragment key={cofre.id}>
+                    <tr className={`border-b hover:bg-slate-50 cursor-pointer ${isOpen ? 'bg-amber-50' : ''}`} onClick={() => setExtratoCofreId(isOpen ? null : cofre.id)}>
+                      <td className="px-4 py-3 text-slate-400">
+                        {isOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                      </td>
+                      <td className="px-4 py-3">
+                        <p className="font-medium text-slate-800">{cofre.nome}</p>
+                        <p className="text-xs text-slate-500">{cofre.tipo === 'central' ? 'Central' : getLojaName(cofre.loja_id)}</p>
+                      </td>
+                      <td className="px-4 py-3 capitalize text-slate-600">{cofre.tipo === 'central' ? 'Central' : 'Loja'}</td>
+                      <td className="px-4 py-3 text-right"><MoneyDisplay value={cofre.saldo_inicial || 0} size="sm" /></td>
+                      <td className="px-4 py-3 text-right"><MoneyDisplay value={saldo} size="sm" colorize /></td>
+                      <td className="px-4 py-3 text-center"><StatusBadge status={cofre.status} size="sm" /></td>
+                      <td className="px-4 py-3" onClick={e => e.stopPropagation()}>
+                        <div className="flex gap-1 justify-end">
+                          <Button size="sm" variant="ghost" onClick={() => handleEdit(cofre)}><Pencil className="w-3.5 h-3.5" /></Button>
+                          <Button size="sm" variant="ghost" className="text-red-500" onClick={() => deleteMutation.mutate(cofre.id)}><Trash2 className="w-3.5 h-3.5" /></Button>
+                        </div>
+                      </td>
+                    </tr>
+                    {isOpen && (
+                      <tr>
+                        <td colSpan={7} className="bg-amber-50 px-6 py-4 border-b">
+                          <p className="text-xs font-semibold text-amber-700 mb-3 uppercase tracking-wide">
+                            Extrato — {cofre.nome} ({movsCofre.length} lançamentos)
+                          </p>
+                          {movsCofre.length === 0 ? (
+                            <p className="text-sm text-slate-400 py-2">Nenhum lançamento registrado.</p>
+                          ) : (
+                            <div className="space-y-1 max-h-60 overflow-y-auto">
+                              {movsCofre.map(m => (
+                                <div key={m.id} className="flex items-center justify-between bg-white rounded-lg px-3 py-2 text-sm border border-slate-100">
+                                  <div className="flex items-center gap-3">
+                                    {getMovIcon(m.tipo)}
+                                    <div>
+                                      <p className="font-medium text-slate-700">{m.motivo || m.tipo}</p>
+                                      <p className="text-xs text-slate-400">{m.data ? format(new Date(m.data + 'T00:00:00'), "dd 'de' MMM yyyy", { locale: ptBR }) : '-'}</p>
+                                    </div>
+                                  </div>
+                                  <div className="flex items-center gap-3">
+                                    <span className={`font-bold ${m.tipo === 'entrada' ? 'text-green-600' : 'text-red-600'}`}>
+                                      {m.tipo === 'entrada' ? '+' : '-'}{fmt(m.valor)}
+                                    </span>
+                                    <Button size="sm" variant="ghost" className="text-red-400 h-6 w-6 p-0" onClick={() => deleteMov.mutate(m.id)}>
+                                      <Trash2 className="w-3 h-3" />
+                                    </Button>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                    )}
+                  </React.Fragment>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       )}
 
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
