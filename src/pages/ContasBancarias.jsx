@@ -511,9 +511,14 @@ function CofresTab() {
           <KPICard title="Total em Cofres" value={formatMoney(totalCofres)} icon={Vault} variant="warning" subtitle={`${cofres.length} cofres`} />
           <KPICard title="Cofres Ativos" value={cofres.filter(c => c.status === 'ativo').length} icon={Vault} variant="info" />
         </div>
-        <Button onClick={() => { resetForm(); setModalOpen(true); }} className="gap-2 whitespace-nowrap">
-          <Plus className="w-4 h-4" /> Novo Cofre
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => setTransCofreOpen(true)} className="gap-2 whitespace-nowrap">
+            <ArrowRightLeft className="w-4 h-4" /> Transferir entre Cofres
+          </Button>
+          <Button onClick={() => { resetForm(); setModalOpen(true); }} className="gap-2 whitespace-nowrap">
+            <Plus className="w-4 h-4" /> Novo Cofre
+          </Button>
+        </div>
       </div>
 
       {cofres.length === 0 && !isLoading ? (
