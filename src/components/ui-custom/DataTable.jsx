@@ -210,7 +210,7 @@ export default function DataTable({
           <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
             {filteredData.length === 0 ? (
               <tr>
-                <td colSpan={columns.length + (rowActions ? 1 : 0) + (onBulkDelete ? 1 : 0)} className="py-16">
+                <td colSpan={columns.length + (rowActions ? 1 : 0) + ((onBulkDelete || bulkActions) ? 1 : 0)} className="py-16">
                   <div className="flex flex-col items-center justify-center text-center">
                     {EmptyIcon && (
                       <div className="p-4 rounded-2xl bg-slate-100 dark:bg-slate-700 mb-4">
