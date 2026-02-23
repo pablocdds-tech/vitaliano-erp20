@@ -419,8 +419,9 @@ export default function Produtos() {
                     <Input
                       value={formData.codigo}
                       onChange={(e) => setFormData({ ...formData, codigo: e.target.value })}
-                      placeholder="SKU001"
+                      placeholder="Gerado automaticamente"
                     />
+                    <p className="text-xs text-slate-400">Deixe vazio para gerar automaticamente</p>
                   </div>
                   <div className="space-y-2">
                     <Label>Código de Barras</Label>
