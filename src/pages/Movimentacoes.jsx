@@ -6,8 +6,10 @@ import DataTable from '@/components/ui-custom/DataTable';
 import StatusBadge from '@/components/ui-custom/StatusBadge';
 import MoneyDisplay from '@/components/ui-custom/MoneyDisplay';
 import KPICard from '@/components/ui-custom/KPICard';
+import AjusteSaldosTab from '@/components/movimentacoes/AjusteSaldosTab';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Select,
   SelectContent,
@@ -29,7 +31,8 @@ import {
   TrendingUp,
   TrendingDown,
   FileText,
-  Store
+  Store,
+  BarChart3
 } from 'lucide-react';
 import { format, startOfMonth, endOfMonth } from 'date-fns';
 
