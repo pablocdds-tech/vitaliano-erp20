@@ -70,6 +70,37 @@ export default function Configuracoes() {
     updateMutation.mutate(formData);
   };
 
+  const [resetting, setResetting] = useState(false);
+
+  const handleReset = async () => {
+    setResetting(true);
+    try {
+      const entities = [
+        'Estoque', 'MovimentacaoEstoque', 'ContaPagar', 'ContaReceber',
+        'BancoVirtual', 'NotaFiscal', 'Venda', 'Producao', 'PedidoInterno',
+        'Contagem', 'ItemContagem', 'RespostaChecklist', 'AuditoriaDodia',
+        'MovimentacaoCofre', 'TransacaoBancaria', 'AcaoIA', 'Notificacao'
+      ];
+
+      for (const entity of entities) {
+        try {
+          const records = await base44.entities[entity].list();
+          for (const record of records) {
+            await base44.entities[entity].delete(record.id);
+          }
+        } catch (e) {
+          // ignora entidade inexistente
+        }
+      }
+
+      toast.success('Sistema resetado! Dados operacionais apagados.');
+    } catch (err) {
+      toast.error('Erro ao resetar: ' + err.message);
+    } finally {
+      setResetting(false);
+    }
+  };
+
   const handleLogout = async () => {
     try {
       await base44.auth.logout();
