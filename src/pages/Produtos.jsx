@@ -38,8 +38,11 @@ export default function Produtos() {
   const [modalOpen, setModalOpen] = useState(false);
   const [importarOpen, setImportarOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
-  const [filtroCategoria, setFiltroCategoria] = useState('');
+  const [filtroCategorias, setFiltroCategorias] = useState([]);
   const [filtroStatus, setFiltroStatus] = useState('');
+  const [edicaoLoteIds, setEdicaoLoteIds] = useState([]);
+  const [edicaoLoteOpen, setEdicaoLoteOpen] = useState(false);
+  const [salvandoLote, setSalvandoLote] = useState(false);
   const [formData, setFormData] = useState({
     nome: '',
     codigo: '',
