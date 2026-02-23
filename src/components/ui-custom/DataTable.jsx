@@ -24,6 +24,7 @@ export default function DataTable({
   actions,
   rowActions,
   onBulkDelete,   // callback(ids[]) - se fornecido, habilita seleção em lote
+  bulkActions,    // React element rendered when items are selected (custom bulk actions)
   filterBar,      // elemento React extra (filtros) exibido ao lado do search
 }) {
   const [search, setSearch] = React.useState('');
