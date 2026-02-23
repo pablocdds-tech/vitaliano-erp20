@@ -4,6 +4,7 @@ import Sidebar from './components/sidebar/Sidebar';
 import TopBar from './components/sidebar/TopBar';
 import MobileInstallBanner from './components/mobile/MobileInstallBanner';
 import MobileBottomNav from './components/mobile/MobileBottomNav';
+import TenantGuard from './components/onboarding/TenantGuard';
 
 export default function Layout({ children, currentPageName }) {
   const [collapsed, setCollapsed] = useState(false);
