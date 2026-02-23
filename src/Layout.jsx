@@ -76,5 +76,6 @@ export default function Layout({ children, currentPageName }) {
 
       <MobileInstallBanner />
     </div>
+    </TenantGuard>
   );
 }
