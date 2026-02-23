@@ -559,6 +559,9 @@ export default function ContasBancarias() {
           <TabsTrigger value="cofres" className="gap-2">
             <Vault className="w-4 h-4" />Cofres
           </TabsTrigger>
+          <TabsTrigger value="movimentacoes" className="gap-2">
+            <ArrowRightLeft className="w-4 h-4" />Movimentações
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="contas" className="mt-4">
