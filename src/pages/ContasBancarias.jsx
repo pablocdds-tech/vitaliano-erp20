@@ -19,7 +19,7 @@ import {
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { CreditCard, Plus, Pencil, Trash2, Wallet, Vault, ArrowRightLeft, ArrowDownToLine, ArrowUpFromLine, ChevronDown, ChevronUp } from 'lucide-react';
+import { CreditCard, Plus, Pencil, Trash2, Wallet, Vault, ArrowRightLeft, ArrowDownToLine, ArrowUpFromLine, ChevronDown, ChevronUp, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { formatMoney } from '@/components/ui-custom/MoneyDisplay';
 import { format } from 'date-fns';
