@@ -46,12 +46,13 @@ export default function Fornecedores() {
   });
 
   const { data: fornecedores = [], isLoading } = useQuery({
-    queryKey: ['fornecedores'],
-    queryFn: () => base44.entities.Fornecedor.list()
+    queryKey: ['fornecedores', empresa_id],
+    queryFn: () => empresa_id ? base44.entities.Fornecedor.filter({ empresa_id }) : [],
+    enabled: !!empresa_id
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.Fornecedor.create(data),
+    mutationFn: (data) => base44.entities.Fornecedor.create({ ...data, empresa_id }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['fornecedores'] });
       setModalOpen(false);
