@@ -24,7 +24,6 @@ export default function DataTable({
   actions,
   rowActions,
   onBulkDelete,   // callback(ids[]) - se fornecido, habilita seleção em lote
-  bulkActions,    // React element rendered when items are selected (custom bulk actions)
   filterBar,      // elemento React extra (filtros) exibido ao lado do search
 }) {
   const [search, setSearch] = React.useState('');
@@ -144,33 +143,28 @@ export default function DataTable({
         </div>
 
         {/* Bulk action bar */}
-        {(onBulkDelete || bulkActions) && selectedIds.size > 0 && (
-          <div className="flex items-center gap-3 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-xl px-4 py-2.5 flex-wrap">
-            <span className="text-sm font-medium text-indigo-700 dark:text-indigo-400">
+        {onBulkDelete && selectedIds.size > 0 && (
+          <div className="flex items-center gap-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl px-4 py-2.5">
+            <span className="text-sm font-medium text-red-700 dark:text-red-400">
               {selectedIds.size} {selectedIds.size === 1 ? 'item selecionado' : 'itens selecionados'}
             </span>
-            <div className="flex items-center gap-2 ml-auto flex-wrap">
-              {typeof bulkActions === 'function' ? bulkActions([...selectedIds], () => setSelectedIds(new Set())) : bulkActions}
-              {onBulkDelete && (
-                <Button
-                  size="sm"
-                  variant="destructive"
-                  className="gap-1.5"
-                  onClick={handleBulkDelete}
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                  Excluir
-                </Button>
-              )}
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={() => setSelectedIds(new Set())}
-                className="text-slate-600"
-              >
-                Cancelar
-              </Button>
-            </div>
+            <Button
+              size="sm"
+              variant="destructive"
+              className="ml-auto gap-1.5"
+              onClick={handleBulkDelete}
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+              Excluir selecionados
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => setSelectedIds(new Set())}
+              className="text-red-600"
+            >
+              Cancelar
+            </Button>
           </div>
         )}
       </div>
@@ -179,7 +173,7 @@ export default function DataTable({
         <table className="w-full">
           <thead>
             <tr className="bg-slate-50 dark:bg-slate-900/50">
-              {(onBulkDelete || bulkActions) && (
+              {onBulkDelete && (
                 <th className="w-10 px-4 py-3">
                   <Checkbox
                     checked={allSelected}
@@ -210,7 +204,7 @@ export default function DataTable({
           <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
             {filteredData.length === 0 ? (
               <tr>
-                <td colSpan={columns.length + (rowActions ? 1 : 0) + ((onBulkDelete || bulkActions) ? 1 : 0)} className="py-16">
+                <td colSpan={columns.length + (rowActions ? 1 : 0) + (onBulkDelete ? 1 : 0)} className="py-16">
                   <div className="flex flex-col items-center justify-center text-center">
                     {EmptyIcon && (
                       <div className="p-4 rounded-2xl bg-slate-100 dark:bg-slate-700 mb-4">
@@ -230,10 +224,10 @@ export default function DataTable({
                   className={cn(
                     'transition-colors',
                     onRowClick && 'cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50',
-                    (onBulkDelete || bulkActions) && selectedIds.has(row.id) && 'bg-indigo-50/60 dark:bg-indigo-900/10'
+                    onBulkDelete && selectedIds.has(row.id) && 'bg-red-50/60 dark:bg-red-900/10'
                   )}
                 >
-                  {(onBulkDelete || bulkActions) && (
+                  {onBulkDelete && (
                     <td className="px-4 py-3.5" onClick={e => e.stopPropagation()}>
                       <Checkbox
                         checked={selectedIds.has(row.id)}

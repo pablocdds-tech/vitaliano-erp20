@@ -56,7 +56,7 @@ export default function AdminSaaS() {
     queryFn: () => base44.entities.Loja.list('nome', 500),
   });
 
-  if (user && user.role !== 'admin' && user.role !== 'superadmin') {
+  if (user?.role !== 'admin') {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4 text-center">
         <Shield className="w-12 h-12 text-slate-300" />

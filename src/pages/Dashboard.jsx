@@ -44,53 +44,54 @@ export default function Dashboard() {
   const [empresa_id, setEmpresa_id] = useState(null);
 
   useEffect(() => {
+    // Recuperar empresa_id do contexto do usuário
     async function getEmpresaId() {
       try {
         const user = await base44.auth.me();
-        setEmpresa_id(user.empresa_id || null);
+        // Assumindo que empresa_id está salvo no usuário
+        setEmpresa_id(user.empresa_id);
       } catch {
-        setEmpresa_id(null);
+        // Usar primeira empresa disponível como fallback
+        const empresas = await base44.entities.Empresa.list();
+        if (empresas.length > 0) {
+          setEmpresa_id(empresas[0].id);
+        }
       }
     }
     getEmpresaId();
   }, []);
 
-  // Query para dados do dashboard — filtrados por empresa_id
-  const { data: vendas = [], isLoading: loadingVendas } = useQuery({
-    queryKey: ['vendas-dashboard', empresa_id],
-    queryFn: () => empresa_id ? base44.entities.Venda.filter({ empresa_id }, '-data', 30) : [],
-    enabled: !!empresa_id
+  // Query para dados do dashboard
+   const { data: vendas = [], isLoading: loadingVendas } = useQuery({
+    queryKey: ['vendas-dashboard'],
+    queryFn: () => base44.entities.Venda.list('-data', 30)
   });
 
   const { data: contasPagar = [], isLoading: loadingContas } = useQuery({
-    queryKey: ['contas-pagar-dashboard', empresa_id],
-    queryFn: () => empresa_id ? base44.entities.ContaPagar.filter({ empresa_id, status: 'pendente' }, 'data_vencimento', 10) : [],
-    enabled: !!empresa_id
+    queryKey: ['contas-pagar-dashboard'],
+    queryFn: () => base44.entities.ContaPagar.filter({ status: 'pendente' }, 'data_vencimento', 10)
   });
 
   const { data: contasReceber = [], isLoading: loadingReceber } = useQuery({
-    queryKey: ['contas-receber-dashboard', empresa_id],
-    queryFn: () => empresa_id ? base44.entities.ContaReceber.filter({ empresa_id, status: 'pendente' }, 'data_vencimento', 10) : [],
-    enabled: !!empresa_id
+    queryKey: ['contas-receber-dashboard'],
+    queryFn: () => base44.entities.ContaReceber.filter({ status: 'pendente' }, 'data_vencimento', 10)
   });
 
-  const { data: contasBancarias = [] } = useQuery({ queryKey: ['contas-bancarias', empresa_id], queryFn: () => empresa_id ? base44.entities.ContaBancaria.filter({ empresa_id }, 'nome') : [], enabled: !!empresa_id });
-  const { data: transacoesBanco = [] } = useQuery({ queryKey: ['transacoes-banco', empresa_id], queryFn: () => empresa_id ? base44.entities.TransacaoBancaria.filter({ empresa_id }, '-data', 1000) : [], enabled: !!empresa_id });
-  const { data: cofres = [] } = useQuery({ queryKey: ['cofres', empresa_id], queryFn: () => empresa_id ? base44.entities.Cofre.filter({ empresa_id }, 'nome') : [], enabled: !!empresa_id });
-  const { data: movsCofre = [] } = useQuery({ queryKey: ['movs-cofre', empresa_id], queryFn: () => empresa_id ? base44.entities.MovimentacaoCofre.filter({ empresa_id }, '-data', 500) : [], enabled: !!empresa_id });
+  const { data: contasBancarias = [] } = useQuery({ queryKey: ['contas-bancarias'], queryFn: () => base44.entities.ContaBancaria.list('nome') });
+  const { data: transacoesBanco = [] } = useQuery({ queryKey: ['transacoes-banco'], queryFn: () => base44.entities.TransacaoBancaria.list('-data', 1000) });
+  const { data: cofres = [] } = useQuery({ queryKey: ['cofres'], queryFn: () => base44.entities.Cofre.list('nome') });
+  const { data: movsCofre = [] } = useQuery({ queryKey: ['movs-cofre'], queryFn: () => base44.entities.MovimentacaoCofre.list('-data', 500) });
 
   const { data: estoqueAlerta = [], isLoading: loadingEstoque } = useQuery({
-    queryKey: ['estoque-alerta', empresa_id],
+    queryKey: ['estoque-alerta'],
     queryFn: async () => {
-      if (!empresa_id) return [];
-      const estoques = await base44.entities.Estoque.filter({ empresa_id });
-      const produtos = await base44.entities.Produto.filter({ empresa_id });
+      const estoques = await base44.entities.Estoque.list();
+      const produtos = await base44.entities.Produto.list();
       return estoques.filter(e => {
         const produto = produtos.find(p => p.id === e.produto_id);
         return produto && e.quantidade <= (produto.estoque_minimo || 0);
       }).slice(0, 5);
-    },
-    enabled: !!empresa_id
+    }
   });
 
   // Cálculos

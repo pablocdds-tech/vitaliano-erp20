@@ -26,23 +26,18 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Package, Plus, Pencil, Trash2, Tags, Upload, Layers } from 'lucide-react';
+import { Package, Plus, Pencil, Trash2, Tags, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 import ImportarCSVModal, { IMPORT_CONFIGS } from '@/components/importacao/ImportarCSVModal';
 import { subDays } from 'date-fns';
-import EdicaoLoteModal from '@/components/produtos/EdicaoLoteModal';
-import CategoriaMultiFilter from '@/components/produtos/CategoriaMultiFilter';
 
 export default function Produtos() {
   const queryClient = useQueryClient();
   const [modalOpen, setModalOpen] = useState(false);
   const [importarOpen, setImportarOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
-  const [filtroCategorias, setFiltroCategorias] = useState([]);
+  const [filtroCategoria, setFiltroCategoria] = useState('');
   const [filtroStatus, setFiltroStatus] = useState('');
-  const [edicaoLoteIds, setEdicaoLoteIds] = useState([]);
-  const [edicaoLoteOpen, setEdicaoLoteOpen] = useState(false);
-  const [salvandoLote, setSalvandoLote] = useState(false);
   const [formData, setFormData] = useState({
     nome: '',
     codigo: '',
@@ -156,45 +151,12 @@ export default function Produtos() {
     setModalOpen(true);
   };
 
-  const gerarCodigoAuto = () => {
-    const prefixo = 'PROD';
-    const existentes = produtos.map(p => p.codigo || '').filter(c => c.startsWith(prefixo));
-    let maxNum = 0;
-    existentes.forEach(c => {
-      const num = parseInt(c.replace(prefixo, ''), 10);
-      if (!isNaN(num) && num > maxNum) maxNum = num;
-    });
-    return `${prefixo}${String(maxNum + 1).padStart(5, '0')}`;
-  };
-
   const handleSubmit = (e) => {
     e.preventDefault();
-    const data = { ...formData };
-    // Gera código automático se não informado
-    if (!data.codigo) {
-      data.codigo = gerarCodigoAuto();
-    }
     if (editingItem) {
-      updateMutation.mutate({ id: editingItem.id, data });
+      updateMutation.mutate({ id: editingItem.id, data: formData });
     } else {
-      createMutation.mutate(data);
-    }
-  };
-
-  const handleBulkEdit = async (data) => {
-    setSalvandoLote(true);
-    try {
-      for (const id of edicaoLoteIds) {
-        await base44.entities.Produto.update(id, data);
-      }
-      queryClient.invalidateQueries({ queryKey: ['produtos'] });
-      toast.success(`${edicaoLoteIds.length} produto(s) atualizado(s)!`);
-      setEdicaoLoteOpen(false);
-      setEdicaoLoteIds([]);
-    } catch (e) {
-      toast.error('Erro ao atualizar: ' + e.message);
-    } finally {
-      setSalvandoLote(false);
+      createMutation.mutate(formData);
     }
   };
 
@@ -222,16 +184,11 @@ export default function Produtos() {
   // Dados filtrados por categoria e status
   const produtosFiltrados = useMemo(() => {
     return produtos.filter(p => {
-      if (filtroCategorias.length > 0) {
-        const semCat = filtroCategorias.includes('__sem__');
-        const catIds = filtroCategorias.filter(x => x !== '__sem__');
-        const match = (semCat && !p.categoria_id) || catIds.includes(p.categoria_id);
-        if (!match) return false;
-      }
+      if (filtroCategoria && p.categoria_id !== filtroCategoria) return false;
       if (filtroStatus && p.status !== filtroStatus) return false;
       return true;
     });
-  }, [produtos, filtroCategorias, filtroStatus]);
+  }, [produtos, filtroCategoria, filtroStatus]);
 
   const columns = [
     {
@@ -343,24 +300,19 @@ export default function Produtos() {
           emptyIcon={Package}
           emptyTitle="Nenhum produto encontrado"
           onBulkDelete={handleBulkDelete}
-          bulkActions={(ids, clearSelection) => (
-            <Button
-              size="sm"
-              variant="outline"
-              className="gap-1.5"
-              onClick={() => { setEdicaoLoteIds(ids); setEdicaoLoteOpen(true); }}
-            >
-              <Layers className="w-3.5 h-3.5" />
-              Editar em Lote
-            </Button>
-          )}
           filterBar={
             <div className="flex gap-2 flex-wrap">
-              <CategoriaMultiFilter
-                categorias={categorias}
-                selected={filtroCategorias}
-                onChange={setFiltroCategorias}
-              />
+              <Select value={filtroCategoria} onValueChange={setFiltroCategoria}>
+                <SelectTrigger className="h-9 w-40 text-xs">
+                  <SelectValue placeholder="Categoria" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={null}>Todas categorias</SelectItem>
+                  {categorias.map(c => (
+                    <SelectItem key={c.id} value={c.id}>{c.nome}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <Select value={filtroStatus} onValueChange={setFiltroStatus}>
                 <SelectTrigger className="h-9 w-32 text-xs">
                   <SelectValue placeholder="Status" />
@@ -419,9 +371,8 @@ export default function Produtos() {
                     <Input
                       value={formData.codigo}
                       onChange={(e) => setFormData({ ...formData, codigo: e.target.value })}
-                      placeholder="Gerado automaticamente"
+                      placeholder="SKU001"
                     />
-                    <p className="text-xs text-slate-400">Deixe vazio para gerar automaticamente</p>
                   </div>
                   <div className="space-y-2">
                     <Label>Código de Barras</Label>
@@ -586,14 +537,6 @@ export default function Produtos() {
           </form>
         </DialogContent>
       </Dialog>
-      <EdicaoLoteModal
-        open={edicaoLoteOpen}
-        onClose={setEdicaoLoteOpen}
-        ids={edicaoLoteIds}
-        categorias={categorias}
-        onSubmit={handleBulkEdit}
-        loading={salvandoLote}
-      />
     </div>
   );
 }

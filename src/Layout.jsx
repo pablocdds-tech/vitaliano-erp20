@@ -4,11 +4,15 @@ import Sidebar from './components/sidebar/Sidebar';
 import TopBar from './components/sidebar/TopBar';
 import MobileInstallBanner from './components/mobile/MobileInstallBanner';
 import MobileBottomNav from './components/mobile/MobileBottomNav';
-import TenantGuard from './components/onboarding/TenantGuard';
 
 export default function Layout({ children, currentPageName }) {
   const [collapsed, setCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+
+  // Página pública do funcionário: sem sidebar/topbar
+  if (currentPageName === 'ContagemTarefa') {
+    return <>{children}</>;
+  }
 
   useEffect(() => {
     const checkMobile = () => {
@@ -24,13 +28,7 @@ export default function Layout({ children, currentPageName }) {
 
   const toggleSidebar = () => setCollapsed(!collapsed);
 
-  // Página pública do funcionário: sem sidebar/topbar
-  if (currentPageName === 'ContagemTarefa') {
-    return <>{children}</>;
-  }
-
   return (
-    <TenantGuard currentPageName={currentPageName}>
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
       <style>{`
         :root {
@@ -76,6 +74,5 @@ export default function Layout({ children, currentPageName }) {
 
       <MobileInstallBanner />
     </div>
-    </TenantGuard>
   );
 }

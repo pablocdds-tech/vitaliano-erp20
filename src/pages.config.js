@@ -60,6 +60,7 @@ import Configuracoes from './pages/Configuracoes';
 import ContagemTarefa from './pages/ContagemTarefa';
 import Contagens from './pages/Contagens';
 import ContasBancarias from './pages/ContasBancarias';
+import ContasPagar from './pages/ContasPagar';
 import ContasReceber from './pages/ContasReceber';
 import DRE from './pages/DRE';
 import Dashboard from './pages/Dashboard';
@@ -76,8 +77,6 @@ import NotasFiscais from './pages/NotasFiscais';
 import Notificacoes from './pages/Notificacoes';
 import Onboarding from './pages/Onboarding';
 import PDVMobile from './pages/PDVMobile';
-import PassivoDetalhe from './pages/PassivoDetalhe';
-import Passivos from './pages/Passivos';
 import PedidosInternos from './pages/PedidosInternos';
 import Producao from './pages/Producao';
 import Produtos from './pages/Produtos';
@@ -85,7 +84,6 @@ import Relatorios from './pages/Relatorios';
 import TemplatesContagem from './pages/TemplatesContagem';
 import Usuarios from './pages/Usuarios';
 import Vendas from './pages/Vendas';
-import ContasPagar from './pages/ContasPagar';
 import __Layout from './Layout.jsx';
 
 
@@ -103,6 +101,7 @@ export const PAGES = {
     "ContagemTarefa": ContagemTarefa,
     "Contagens": Contagens,
     "ContasBancarias": ContasBancarias,
+    "ContasPagar": ContasPagar,
     "ContasReceber": ContasReceber,
     "DRE": DRE,
     "Dashboard": Dashboard,
@@ -119,8 +118,6 @@ export const PAGES = {
     "Notificacoes": Notificacoes,
     "Onboarding": Onboarding,
     "PDVMobile": PDVMobile,
-    "PassivoDetalhe": PassivoDetalhe,
-    "Passivos": Passivos,
     "PedidosInternos": PedidosInternos,
     "Producao": Producao,
     "Produtos": Produtos,
@@ -128,7 +125,6 @@ export const PAGES = {
     "TemplatesContagem": TemplatesContagem,
     "Usuarios": Usuarios,
     "Vendas": Vendas,
-    "ContasPagar": ContasPagar,
 }
 
 export const pagesConfig = {
