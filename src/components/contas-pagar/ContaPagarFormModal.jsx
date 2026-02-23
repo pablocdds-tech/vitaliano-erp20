@@ -118,27 +118,33 @@ export default function ContaPagarFormModal({ open, onClose, editingItem, lojas,
     onError: (e) => toast.error('Erro: ' + e.message),
   });
 
-  const handleSubmit = () => {
-    if (!formData.descricao?.trim()) { toast.error('Informe a descrição'); return; }
-    if (!formData.loja_id || formData.loja_id === '__none__') { toast.error('Selecione a loja/CD'); return; }
-    if (!formData.valor_original || parseFloat(formData.valor_original) <= 0) { toast.error('Informe o valor'); return; }
+  const handleSubmit = (e) => {
+    if (e) { e.preventDefault(); e.stopPropagation(); }
+    
+    const desc = (formData.descricao || '').trim();
+    const loja = (formData.loja_id || '').trim();
+    const valor = parseFloat(formData.valor_original) || 0;
+    
+    if (!desc) { toast.error('Informe a descrição'); return; }
+    if (!loja || loja === '__none__') { toast.error('Selecione a loja/CD'); return; }
+    if (valor <= 0) { toast.error('Informe o valor'); return; }
     if (!editingItem && formData.parcelar && !formData.primeiro_vencimento) { toast.error('Informe o primeiro vencimento'); return; }
-    if ((!editingItem && !formData.parcelar && !formData.data_vencimento) || (editingItem && !formData.data_vencimento)) {
-      toast.error('Informe o vencimento'); return;
-    }
+    if (!editingItem && !formData.parcelar && !formData.data_vencimento) { toast.error('Informe o vencimento'); return; }
+    if (editingItem && !formData.data_vencimento) { toast.error('Informe o vencimento'); return; }
+
     if (editingItem) {
       updateMutation.mutate({
         id: editingItem.id,
         data: {
-          descricao: formData.descricao, credor_nome: formData.credor_nome,
+          descricao: desc, credor_nome: formData.credor_nome,
           credor_tipo: formData.credor_tipo, fornecedor_id: formData.fornecedor_id || null,
-          loja_id: formData.loja_id, categoria_dre_id: formData.categoria_dre_id || null,
-          data_vencimento: formData.data_vencimento, valor_original: parseFloat(formData.valor_original),
+          loja_id: loja, categoria_dre_id: formData.categoria_dre_id || null,
+          data_vencimento: formData.data_vencimento, valor_original: valor,
           forma_pagamento: formData.forma_pagamento, observacoes: formData.observacoes,
         }
       });
     } else {
-      createMutation.mutate(formData);
+      createMutation.mutate({ ...formData, descricao: desc, loja_id: loja, valor_original: valor });
     }
   };
 
