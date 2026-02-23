@@ -30,9 +30,11 @@ import { Package, Plus, Pencil, Trash2, Tags, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 import ImportarCSVModal, { IMPORT_CONFIGS } from '@/components/importacao/ImportarCSVModal';
 import { subDays } from 'date-fns';
+import { useTenant } from '@/components/services/useTenant';
 
 export default function Produtos() {
   const queryClient = useQueryClient();
+  const { empresa_id } = useTenant();
   const [modalOpen, setModalOpen] = useState(false);
   const [importarOpen, setImportarOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
