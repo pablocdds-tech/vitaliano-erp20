@@ -24,6 +24,11 @@ export default function Layout({ children, currentPageName }) {
 
   const toggleSidebar = () => setCollapsed(!collapsed);
 
+  // Página pública do funcionário: sem sidebar/topbar
+  if (currentPageName === 'ContagemTarefa') {
+    return <>{children}</>;
+  }
+
   return (
     <TenantGuard currentPageName={currentPageName}>
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
