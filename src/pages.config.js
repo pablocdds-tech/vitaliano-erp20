@@ -85,6 +85,7 @@ import Relatorios from './pages/Relatorios';
 import TemplatesContagem from './pages/TemplatesContagem';
 import Usuarios from './pages/Usuarios';
 import Vendas from './pages/Vendas';
+import ContasPagar from './pages/ContasPagar';
 import __Layout from './Layout.jsx';
 
 
@@ -127,6 +128,7 @@ export const PAGES = {
     "TemplatesContagem": TemplatesContagem,
     "Usuarios": Usuarios,
     "Vendas": Vendas,
+    "ContasPagar": ContasPagar,
 }
 
 export const pagesConfig = {
