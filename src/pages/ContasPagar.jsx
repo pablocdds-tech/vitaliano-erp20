@@ -466,40 +466,42 @@ export default function ContasPagar() {
               </div>
             </div>
 
-            {/* Parcelamento */}
+            {/* Vencimento / Parcelamento */}
             {!editingItem && (
-              <div className="border rounded-lg p-4 space-y-3 bg-slate-50 dark:bg-slate-800/50">
-                <div className="flex items-center gap-3">
-                  <input
-                    type="checkbox"
-                    id="parcelar"
-                    checked={formData.parcelar}
-                    onChange={e => setFormData({ ...formData, parcelar: e.target.checked })}
-                    className="w-4 h-4 rounded"
-                  />
-                  <label htmlFor="parcelar" className="text-sm font-medium flex items-center gap-2 cursor-pointer">
-                    <Layers className="w-4 h-4 text-indigo-500" />
-                    Parcelar em múltiplos boletos
-                  </label>
-                </div>
-
-                {formData.parcelar && (
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label>Número de Parcelas</Label>
-                      <Input type="number" min="2" max="48" value={formData.num_parcelas} onChange={e => setFormData({ ...formData, num_parcelas: parseInt(e.target.value) || 2 })} />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>1º Vencimento *</Label>
-                      <Input type="date" value={formData.primeiro_vencimento} onChange={e => setFormData({ ...formData, primeiro_vencimento: e.target.value })} />
-                    </div>
-                    {formData.valor_original && formData.num_parcelas >= 2 && (
-                      <div className="col-span-2 text-xs text-slate-500 bg-white dark:bg-slate-900 rounded p-2 border">
-                        <strong>{formData.num_parcelas}x</strong> de aproximadamente <strong>{formatMoney(parseFloat(formData.valor_original) / formData.num_parcelas)}</strong> — mensal
-                      </div>
-                    )}
+              <>
+                <div className="border rounded-lg p-4 space-y-3 bg-slate-50 dark:bg-slate-800/50">
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      id="parcelar"
+                      checked={formData.parcelar}
+                      onChange={e => setFormData({ ...formData, parcelar: e.target.checked })}
+                      className="w-4 h-4 rounded"
+                    />
+                    <label htmlFor="parcelar" className="text-sm font-medium flex items-center gap-2 cursor-pointer">
+                      <Layers className="w-4 h-4 text-indigo-500" />
+                      Parcelar em múltiplos boletos
+                    </label>
                   </div>
-                )}
+
+                  {formData.parcelar && (
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label>Número de Parcelas</Label>
+                        <Input type="number" min="2" max="48" value={formData.num_parcelas} onChange={e => setFormData({ ...formData, num_parcelas: parseInt(e.target.value) || 2 })} />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>1º Vencimento *</Label>
+                        <Input type="date" value={formData.primeiro_vencimento} onChange={e => setFormData({ ...formData, primeiro_vencimento: e.target.value })} />
+                      </div>
+                      {formData.valor_original && formData.num_parcelas >= 2 && (
+                        <div className="col-span-2 text-xs text-slate-500 bg-white dark:bg-slate-900 rounded p-2 border">
+                          <strong>{formData.num_parcelas}x</strong> de aproximadamente <strong>{formatMoney(parseFloat(formData.valor_original) / formData.num_parcelas)}</strong> — mensal
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
 
                 {!formData.parcelar && (
                   <div className="space-y-2">
@@ -507,13 +509,13 @@ export default function ContasPagar() {
                     <Input type="date" value={formData.data_vencimento} onChange={e => setFormData({ ...formData, data_vencimento: e.target.value })} />
                   </div>
                 )}
-              </div>
+              </>
             )}
 
             {editingItem && (
               <div className="space-y-2">
                 <Label>Data de Vencimento *</Label>
-                <Input type="date" value={formData.data_vencimento} onChange={e => setFormData({ ...formData, data_vencimento: e.target.value })} required />
+                <Input type="date" value={formData.data_vencimento} onChange={e => setFormData({ ...formData, data_vencimento: e.target.value })} />
               </div>
             )}
 
