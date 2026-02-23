@@ -156,12 +156,45 @@ export default function Produtos() {
     setModalOpen(true);
   };
 
+  const gerarCodigoAuto = () => {
+    const prefixo = 'PROD';
+    const existentes = produtos.map(p => p.codigo || '').filter(c => c.startsWith(prefixo));
+    let maxNum = 0;
+    existentes.forEach(c => {
+      const num = parseInt(c.replace(prefixo, ''), 10);
+      if (!isNaN(num) && num > maxNum) maxNum = num;
+    });
+    return `${prefixo}${String(maxNum + 1).padStart(5, '0')}`;
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
+    const data = { ...formData };
+    // Gera código automático se não informado
+    if (!data.codigo) {
+      data.codigo = gerarCodigoAuto();
+    }
     if (editingItem) {
-      updateMutation.mutate({ id: editingItem.id, data: formData });
+      updateMutation.mutate({ id: editingItem.id, data });
     } else {
-      createMutation.mutate(formData);
+      createMutation.mutate(data);
+    }
+  };
+
+  const handleBulkEdit = async (data) => {
+    setSalvandoLote(true);
+    try {
+      for (const id of edicaoLoteIds) {
+        await base44.entities.Produto.update(id, data);
+      }
+      queryClient.invalidateQueries({ queryKey: ['produtos'] });
+      toast.success(`${edicaoLoteIds.length} produto(s) atualizado(s)!`);
+      setEdicaoLoteOpen(false);
+      setEdicaoLoteIds([]);
+    } catch (e) {
+      toast.error('Erro ao atualizar: ' + e.message);
+    } finally {
+      setSalvandoLote(false);
     }
   };
 
