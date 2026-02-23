@@ -60,7 +60,6 @@ import Configuracoes from './pages/Configuracoes';
 import ContagemTarefa from './pages/ContagemTarefa';
 import Contagens from './pages/Contagens';
 import ContasBancarias from './pages/ContasBancarias';
-import ContasPagar from './pages/ContasPagar';
 import ContasReceber from './pages/ContasReceber';
 import DRE from './pages/DRE';
 import Dashboard from './pages/Dashboard';
@@ -103,7 +102,6 @@ export const PAGES = {
     "ContagemTarefa": ContagemTarefa,
     "Contagens": Contagens,
     "ContasBancarias": ContasBancarias,
-    "ContasPagar": ContasPagar,
     "ContasReceber": ContasReceber,
     "DRE": DRE,
     "Dashboard": Dashboard,
