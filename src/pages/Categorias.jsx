@@ -43,12 +43,13 @@ export default function Categorias() {
   });
 
   const { data: categorias = [], isLoading } = useQuery({
-    queryKey: ['categorias'],
-    queryFn: () => base44.entities.Categoria.list()
+    queryKey: ['categorias', empresa_id],
+    queryFn: () => empresa_id ? base44.entities.Categoria.filter({ empresa_id }) : [],
+    enabled: !!empresa_id
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.Categoria.create(data),
+    mutationFn: (data) => base44.entities.Categoria.create({ ...data, empresa_id }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['categorias'] });
       setModalOpen(false);
