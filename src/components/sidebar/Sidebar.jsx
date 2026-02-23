@@ -80,6 +80,7 @@ const menuGroups = [
     items: [
       { icon: CreditCard, label: 'Contas a Pagar', href: 'ContasPagar' },
       { icon: Wallet, label: 'Contas a Receber', href: 'ContasReceber' },
+      { icon: TrendingDown, label: 'Passivos & Planejamento', href: 'Passivos' },
       { icon: PiggyBank, label: 'Banco Virtual', href: 'BancoVirtual' },
       { icon: FileBarChart, label: 'DRE Gerencial', href: 'DRE' },
       { icon: Landmark, label: 'Contas Bancárias', href: 'ContasBancarias' },
