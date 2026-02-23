@@ -258,7 +258,7 @@ function ContasBancariasTab() {
       </Dialog>
 
       {/* Modal de operação */}
-      <OperacaoContaModal open={operacaoOpen} onClose={() => setOperacaoOpen(false)} contas={contas} />
+      <OperacaoContaModal open={operacaoOpen} onClose={() => setOperacaoOpen(false)} contas={contas} cofres={cofresDisponiveis} />
     </div>
   );
 }
