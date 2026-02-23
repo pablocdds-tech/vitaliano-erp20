@@ -375,7 +375,7 @@ export default function ContasPagar() {
             <DialogTitle>{editingItem ? 'Editar Conta' : 'Nova Conta a Pagar'}</DialogTitle>
           </DialogHeader>
 
-          <div className="space-y-4">
+          <div className="space-y-4" role="form">
             {/* Descrição */}
             <div className="space-y-2">
               <Label>Descrição *</Label>
