@@ -30,6 +30,7 @@ export default function Layout({ children, currentPageName }) {
   const toggleSidebar = () => setCollapsed(!collapsed);
 
   return (
+    <TenantGuard currentPageName={currentPageName}>
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
       <style>{`
         :root {
