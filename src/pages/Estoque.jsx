@@ -22,30 +22,36 @@ import {
 } from "@/components/ui/dialog";
 import { Boxes, Package, AlertTriangle, TrendingDown, TrendingUp, Tags, Store } from 'lucide-react';
 import { format } from 'date-fns';
+import { useTenant } from '@/components/services/useTenant';
 
 export default function Estoque() {
+  const { empresa_id } = useTenant();
   const [lojaFiltro, setLojaFiltro] = useState('all');
   const [categoriaFiltro, setCategoriaFiltro] = useState('all');
   const [viewModal, setViewModal] = useState(null);
 
   const { data: estoques = [], isLoading: loadingEstoques } = useQuery({
-    queryKey: ['estoques'],
-    queryFn: () => base44.entities.Estoque.list()
+    queryKey: ['estoques', empresa_id],
+    queryFn: () => empresa_id ? base44.entities.Estoque.filter({ empresa_id }) : [],
+    enabled: !!empresa_id
   });
 
   const { data: produtos = [], isLoading: loadingProdutos } = useQuery({
-    queryKey: ['produtos'],
-    queryFn: () => base44.entities.Produto.list()
+    queryKey: ['produtos', empresa_id],
+    queryFn: () => empresa_id ? base44.entities.Produto.filter({ empresa_id }) : [],
+    enabled: !!empresa_id
   });
 
   const { data: lojas = [] } = useQuery({
-    queryKey: ['lojas'],
-    queryFn: () => base44.entities.Loja.list()
+    queryKey: ['lojas', empresa_id],
+    queryFn: () => empresa_id ? base44.entities.Loja.filter({ empresa_id }) : [],
+    enabled: !!empresa_id
   });
 
   const { data: categorias = [] } = useQuery({
-    queryKey: ['categorias'],
-    queryFn: () => base44.entities.Categoria.list()
+    queryKey: ['categorias', empresa_id],
+    queryFn: () => empresa_id ? base44.entities.Categoria.filter({ empresa_id }) : [],
+    enabled: !!empresa_id
   });
 
   const isLoading = loadingEstoques || loadingProdutos;
