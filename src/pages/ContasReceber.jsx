@@ -52,27 +52,31 @@ export default function ContasReceber() {
   });
 
   const { data: contas = [], isLoading } = useQuery({
-    queryKey: ['contasReceber'],
-    queryFn: () => base44.entities.ContaReceber.list('-data_vencimento', 50)
+    queryKey: ['contasReceber', empresa_id],
+    queryFn: () => empresa_id ? base44.entities.ContaReceber.filter({ empresa_id }, '-data_vencimento', 50) : [],
+    enabled: !!empresa_id
   });
 
   const { data: contasBancarias = [] } = useQuery({
-    queryKey: ['contas-bancarias'],
-    queryFn: () => base44.entities.ContaBancaria.filter({ status: 'ativo' })
+    queryKey: ['contas-bancarias', empresa_id],
+    queryFn: () => empresa_id ? base44.entities.ContaBancaria.filter({ empresa_id, status: 'ativo' }) : [],
+    enabled: !!empresa_id
   });
 
   const { data: cofres = [] } = useQuery({
-    queryKey: ['cofres'],
-    queryFn: () => base44.entities.Cofre.filter({ status: 'ativo' })
+    queryKey: ['cofres', empresa_id],
+    queryFn: () => empresa_id ? base44.entities.Cofre.filter({ empresa_id, status: 'ativo' }) : [],
+    enabled: !!empresa_id
   });
 
   const { data: lojas = [] } = useQuery({
-    queryKey: ['lojas'],
-    queryFn: () => base44.entities.Loja.list()
+    queryKey: ['lojas', empresa_id],
+    queryFn: () => empresa_id ? base44.entities.Loja.filter({ empresa_id }) : [],
+    enabled: !!empresa_id
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.ContaReceber.create(data),
+    mutationFn: (data) => base44.entities.ContaReceber.create({ ...data, empresa_id }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['contasReceber'] });
       setModalOpen(false);
