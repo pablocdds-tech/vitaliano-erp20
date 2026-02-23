@@ -379,7 +379,7 @@ export default function ContasPagar() {
             {/* Descrição */}
             <div className="space-y-2">
               <Label>Descrição *</Label>
-              <Input value={formData.descricao} onChange={e => setFormData({ ...formData, descricao: e.target.value })} placeholder="Ex: Aluguel fevereiro, Boleto fornecedor..." required />
+              <Input value={formData.descricao} onChange={e => setFormData({ ...formData, descricao: e.target.value })} placeholder="Ex: Aluguel fevereiro, Boleto fornecedor..." />
             </div>
 
             {/* Credor */}
