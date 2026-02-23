@@ -30,9 +30,11 @@ import { format, differenceInDays, isAfter } from 'date-fns';
 import RegistrarRecebimentoModal from '@/components/contas/RegistrarRecebimentoModal';
 import KPICard from '@/components/ui-custom/KPICard';
 import { formatMoney } from '@/components/ui-custom/MoneyDisplay';
+import { useTenant } from '@/components/services/useTenant';
 
 export default function ContasReceber() {
   const queryClient = useQueryClient();
+  const { empresa_id } = useTenant();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [recebimentoModal, setRecebimentoModal] = useState(null);
