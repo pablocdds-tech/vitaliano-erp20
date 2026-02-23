@@ -24,9 +24,11 @@ import {
 } from "@/components/ui/select";
 import { Store, Plus, Pencil, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTenant } from '@/components/services/useTenant';
 
 export default function Lojas() {
   const queryClient = useQueryClient();
+  const { empresa_id } = useTenant();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [formData, setFormData] = useState({
