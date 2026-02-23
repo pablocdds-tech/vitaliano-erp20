@@ -158,6 +158,12 @@ export default function Usuarios() {
         ]} />
       )}
 
+      <PermissoesModal
+        user={permissoesUser}
+        onClose={() => setPermissoesUser(null)}
+        onSave={(id, paginas) => salvarPermissoesMutation.mutate({ id, paginas })}
+      />
+
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
