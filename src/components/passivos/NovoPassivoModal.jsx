@@ -20,6 +20,7 @@ const TIPOS = [
 
 export default function NovoPassivoModal({ open, onClose, onSuccess, lojas }) {
   const [loading, setLoading] = useState(false);
+  const [mode, setMode] = useState('novo'); // 'novo' ou 'em_andamento'
   const [form, setForm] = useState({
     title: '',
     type: '',
@@ -27,19 +28,27 @@ export default function NovoPassivoModal({ open, onClose, onSuccess, lojas }) {
     responsible: '',
     loja_id: '',
     original_amount: '',
+    amount_paid: '',
     interest_rate_monthly: '',
     total_installments: '',
     installment_value: '',
+    has_variable_installments: false,
     start_date: '',
     first_due_date: '',
     notes: ''
   });
+  const [installmentsInput, setInstallmentsInput] = useState(''); // JSON para parcelas variáveis
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
   const handleSubmit = async () => {
-    if (!form.title || !form.type || !form.original_amount || !form.total_installments || !form.installment_value || !form.first_due_date) {
+    if (!form.title || !form.type || !form.original_amount || !form.total_installments || !form.first_due_date) {
       toast.error('Preencha todos os campos obrigatórios');
+      return;
+    }
+    
+    if (!form.has_variable_installments && !form.installment_value) {
+      toast.error('Indique valor da parcela ou marque como parcelas variáveis');
       return;
     }
     setLoading(true);
