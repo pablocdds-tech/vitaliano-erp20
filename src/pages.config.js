@@ -47,29 +47,18 @@
  *
  * The mainPage value must match a key in the PAGES object exactly.
  */
-import AdminSaaS from './pages/AdminSaaS';
 import AgenteConciliacao from './pages/AgenteConciliacao';
 import AgenteFiscal from './pages/AgenteFiscal';
 import AssistenteERP from './pages/AssistenteERP';
 import AuditoriaDodia from './pages/AuditoriaDodia';
 import BancoVirtual from './pages/BancoVirtual';
-import Categorias from './pages/Categorias';
 import Checklists from './pages/Checklists';
 import Cofres from './pages/Cofres';
 import Configuracoes from './pages/Configuracoes';
-import ContagemTarefa from './pages/ContagemTarefa';
-import Contagens from './pages/Contagens';
 import ContasBancarias from './pages/ContasBancarias';
-import ContasPagar from './pages/ContasPagar';
-import ContasReceber from './pages/ContasReceber';
 import DRE from './pages/DRE';
-import Dashboard from './pages/Dashboard';
-import Empresas from './pages/Empresas';
-import Estoque from './pages/Estoque';
 import FichasTecnicas from './pages/FichasTecnicas';
-import Fornecedores from './pages/Fornecedores';
 import IAExecutora from './pages/IAExecutora';
-import Lojas from './pages/Lojas';
 import Manutencao from './pages/Manutencao';
 import Movimentacoes from './pages/Movimentacoes';
 import MovimentacoesBancarias from './pages/MovimentacoesBancarias';
@@ -79,38 +68,39 @@ import Onboarding from './pages/Onboarding';
 import PDVMobile from './pages/PDVMobile';
 import PedidosInternos from './pages/PedidosInternos';
 import Producao from './pages/Producao';
-import Produtos from './pages/Produtos';
 import Relatorios from './pages/Relatorios';
 import TemplatesContagem from './pages/TemplatesContagem';
 import Usuarios from './pages/Usuarios';
 import Vendas from './pages/Vendas';
+import ContagemTarefa from './pages/ContagemTarefa';
+import Contagens from './pages/Contagens';
+import ContasReceber from './pages/ContasReceber';
+import ContasPagar from './pages/ContasPagar';
+import Empresas from './pages/Empresas';
+import Lojas from './pages/Lojas';
+import Estoque from './pages/Estoque';
+import Produtos from './pages/Produtos';
+import Categorias from './pages/Categorias';
+import Fornecedores from './pages/Fornecedores';
+import Dashboard from './pages/Dashboard';
+import AdminSaaS from './pages/AdminSaaS';
+import Passivos from './pages/Passivos';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
-    "AdminSaaS": AdminSaaS,
     "AgenteConciliacao": AgenteConciliacao,
     "AgenteFiscal": AgenteFiscal,
     "AssistenteERP": AssistenteERP,
     "AuditoriaDodia": AuditoriaDodia,
     "BancoVirtual": BancoVirtual,
-    "Categorias": Categorias,
     "Checklists": Checklists,
     "Cofres": Cofres,
     "Configuracoes": Configuracoes,
-    "ContagemTarefa": ContagemTarefa,
-    "Contagens": Contagens,
     "ContasBancarias": ContasBancarias,
-    "ContasPagar": ContasPagar,
-    "ContasReceber": ContasReceber,
     "DRE": DRE,
-    "Dashboard": Dashboard,
-    "Empresas": Empresas,
-    "Estoque": Estoque,
     "FichasTecnicas": FichasTecnicas,
-    "Fornecedores": Fornecedores,
     "IAExecutora": IAExecutora,
-    "Lojas": Lojas,
     "Manutencao": Manutencao,
     "Movimentacoes": Movimentacoes,
     "MovimentacoesBancarias": MovimentacoesBancarias,
@@ -120,11 +110,23 @@ export const PAGES = {
     "PDVMobile": PDVMobile,
     "PedidosInternos": PedidosInternos,
     "Producao": Producao,
-    "Produtos": Produtos,
     "Relatorios": Relatorios,
     "TemplatesContagem": TemplatesContagem,
     "Usuarios": Usuarios,
     "Vendas": Vendas,
+    "ContagemTarefa": ContagemTarefa,
+    "Contagens": Contagens,
+    "ContasReceber": ContasReceber,
+    "ContasPagar": ContasPagar,
+    "Empresas": Empresas,
+    "Lojas": Lojas,
+    "Estoque": Estoque,
+    "Produtos": Produtos,
+    "Categorias": Categorias,
+    "Fornecedores": Fornecedores,
+    "Dashboard": Dashboard,
+    "AdminSaaS": AdminSaaS,
+    "Passivos": Passivos,
 }
 
 export const pagesConfig = {
