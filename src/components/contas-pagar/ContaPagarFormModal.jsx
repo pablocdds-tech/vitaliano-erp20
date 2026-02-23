@@ -294,8 +294,8 @@ export default function ContaPagarFormModal({ open, onClose, editingItem, lojas,
         </div>
 
         <DialogFooter className="mt-2">
-          <Button variant="outline" onClick={onClose}>Cancelar</Button>
-          <Button disabled={isSaving} onClick={handleSubmit}>
+          <Button type="button" variant="outline" onClick={onClose}>Cancelar</Button>
+          <Button type="button" disabled={isSaving} onClick={handleSubmit}>
             {isSaving ? 'Salvando...' : editingItem ? 'Salvar' : formData.parcelar ? `Gerar ${formData.num_parcelas} Parcelas` : 'Cadastrar'}
           </Button>
         </DialogFooter>
