@@ -26,11 +26,9 @@ import {
 } from "@/components/ui/select";
 import { toast } from 'sonner';
 import ImportarCSVModal, { IMPORT_CONFIGS } from '@/components/importacao/ImportarCSVModal';
-import { useTenant } from '@/components/services/useTenant';
 
 export default function Fornecedores() {
   const queryClient = useQueryClient();
-  const { empresa_id } = useTenant();
   const [modalOpen, setModalOpen] = useState(false);
   const [importarOpen, setImportarOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
@@ -46,13 +44,12 @@ export default function Fornecedores() {
   });
 
   const { data: fornecedores = [], isLoading } = useQuery({
-    queryKey: ['fornecedores', empresa_id],
-    queryFn: () => empresa_id ? base44.entities.Fornecedor.filter({ empresa_id }) : [],
-    enabled: !!empresa_id
+    queryKey: ['fornecedores'],
+    queryFn: () => base44.entities.Fornecedor.list()
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.Fornecedor.create({ ...data, empresa_id }),
+    mutationFn: (data) => base44.entities.Fornecedor.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['fornecedores'] });
       setModalOpen(false);

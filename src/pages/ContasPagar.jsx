@@ -29,7 +29,6 @@ import { CreditCard, Plus, Pencil, CheckCircle2, Trash2, Clock, AlertTriangle, W
 import { format, differenceInDays, isAfter, addMonths } from 'date-fns';
 import { toast } from 'sonner';
 import { getEmpresaAtiva } from '@/components/services/tenantService';
-import { useTenant } from '@/components/services/useTenant';
 import RegistrarPagamentoModal from '@/components/contas/RegistrarPagamentoModal';
 
 const FORMAS = ['boleto', 'pix', 'transferencia', 'dinheiro', 'cartao', 'cheque'];
@@ -52,7 +51,6 @@ function gerarParcelas(valor, numParcelas, primeiroVencimento, intervalo = 'mens
 
 export default function ContasPagar() {
   const queryClient = useQueryClient();
-  const { empresa_id } = useTenant();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [pagamentoModal, setPagamentoModal] = useState(null); // conta sendo paga
@@ -79,39 +77,33 @@ export default function ContasPagar() {
   const [formData, setFormData] = useState(emptyForm);
 
   const { data: contas = [], isLoading } = useQuery({
-    queryKey: ['contas-pagar', empresa_id],
-    queryFn: () => empresa_id ? base44.entities.ContaPagar.filter({ empresa_id }, '-data_vencimento') : [],
-    enabled: !!empresa_id
+    queryKey: ['contas-pagar'],
+    queryFn: () => base44.entities.ContaPagar.list('-data_vencimento')
   });
 
   const { data: lojas = [] } = useQuery({
-    queryKey: ['lojas', empresa_id],
-    queryFn: () => empresa_id ? base44.entities.Loja.filter({ empresa_id }) : [],
-    enabled: !!empresa_id
+    queryKey: ['lojas'],
+    queryFn: () => base44.entities.Loja.list()
   });
 
   const { data: fornecedores = [] } = useQuery({
-    queryKey: ['fornecedores', empresa_id],
-    queryFn: () => empresa_id ? base44.entities.Fornecedor.filter({ empresa_id }) : [],
-    enabled: !!empresa_id
+    queryKey: ['fornecedores'],
+    queryFn: () => base44.entities.Fornecedor.list()
   });
 
   const { data: categoriasDRE = [] } = useQuery({
-    queryKey: ['categorias-dre', empresa_id],
-    queryFn: () => empresa_id ? base44.entities.CategoriaDRE.filter({ empresa_id }) : [],
-    enabled: !!empresa_id
+    queryKey: ['categorias-dre'],
+    queryFn: () => base44.entities.CategoriaDRE.list()
   });
 
   const { data: contasBancarias = [] } = useQuery({
-    queryKey: ['contas-bancarias', empresa_id],
-    queryFn: () => empresa_id ? base44.entities.ContaBancaria.filter({ empresa_id, status: 'ativo' }) : [],
-    enabled: !!empresa_id
+    queryKey: ['contas-bancarias'],
+    queryFn: () => base44.entities.ContaBancaria.filter({ status: 'ativo' })
   });
 
   const { data: cofres = [] } = useQuery({
-    queryKey: ['cofres', empresa_id],
-    queryFn: () => empresa_id ? base44.entities.Cofre.filter({ empresa_id, status: 'ativo' }) : [],
-    enabled: !!empresa_id
+    queryKey: ['cofres'],
+    queryFn: () => base44.entities.Cofre.filter({ status: 'ativo' })
   });
 
   const createMutation = useMutation({

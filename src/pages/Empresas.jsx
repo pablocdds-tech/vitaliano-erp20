@@ -22,13 +22,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Building2, Plus, Pencil, Trash2, Lock } from 'lucide-react';
+import { Building2, Plus, Pencil, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { useTenant } from '@/components/services/useTenant';
 
 export default function Empresas() {
   const queryClient = useQueryClient();
-  const { isSuperAdmin, loading: loadingUser } = useTenant();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [formData, setFormData] = useState({
@@ -41,8 +39,7 @@ export default function Empresas() {
 
   const { data: empresas = [], isLoading } = useQuery({
     queryKey: ['empresas'],
-    queryFn: () => base44.entities.Empresa.list(),
-    enabled: isSuperAdmin
+    queryFn: () => base44.entities.Empresa.list()
   });
 
   const createMutation = useMutation({
@@ -125,19 +122,6 @@ export default function Empresas() {
       render: (v) => <StatusBadge status={v} size="sm" />
     }
   ];
-
-  // Bloquear acesso para não-superadmins
-  if (!loadingUser && !isSuperAdmin) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4 text-center">
-        <div className="p-6 rounded-full bg-red-50">
-          <Lock className="w-12 h-12 text-red-400" />
-        </div>
-        <h2 className="text-xl font-semibold text-slate-700">Acesso Restrito</h2>
-        <p className="text-slate-500 max-w-sm">Esta área é exclusiva para administradores do sistema (superadmin).</p>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-6">

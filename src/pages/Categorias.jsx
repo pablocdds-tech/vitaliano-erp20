@@ -25,11 +25,9 @@ import {
 import { Tags, Plus, Pencil, Trash2, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 import ImportarCSVModal, { IMPORT_CONFIGS } from '@/components/importacao/ImportarCSVModal';
-import { useTenant } from '@/components/services/useTenant';
 
 export default function Categorias() {
   const queryClient = useQueryClient();
-  const { empresa_id } = useTenant();
   const [modalOpen, setModalOpen] = useState(false);
   const [importarOpen, setImportarOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
@@ -43,13 +41,12 @@ export default function Categorias() {
   });
 
   const { data: categorias = [], isLoading } = useQuery({
-    queryKey: ['categorias', empresa_id],
-    queryFn: () => empresa_id ? base44.entities.Categoria.filter({ empresa_id }) : [],
-    enabled: !!empresa_id
+    queryKey: ['categorias'],
+    queryFn: () => base44.entities.Categoria.list()
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.Categoria.create({ ...data, empresa_id }),
+    mutationFn: (data) => base44.entities.Categoria.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['categorias'] });
       setModalOpen(false);

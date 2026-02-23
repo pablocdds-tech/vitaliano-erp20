@@ -24,11 +24,9 @@ import {
 } from "@/components/ui/select";
 import { Store, Plus, Pencil, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { useTenant } from '@/components/services/useTenant';
 
 export default function Lojas() {
   const queryClient = useQueryClient();
-  const { empresa_id } = useTenant();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [formData, setFormData] = useState({
@@ -41,13 +39,12 @@ export default function Lojas() {
   });
 
   const { data: lojas = [], isLoading } = useQuery({
-    queryKey: ['lojas', empresa_id],
-    queryFn: () => empresa_id ? base44.entities.Loja.filter({ empresa_id }) : [],
-    enabled: !!empresa_id
+    queryKey: ['lojas'],
+    queryFn: () => base44.entities.Loja.list()
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.Loja.create({ ...data, empresa_id }),
+    mutationFn: (data) => base44.entities.Loja.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['lojas'] });
       setModalOpen(false);

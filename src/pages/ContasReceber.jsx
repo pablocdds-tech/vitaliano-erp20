@@ -30,11 +30,9 @@ import { format, differenceInDays, isAfter } from 'date-fns';
 import RegistrarRecebimentoModal from '@/components/contas/RegistrarRecebimentoModal';
 import KPICard from '@/components/ui-custom/KPICard';
 import { formatMoney } from '@/components/ui-custom/MoneyDisplay';
-import { useTenant } from '@/components/services/useTenant';
 
 export default function ContasReceber() {
   const queryClient = useQueryClient();
-  const { empresa_id } = useTenant();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [recebimentoModal, setRecebimentoModal] = useState(null);
@@ -52,31 +50,27 @@ export default function ContasReceber() {
   });
 
   const { data: contas = [], isLoading } = useQuery({
-    queryKey: ['contasReceber', empresa_id],
-    queryFn: () => empresa_id ? base44.entities.ContaReceber.filter({ empresa_id }, '-data_vencimento', 50) : [],
-    enabled: !!empresa_id
+    queryKey: ['contasReceber'],
+    queryFn: () => base44.entities.ContaReceber.list('-data_vencimento', 50)
   });
 
   const { data: contasBancarias = [] } = useQuery({
-    queryKey: ['contas-bancarias', empresa_id],
-    queryFn: () => empresa_id ? base44.entities.ContaBancaria.filter({ empresa_id, status: 'ativo' }) : [],
-    enabled: !!empresa_id
+    queryKey: ['contas-bancarias'],
+    queryFn: () => base44.entities.ContaBancaria.filter({ status: 'ativo' })
   });
 
   const { data: cofres = [] } = useQuery({
-    queryKey: ['cofres', empresa_id],
-    queryFn: () => empresa_id ? base44.entities.Cofre.filter({ empresa_id, status: 'ativo' }) : [],
-    enabled: !!empresa_id
+    queryKey: ['cofres'],
+    queryFn: () => base44.entities.Cofre.filter({ status: 'ativo' })
   });
 
   const { data: lojas = [] } = useQuery({
-    queryKey: ['lojas', empresa_id],
-    queryFn: () => empresa_id ? base44.entities.Loja.filter({ empresa_id }) : [],
-    enabled: !!empresa_id
+    queryKey: ['lojas'],
+    queryFn: () => base44.entities.Loja.list()
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.ContaReceber.create({ ...data, empresa_id }),
+    mutationFn: (data) => base44.entities.ContaReceber.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['contasReceber'] });
       setModalOpen(false);

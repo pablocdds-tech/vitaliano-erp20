@@ -30,11 +30,9 @@ import { Package, Plus, Pencil, Trash2, Tags, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 import ImportarCSVModal, { IMPORT_CONFIGS } from '@/components/importacao/ImportarCSVModal';
 import { subDays } from 'date-fns';
-import { useTenant } from '@/components/services/useTenant';
 
 export default function Produtos() {
   const queryClient = useQueryClient();
-  const { empresa_id } = useTenant();
   const [modalOpen, setModalOpen] = useState(false);
   const [importarOpen, setImportarOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
@@ -57,26 +55,25 @@ export default function Produtos() {
   });
 
   const { data: produtos = [], isLoading } = useQuery({
-    queryKey: ['produtos', empresa_id],
-    queryFn: () => empresa_id ? base44.entities.Produto.filter({ empresa_id }) : [],
-    enabled: !!empresa_id
+    queryKey: ['produtos'],
+    queryFn: () => base44.entities.Produto.list()
   });
 
   const { data: categorias = [] } = useQuery({
-    queryKey: ['categorias', empresa_id],
-    queryFn: () => empresa_id ? base44.entities.Categoria.filter({ empresa_id }) : [],
-    enabled: !!empresa_id
+    queryKey: ['categorias'],
+    queryFn: () => base44.entities.Categoria.list()
   });
 
   // Movimentações dos últimos 30 dias para custo médio real
   const { data: movimentacoes30d = [] } = useQuery({
-    queryKey: ['movimentacoes-30d', empresa_id],
-    queryFn: () => empresa_id ? base44.entities.MovimentacaoEstoque.filter({ empresa_id, tipo: 'entrada' }) : [],
-    enabled: !!empresa_id
+    queryKey: ['movimentacoes-30d'],
+    queryFn: () => base44.entities.MovimentacaoEstoque.filter({
+      tipo: 'entrada'
+    })
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.Produto.create({ ...data, empresa_id }),
+    mutationFn: (data) => base44.entities.Produto.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['produtos'] });
       setModalOpen(false);
