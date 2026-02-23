@@ -29,6 +29,7 @@ import { CreditCard, Plus, Pencil, CheckCircle2, Trash2, Clock, AlertTriangle, W
 import { format, differenceInDays, isAfter, addMonths } from 'date-fns';
 import { toast } from 'sonner';
 import { getEmpresaAtiva } from '@/components/services/tenantService';
+import { useTenant } from '@/components/services/useTenant';
 import RegistrarPagamentoModal from '@/components/contas/RegistrarPagamentoModal';
 
 const FORMAS = ['boleto', 'pix', 'transferencia', 'dinheiro', 'cartao', 'cheque'];
