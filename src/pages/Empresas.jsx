@@ -126,6 +126,19 @@ export default function Empresas() {
     }
   ];
 
+  // Bloquear acesso para não-superadmins
+  if (!loadingUser && !isSuperAdmin) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4 text-center">
+        <div className="p-6 rounded-full bg-red-50">
+          <Lock className="w-12 h-12 text-red-400" />
+        </div>
+        <h2 className="text-xl font-semibold text-slate-700">Acesso Restrito</h2>
+        <p className="text-slate-500 max-w-sm">Esta área é exclusiva para administradores do sistema (superadmin).</p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <PageHeader
