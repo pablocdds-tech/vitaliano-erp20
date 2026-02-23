@@ -26,10 +26,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Package, Plus, Pencil, Trash2, Tags, Upload } from 'lucide-react';
+import { Package, Plus, Pencil, Trash2, Tags, Upload, Layers } from 'lucide-react';
 import { toast } from 'sonner';
 import ImportarCSVModal, { IMPORT_CONFIGS } from '@/components/importacao/ImportarCSVModal';
 import { subDays } from 'date-fns';
+import EdicaoLoteModal from '@/components/produtos/EdicaoLoteModal';
+import CategoriaMultiFilter from '@/components/produtos/CategoriaMultiFilter';
 
 export default function Produtos() {
   const queryClient = useQueryClient();
