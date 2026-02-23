@@ -165,7 +165,7 @@ export default function Sidebar({ collapsed, onToggle }) {
           const visibleItems = filterItems(group.items);
           if (visibleItems.length === 0) return null;
           return (
-          <div key={group.label} className="mb-4">
+            <div key={group.label} className="mb-4">
             <button
               onClick={() => toggleGroup(group.label)}
               className="w-full flex items-center justify-between px-2 py-1.5 text-xs font-semibold text-slate-400 uppercase tracking-wider hover:text-slate-600 dark:hover:text-slate-300"
