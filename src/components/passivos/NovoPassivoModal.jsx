@@ -155,18 +155,32 @@ export default function NovoPassivoModal({ open, onClose, onSuccess, lojas }) {
             <Label>Valor Original (R$) *</Label>
             <Input type="number" placeholder="0,00" value={form.original_amount} onChange={e => set('original_amount', e.target.value)} />
           </div>
+          {mode === 'em_andamento' && (
+            <div className="space-y-1">
+              <Label>Valor Já Pago (R$)</Label>
+              <Input type="number" placeholder="0,00" value={form.amount_paid} onChange={e => set('amount_paid', e.target.value)} />
+            </div>
+          )}
           <div className="space-y-1">
             <Label>Taxa de Juros Mensal (%)</Label>
             <Input type="number" placeholder="1,5" value={form.interest_rate_monthly} onChange={e => set('interest_rate_monthly', e.target.value)} />
           </div>
           <div className="space-y-1">
             <Label>Total de Parcelas *</Label>
-            <Input type="number" placeholder="12" value={form.total_installments} onChange={e => set('total_installments', e.target.value)} />
+            <Input type="number" placeholder="42" value={form.total_installments} onChange={e => set('total_installments', e.target.value)} />
           </div>
           <div className="space-y-1">
-            <Label>Valor da Parcela (R$) *</Label>
-            <Input type="number" placeholder="0,00" value={form.installment_value} onChange={e => set('installment_value', e.target.value)} />
+            <Label>
+              <input type="checkbox" checked={form.has_variable_installments} onChange={e => set('has_variable_installments', e.target.checked)} className="mr-2" />
+              Parcelas com valores variáveis?
+            </Label>
           </div>
+          {!form.has_variable_installments && (
+            <div className="space-y-1">
+              <Label>Valor da Parcela (R$) *</Label>
+              <Input type="number" placeholder="0,00" value={form.installment_value} onChange={e => set('installment_value', e.target.value)} />
+            </div>
+          )}
           <div className="space-y-1">
             <Label>Data de Início</Label>
             <Input type="date" value={form.start_date} onChange={e => set('start_date', e.target.value)} />
