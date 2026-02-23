@@ -41,12 +41,13 @@ export default function Lojas() {
   });
 
   const { data: lojas = [], isLoading } = useQuery({
-    queryKey: ['lojas'],
-    queryFn: () => base44.entities.Loja.list()
+    queryKey: ['lojas', empresa_id],
+    queryFn: () => empresa_id ? base44.entities.Loja.filter({ empresa_id }) : [],
+    enabled: !!empresa_id
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.Loja.create(data),
+    mutationFn: (data) => base44.entities.Loja.create({ ...data, empresa_id }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['lojas'] });
       setModalOpen(false);
