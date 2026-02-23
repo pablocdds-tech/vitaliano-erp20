@@ -211,7 +211,7 @@ export default function NovoPassivoModal({ open, onClose, onSuccess, lojas }) {
           <Button variant="outline" onClick={onClose}>Cancelar</Button>
           <Button onClick={handleSubmit} disabled={loading}>
             {loading && <Loader2 className="w-4 h-4 animate-spin mr-2" />}
-            Criar Passivo e Gerar Parcelas
+            {mode === 'em_andamento' ? 'Criar (Em Pagamento)' : 'Criar Passivo'}
           </Button>
         </div>
       </DialogContent>
