@@ -200,10 +200,11 @@ export default function ContasPagar() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!formData.descricao?.trim()) { toast.error('Informe a descrição'); return; }
     if (!formData.loja_id) { toast.error('Selecione a loja/CD'); return; }
     if (!formData.valor_original || parseFloat(formData.valor_original) <= 0) { toast.error('Informe o valor'); return; }
-    if (formData.parcelar && !formData.primeiro_vencimento) { toast.error('Informe o primeiro vencimento'); return; }
-    if (!formData.parcelar && !formData.data_vencimento) { toast.error('Informe o vencimento'); return; }
+    if (!editingItem && formData.parcelar && !formData.primeiro_vencimento) { toast.error('Informe o primeiro vencimento'); return; }
+    if ((!editingItem && !formData.parcelar && !formData.data_vencimento) || (editingItem && !formData.data_vencimento)) { toast.error('Informe o vencimento'); return; }
 
     if (editingItem) {
       updateMutation.mutate({
