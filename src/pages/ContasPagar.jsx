@@ -526,7 +526,7 @@ export default function ContasPagar() {
 
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setModalOpen(false)}>Cancelar</Button>
-              <Button type="submit" disabled={createMutation.isPending || updateMutation.isPending}>
+              <Button type="button" disabled={createMutation.isPending || updateMutation.isPending} onClick={handleSubmit}>
                 {editingItem ? 'Salvar' : formData.parcelar ? `Gerar ${formData.num_parcelas} Parcelas` : 'Cadastrar'}
               </Button>
             </DialogFooter>
