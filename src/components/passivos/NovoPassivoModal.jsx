@@ -53,21 +53,42 @@ export default function NovoPassivoModal({ open, onClose, onSuccess, lojas }) {
     }
     setLoading(true);
     try {
+      let customInstallments = null;
+      if (form.has_variable_installments && installmentsInput) {
+        try {
+          customInstallments = JSON.parse(installmentsInput);
+          if (!Array.isArray(customInstallments) || customInstallments.length !== parseInt(form.total_installments)) {
+            toast.error('JSON de parcelas inválido. Deve ser array com ' + form.total_installments + ' elementos');
+            setLoading(false);
+            return;
+          }
+        } catch {
+          toast.error('JSON de parcelas inválido');
+          setLoading(false);
+          return;
+        }
+      }
+
       const resp = await base44.functions.invoke('criarPassivo', {
         liability: {
           ...form,
           original_amount: parseFloat(form.original_amount),
+          amount_paid: form.amount_paid ? parseFloat(form.amount_paid) : 0,
           interest_rate_monthly: form.interest_rate_monthly ? parseFloat(form.interest_rate_monthly) : undefined,
           total_installments: parseInt(form.total_installments),
-          installment_value: parseFloat(form.installment_value),
-        }
+          installment_value: form.has_variable_installments ? undefined : parseFloat(form.installment_value),
+          has_variable_installments: form.has_variable_installments
+        },
+        customInstallments
       });
 
       if (resp.data?.success) {
         toast.success(`Passivo criado! ${resp.data.installments_created} parcelas geradas.`);
         onSuccess();
         onClose();
-        setForm({ title: '', type: '', creditor_name: '', responsible: '', loja_id: '', original_amount: '', interest_rate_monthly: '', total_installments: '', installment_value: '', start_date: '', first_due_date: '', notes: '' });
+        setMode('novo');
+        setForm({ title: '', type: '', creditor_name: '', responsible: '', loja_id: '', original_amount: '', amount_paid: '', interest_rate_monthly: '', total_installments: '', installment_value: '', has_variable_installments: false, start_date: '', first_due_date: '', notes: '' });
+        setInstallmentsInput('');
       } else {
         toast.error('Erro: ' + (resp.data?.error || 'Falha ao criar'));
       }
