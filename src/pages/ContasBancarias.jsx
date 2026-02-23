@@ -429,6 +429,33 @@ function CofresTab() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['movimentacoesCofre'] })
   });
 
+  const transCofreMutation = useMutation({
+    mutationFn: async (data) => {
+      const valor = parseFloat(data.valor);
+      const nomeOrigem = cofres.find(c => c.id === data.cofre_origem_id)?.nome || '';
+      const nomeDestino = cofres.find(c => c.id === data.cofre_destino_id)?.nome || '';
+      await base44.entities.MovimentacaoCofre.create({
+        cofre_id: data.cofre_origem_id, cofre_destino_id: data.cofre_destino_id,
+        tipo: 'saida', valor, data: data.data,
+        motivo: data.motivo || `Transferência para ${nomeDestino}`,
+        referencia_tipo: 'manual'
+      });
+      await base44.entities.MovimentacaoCofre.create({
+        cofre_id: data.cofre_destino_id, cofre_destino_id: data.cofre_origem_id,
+        tipo: 'entrada', valor, data: data.data,
+        motivo: data.motivo || `Transferência de ${nomeOrigem}`,
+        referencia_tipo: 'manual'
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['movimentacoesCofre'] });
+      toast.success('Transferência entre cofres registrada!');
+      setTransCofreOpen(false);
+      setTransForm({ cofre_origem_id: '', cofre_destino_id: '', valor: '', data: new Date().toISOString().split('T')[0], motivo: '' });
+    },
+    onError: () => toast.error('Erro ao registrar transferência')
+  });
+
   const calcularSaldoCofre = (cofreId) => {
     const cofre = cofres.find(c => c.id === cofreId);
     const saldoInicial = cofre?.saldo_inicial || 0;
