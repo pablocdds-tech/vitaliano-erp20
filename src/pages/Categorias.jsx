@@ -25,9 +25,11 @@ import {
 import { Tags, Plus, Pencil, Trash2, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 import ImportarCSVModal, { IMPORT_CONFIGS } from '@/components/importacao/ImportarCSVModal';
+import { useTenant } from '@/components/services/useTenant';
 
 export default function Categorias() {
   const queryClient = useQueryClient();
+  const { empresa_id } = useTenant();
   const [modalOpen, setModalOpen] = useState(false);
   const [importarOpen, setImportarOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
