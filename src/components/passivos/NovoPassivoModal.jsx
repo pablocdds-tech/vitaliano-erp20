@@ -105,7 +105,15 @@ export default function NovoPassivoModal({ open, onClose, onSuccess, lojas }) {
         <DialogHeader>
           <DialogTitle>Novo Passivo Financeiro</DialogTitle>
         </DialogHeader>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+        <div className="flex gap-2 mb-4 border-b">
+          <button onClick={() => setMode('novo')} className={`px-4 py-2 font-medium border-b-2 ${mode === 'novo' ? 'border-blue-500 text-blue-600' : 'border-transparent text-slate-500'}`}>
+            Do Zero
+          </button>
+          <button onClick={() => setMode('em_andamento')} className={`px-4 py-2 font-medium border-b-2 ${mode === 'em_andamento' ? 'border-blue-500 text-blue-600' : 'border-transparent text-slate-500'}`}>
+            Já em Pagamento
+          </button>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="md:col-span-2 space-y-1">
             <Label>Nome da Dívida *</Label>
             <Input placeholder="Ex: PRONAMPE Banco X" value={form.title} onChange={e => set('title', e.target.value)} />
