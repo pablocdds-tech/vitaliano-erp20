@@ -404,6 +404,8 @@ function CofresTab() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [formData, setFormData] = useState({ nome: '', tipo: 'loja', loja_id: '', status: 'ativo' });
+  const [transCofreOpen, setTransCofreOpen] = useState(false);
+  const [transForm, setTransForm] = useState({ cofre_origem_id: '', cofre_destino_id: '', valor: '', data: new Date().toISOString().split('T')[0], motivo: '' });
 
   const [extratoCofreId, setExtratoCofreId] = useState(null);
 
