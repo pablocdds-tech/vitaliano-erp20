@@ -222,11 +222,16 @@ export default function Produtos() {
   // Dados filtrados por categoria e status
   const produtosFiltrados = useMemo(() => {
     return produtos.filter(p => {
-      if (filtroCategoria && p.categoria_id !== filtroCategoria) return false;
+      if (filtroCategorias.length > 0) {
+        const semCat = filtroCategorias.includes('__sem__');
+        const catIds = filtroCategorias.filter(x => x !== '__sem__');
+        const match = (semCat && !p.categoria_id) || catIds.includes(p.categoria_id);
+        if (!match) return false;
+      }
       if (filtroStatus && p.status !== filtroStatus) return false;
       return true;
     });
-  }, [produtos, filtroCategoria, filtroStatus]);
+  }, [produtos, filtroCategorias, filtroStatus]);
 
   const columns = [
     {
