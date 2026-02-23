@@ -22,11 +22,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Building2, Plus, Pencil, Trash2 } from 'lucide-react';
+import { Building2, Plus, Pencil, Trash2, Lock } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTenant } from '@/components/services/useTenant';
 
 export default function Empresas() {
   const queryClient = useQueryClient();
+  const { isSuperAdmin, loading: loadingUser } = useTenant();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [formData, setFormData] = useState({
