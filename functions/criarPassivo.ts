@@ -7,20 +7,25 @@ Deno.serve(async (req) => {
     if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
 
     const body = await req.json();
-    const { liability } = body;
+    const { liability, customInstallments } = body;
 
     if (!liability) return Response.json({ error: 'liability is required' }, { status: 400 });
+
+    // Calcular saldo devedor atual
+    const amountPaid = parseFloat(liability.amount_paid || 0);
+    const currentBalance = parseFloat(liability.original_amount) - amountPaid;
 
     // 1. Criar o passivo
     const created = await base44.entities.FinancialLiability.create({
       ...liability,
-      current_balance: liability.original_amount
+      amount_paid: amountPaid,
+      current_balance: currentBalance
     });
 
     // 2. Gerar parcelas + contas a pagar
     const firstDue = new Date(liability.first_due_date);
     const total = parseInt(liability.total_installments);
-    const installmentValue = parseFloat(liability.installment_value);
+    const hasVariableInstallments = liability.has_variable_installments || false;
 
     // Mapear responsible para loja_id (se informado)
     const lojaId = liability.loja_id || null;
