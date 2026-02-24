@@ -403,7 +403,7 @@ function CofresTab() {
   const queryClient = useQueryClient();
   const [modalOpen, setModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
-  const [formData, setFormData] = useState({ nome: '', tipo: 'loja', loja_id: '', status: 'ativo' });
+  const [formData, setFormData] = useState({ nome: '', tipo: 'loja', loja_id: '', saldo_inicial: 0, status: 'ativo' });
   const [transCofreOpen, setTransCofreOpen] = useState(false);
   const [transForm, setTransForm] = useState({ cofre_origem_id: '', cofre_destino_id: '', valor: '', data: new Date().toISOString().split('T')[0], motivo: '' });
 
@@ -481,11 +481,11 @@ function CofresTab() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['cofres'] })
   });
 
-  const resetForm = () => { setFormData({ nome: '', tipo: 'loja', loja_id: '', status: 'ativo' }); setEditingItem(null); };
+  const resetForm = () => { setFormData({ nome: '', tipo: 'loja', loja_id: '', saldo_inicial: 0, status: 'ativo' }); setEditingItem(null); };
 
   const handleEdit = (item) => {
     setEditingItem(item);
-    setFormData({ nome: item.nome || '', tipo: item.tipo || 'loja', loja_id: item.loja_id || '', status: item.status || 'ativo' });
+    setFormData({ nome: item.nome || '', tipo: item.tipo || 'loja', loja_id: item.loja_id || '', saldo_inicial: item.saldo_inicial || 0, status: item.status || 'ativo' });
     setModalOpen(true);
   };
 
@@ -674,6 +674,18 @@ function CofresTab() {
                 </Select>
               </div>
             )}
+            <div className="space-y-2">
+              <Label>Saldo Inicial *</Label>
+              <Input
+                type="number"
+                step="0.01"
+                min="0"
+                placeholder="0,00"
+                value={formData.saldo_inicial}
+                onChange={e => setFormData({ ...formData, saldo_inicial: parseFloat(e.target.value) || 0 })}
+                required
+              />
+            </div>
             <div className="space-y-2">
               <Label>Status</Label>
               <Select value={formData.status} onValueChange={v => setFormData({ ...formData, status: v })}>
