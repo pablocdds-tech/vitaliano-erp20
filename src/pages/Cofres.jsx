@@ -33,7 +33,7 @@ export default function Cofres() {
     nome: '',
     tipo: 'loja',
     loja_id: '',
-    saldo_atual: 0,
+    saldo_inicial: 0,
     status: 'ativo'
   });
 
@@ -78,7 +78,7 @@ export default function Cofres() {
   });
 
   const resetForm = () => {
-    setFormData({ nome: '', tipo: 'loja', loja_id: '', saldo_atual: 0, status: 'ativo' });
+    setFormData({ nome: '', tipo: 'loja', loja_id: '', saldo_inicial: 0, status: 'ativo' });
     setEditingItem(null);
   };
 
@@ -88,7 +88,7 @@ export default function Cofres() {
       nome: item.nome || '',
       tipo: item.tipo || 'loja',
       loja_id: item.loja_id || '',
-      saldo_atual: item.saldo_atual || 0,
+      saldo_inicial: item.saldo_inicial || 0,
       status: item.status || 'ativo'
     });
     setModalOpen(true);
@@ -192,8 +192,8 @@ export default function Cofres() {
                 type="number" 
                 step="0.01"
                 min="0"
-                value={formData.saldo_atual} 
-                onChange={e => setFormData({ ...formData, saldo_atual: parseFloat(e.target.value) || 0 })} 
+                value={formData.saldo_inicial} 
+                onChange={e => setFormData({ ...formData, saldo_inicial: parseFloat(e.target.value) || 0 })} 
                 required 
                 placeholder="0,00"
               />
