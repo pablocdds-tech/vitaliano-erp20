@@ -66,19 +66,12 @@ export default function AssistenteERP() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
-  const [provider, setProvider] = useState('gemini');
   const bottomRef = useRef(null);
   const inputRef = useRef(null);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
-
-  const getFunctionName = (p) => {
-    if (p === 'gemini') return 'chatGemini';
-    if (p === 'chatgpt') return 'chatOpenAI';
-    return 'chatGrok';
-  };
 
   const sendMessage = async (text) => {
     const msg = text || input.trim();
@@ -90,7 +83,7 @@ export default function AssistenteERP() {
     setLoading(true);
 
     try {
-      const res = await base44.functions.invoke(getFunctionName(provider), {
+      const res = await base44.functions.invoke('chatOpenAI', {
         messages: newMessages,
         systemPrompt: SYSTEM_PROMPT,
       });
@@ -120,14 +113,6 @@ export default function AssistenteERP() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Select value={provider} onValueChange={setProvider}>
-            <SelectTrigger className="w-36 h-8 text-xs">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {PROVIDERS.map(p => <SelectItem key={p.value} value={p.value}>{p.label}</SelectItem>)}
-            </SelectContent>
-          </Select>
           <Button variant="ghost" size="sm" onClick={() => setMessages([])} className="text-slate-500 gap-1.5">
             <Trash2 className="h-4 w-4" /> Limpar
           </Button>
@@ -183,7 +168,7 @@ export default function AssistenteERP() {
             {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
           </Button>
         </div>
-        <p className="text-xs text-slate-400 mt-2 text-center">Usando {PROVIDERS.find(p => p.value === provider)?.label} — sem consumo de créditos Base44</p>
+        <p className="text-xs text-slate-400 mt-2 text-center">🤖 ChatGPT — sem consumo de créditos Base44</p>
       </div>
     </div>
   );
