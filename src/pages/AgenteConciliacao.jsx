@@ -18,10 +18,7 @@ const SUGGESTED = [
   { icon: '⚠️', text: 'Como identificar lançamentos duplicados?' },
 ];
 
-const PROVIDERS = [
-  { value: 'gemini', label: '✨ Gemini' },
-  { value: 'chatgpt', label: '🤖 ChatGPT' },
-];
+
 
 function MessageBubble({ message }) {
   const isUser = message.role === 'user';

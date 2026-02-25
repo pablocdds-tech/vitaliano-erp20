@@ -19,10 +19,7 @@ const SUGGESTED = [
   { icon: '⚠️', text: 'Como identificar fraudes em notas fiscais?' },
 ];
 
-const PROVIDERS = [
-  { value: 'gemini', label: '✨ Gemini' },
-  { value: 'chatgpt', label: '🤖 ChatGPT' },
-];
+
 
 function MessageBubble({ message }) {
   const isUser = message.role === 'user';

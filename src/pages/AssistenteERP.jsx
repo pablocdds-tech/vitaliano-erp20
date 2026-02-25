@@ -19,10 +19,7 @@ const SUGGESTED_QUESTIONS = [
   'Quais indicadores financeiros devo monitorar?',
 ];
 
-const PROVIDERS = [
-  { value: 'gemini', label: '✨ Gemini' },
-  { value: 'chatgpt', label: '🤖 ChatGPT' },
-];
+
 
 function MessageBubble({ message }) {
   const isUser = message.role === 'user';
