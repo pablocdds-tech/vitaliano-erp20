@@ -66,7 +66,6 @@ export default function AgenteConciliacao() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
-  const [provider, setProvider] = useState('gemini');
   const [attachedFiles, setAttachedFiles] = useState([]);
   const [uploading, setUploading] = useState(false);
   const bottomRef = useRef(null);
@@ -74,12 +73,6 @@ export default function AgenteConciliacao() {
   const fileInputRef = useRef(null);
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages]);
-
-  const getFunctionName = (p) => {
-    if (p === 'gemini') return 'chatGemini';
-    if (p === 'chatgpt') return 'chatOpenAI';
-    return 'chatGrok';
-  };
 
   const handleFileSelect = async (e) => {
     const files = Array.from(e.target.files || []);
@@ -112,7 +105,7 @@ export default function AgenteConciliacao() {
     setLoading(true);
 
     try {
-      const res = await base44.functions.invoke(getFunctionName(provider), {
+      const res = await base44.functions.invoke('chatOpenAI', {
         messages: newMessages.map(m => ({ role: m.role, content: m.content })),
         systemPrompt: SYSTEM_PROMPT,
       });
@@ -145,10 +138,6 @@ export default function AgenteConciliacao() {
           <div className="hidden sm:flex items-center gap-1.5 text-xs text-amber-600 bg-amber-50 border border-amber-200 px-3 py-1.5 rounded-lg">
             <AlertTriangle className="h-3.5 w-3.5" /> Confirme antes de aplicar
           </div>
-          <Select value={provider} onValueChange={setProvider}>
-            <SelectTrigger className="w-36 h-8 text-xs"><SelectValue /></SelectTrigger>
-            <SelectContent>{PROVIDERS.map(p => <SelectItem key={p.value} value={p.value}>{p.label}</SelectItem>)}</SelectContent>
-          </Select>
           <Button variant="ghost" size="sm" onClick={() => setMessages([])} className="text-slate-500 gap-1.5">
             <Trash2 className="h-4 w-4" /> Limpar
           </Button>
@@ -221,7 +210,7 @@ export default function AgenteConciliacao() {
           </Button>
         </div>
         <div className="flex items-center justify-center gap-4 text-xs text-slate-400">
-          <span className="flex items-center gap-1"><CheckCircle2 className="h-3 w-3 text-blue-500" /> Usando {PROVIDERS.find(p => p.value === provider)?.label}</span>
+          <span className="flex items-center gap-1"><CheckCircle2 className="h-3 w-3 text-blue-500" /> Usando 🤖 ChatGPT</span>
           <span className="flex items-center gap-1"><AlertTriangle className="h-3 w-3 text-amber-500" /> Sem consumo de créditos Base44</span>
         </div>
       </div>
