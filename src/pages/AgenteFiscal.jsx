@@ -6,7 +6,6 @@ import { Send, FileText, Loader2, Trash2, Paperclip, X, CheckCircle2, AlertTrian
 import ReactMarkdown from 'react-markdown';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const SYSTEM_PROMPT = `Você é um especialista em notas fiscais e documentos fiscais brasileiros.
 Analise imagens e PDFs de notas fiscais, extraia dados (fornecedor, CNPJ, itens, valores, totais, datas), 

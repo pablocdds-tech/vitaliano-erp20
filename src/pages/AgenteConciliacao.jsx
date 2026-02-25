@@ -6,7 +6,6 @@ import { Send, Landmark, Loader2, Trash2, Paperclip, X, CheckCircle2, AlertTrian
 import ReactMarkdown from 'react-markdown';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const SYSTEM_PROMPT = `Você é um especialista em conciliação bancária para empresas de alimentação.
 Analise extratos bancários, identifique lançamentos, sugira conciliações com contas a pagar/receber, detecte duplicatas e inconsistências.

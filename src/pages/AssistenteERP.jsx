@@ -5,7 +5,6 @@ import { Input } from '@/components/ui/input';
 import { Send, Bot, Loader2, Trash2, Sparkles } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { cn } from '@/lib/utils';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const SYSTEM_PROMPT = `Você é um assistente especializado em ERP financeiro para redes de lojas de alimentação. 
 Ajude com análises de CMV, contas a pagar/receber, estoque, compras, banco virtual, fornecedores e DRE.
