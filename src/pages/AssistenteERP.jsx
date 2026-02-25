@@ -23,7 +23,6 @@ const SUGGESTED_QUESTIONS = [
 const PROVIDERS = [
   { value: 'gemini', label: '✨ Gemini' },
   { value: 'chatgpt', label: '🤖 ChatGPT' },
-  { value: 'grok', label: '⚡ Grok' },
 ];
 
 function MessageBubble({ message }) {
