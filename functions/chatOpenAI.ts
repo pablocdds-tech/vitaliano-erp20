@@ -13,7 +13,20 @@ Deno.serve(async (req) => {
 
     const chatMessages = [];
     if (systemPrompt) chatMessages.push({ role: 'system', content: systemPrompt });
-    chatMessages.push(...messages);
+
+    // Converte mensagens com file_urls para o formato vision da OpenAI
+    for (const msg of messages) {
+      if (msg.file_urls && msg.file_urls.length > 0) {
+        const contentParts = [];
+        if (msg.content) contentParts.push({ type: 'text', text: msg.content });
+        for (const url of msg.file_urls) {
+          contentParts.push({ type: 'image_url', image_url: { url, detail: 'high' } });
+        }
+        chatMessages.push({ role: msg.role, content: contentParts });
+      } else {
+        chatMessages.push({ role: msg.role, content: msg.content });
+      }
+    }
 
     const res = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
