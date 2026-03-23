@@ -38,7 +38,11 @@ import {
   Vault,
   ShoppingBag,
   Shield,
-  TrendingDown
+  TrendingDown,
+  UserCircle,
+  FileSignature,
+  CalendarClock,
+  CalendarDays
 } from 'lucide-react';
 
 const menuGroups = [
@@ -95,6 +99,15 @@ const menuGroups = [
       { icon: Smartphone, label: 'PDV Mobile', href: 'PDVMobile' },
       { icon: TrendingUp, label: 'Fechamento de Caixa', href: 'Vendas' },
       { icon: BarChart3, label: 'Relatórios', href: 'Relatorios' }
+    ]
+  },
+  {
+    label: 'Recursos Humanos',
+    items: [
+      { icon: UserCircle, label: 'Funcionários', href: 'RHFuncionarios' },
+      { icon: FileSignature, label: 'Contratos', href: 'RHContratos' },
+      { icon: CalendarClock, label: 'Ponto Eletrônico', href: 'RHPontoEletronico' },
+      { icon: CalendarDays, label: 'Escalas', href: 'RHEscalas' }
     ]
   },
   {

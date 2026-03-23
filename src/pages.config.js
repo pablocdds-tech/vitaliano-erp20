@@ -85,6 +85,11 @@ import Relatorios from './pages/Relatorios';
 import TemplatesContagem from './pages/TemplatesContagem';
 import Usuarios from './pages/Usuarios';
 import Vendas from './pages/Vendas';
+import RHFuncionarios from './pages/RHFuncionarios';
+import RHContratos from './pages/RHContratos';
+import RHPontoEletronico from './pages/RHPontoEletronico';
+import RHEscalas from './pages/RHEscalas';
+import RHAssinarContrato from './pages/RHAssinarContrato';
 import __Layout from './Layout.jsx';
 
 
@@ -127,6 +132,11 @@ export const PAGES = {
     "TemplatesContagem": TemplatesContagem,
     "Usuarios": Usuarios,
     "Vendas": Vendas,
+    "RHFuncionarios": RHFuncionarios,
+    "RHContratos": RHContratos,
+    "RHPontoEletronico": RHPontoEletronico,
+    "RHEscalas": RHEscalas,
+    "RHAssinarContrato": RHAssinarContrato,
 }
 
 export const pagesConfig = {
