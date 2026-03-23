@@ -40,7 +40,7 @@ import {
   Shield,
   TrendingDown,
   CircleUser,
-  FileSignature,
+  FileCheck2,
   CalendarClock,
   CalendarDays
 } from 'lucide-react';
