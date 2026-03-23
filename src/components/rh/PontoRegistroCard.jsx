@@ -38,10 +38,27 @@ export default function PontoRegistroCard({ tiposPonto }) {
   }, []);
 
   const startCamera = async () => {
-    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: 640, height: 480 } });
-    streamRef.current = stream;
-    if (videoRef.current) { videoRef.current.srcObject = stream; videoRef.current.play(); }
+    // Limpar stream anterior se existir
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(t => t.stop());
+      streamRef.current = null;
+    }
     setCameraActive(true);
+    // Pequeno delay para garantir que o <video> já está no DOM
+    await new Promise(r => setTimeout(r, 100));
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } },
+      audio: false
+    });
+    streamRef.current = stream;
+    const video = videoRef.current;
+    if (video) {
+      video.srcObject = stream;
+      // No iOS/Safari o play() precisa ser após loadedmetadata
+      video.onloadedmetadata = () => {
+        video.play().catch(() => {});
+      };
+    }
   };
 
   const capturePhoto = () => {
