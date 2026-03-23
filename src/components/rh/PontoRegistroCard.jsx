@@ -101,6 +101,11 @@ export default function PontoRegistroCard({ tiposPonto }) {
     );
   };
 
+  // Obter localização automaticamente ao montar
+  useEffect(() => {
+    getLocation();
+  }, []);
+
   const registrarMut = useMutation({
     mutationFn: async () => {
       if (!funcId) { toast.error('Selecione o funcionário'); return; }
