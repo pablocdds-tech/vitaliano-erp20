@@ -39,7 +39,7 @@ import {
   ShoppingBag,
   Shield,
   TrendingDown,
-  UserCircle,
+  CircleUser,
   FileSignature,
   CalendarClock,
   CalendarDays
@@ -104,7 +104,7 @@ const menuGroups = [
   {
     label: 'Recursos Humanos',
     items: [
-      { icon: UserCircle, label: 'Funcionários', href: 'RHFuncionarios' },
+      { icon: CircleUser, label: 'Funcionários', href: 'RHFuncionarios' },
       { icon: FileSignature, label: 'Contratos', href: 'RHContratos' },
       { icon: CalendarClock, label: 'Ponto Eletrônico', href: 'RHPontoEletronico' },
       { icon: CalendarDays, label: 'Escalas', href: 'RHEscalas' }
