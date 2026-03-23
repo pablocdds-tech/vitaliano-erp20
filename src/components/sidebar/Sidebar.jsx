@@ -105,7 +105,7 @@ const menuGroups = [
     label: 'Recursos Humanos',
     items: [
       { icon: CircleUser, label: 'Funcionários', href: 'RHFuncionarios' },
-      { icon: FileSignature, label: 'Contratos', href: 'RHContratos' },
+      { icon: FileCheck2, label: 'Contratos', href: 'RHContratos' },
       { icon: CalendarClock, label: 'Ponto Eletrônico', href: 'RHPontoEletronico' },
       { icon: CalendarDays, label: 'Escalas', href: 'RHEscalas' }
     ]
