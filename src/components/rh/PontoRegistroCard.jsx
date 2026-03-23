@@ -130,7 +130,7 @@ export default function PontoRegistroCard({ tiposPonto }) {
   });
 
   const tiposRegistrados = pontosHoje.map(p => p.tipo);
-  const tipoLabels = { entrada: 'Entrada', saida_almoco: 'Saída Almoço', volta_almoco: 'Volta Almoço', saida: 'Saída' };
+  const tipoLabels = { entrada: 'Entrada', saida_almoco: 'Saída Intervalo', volta_almoco: 'Volta Intervalo', saida: 'Saída' };
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">

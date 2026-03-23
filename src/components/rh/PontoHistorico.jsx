@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Eye, MapPin, Clock } from 'lucide-react';
 import { format } from 'date-fns';
 
-const tipoLabels = { entrada: '🟢 Entrada', saida_almoco: '🟡 Saída Almoço', volta_almoco: '🔵 Volta Almoço', saida: '🔴 Saída' };
+const tipoLabels = { entrada: '🟢 Entrada', saida_almoco: '🟡 Saída Intervalo', volta_almoco: '🔵 Volta Intervalo', saida: '🔴 Saída' };
 
 export default function PontoHistorico() {
   const [funcId, setFuncId] = useState('');

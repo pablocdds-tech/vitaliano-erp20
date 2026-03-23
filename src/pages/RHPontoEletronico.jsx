@@ -15,8 +15,8 @@ import RelatorioPonto from '@/components/rh/RelatorioPonto';
 
 const TIPOS_PONTO = [
   { value: 'entrada', label: '🟢 Entrada', color: 'bg-emerald-500' },
-  { value: 'saida_almoco', label: '🟡 Saída Almoço', color: 'bg-amber-500' },
-  { value: 'volta_almoco', label: '🔵 Volta Almoço', color: 'bg-blue-500' },
+  { value: 'saida_almoco', label: '🟡 Saída Intervalo', color: 'bg-amber-500' },
+  { value: 'volta_almoco', label: '🔵 Volta Intervalo', color: 'bg-blue-500' },
   { value: 'saida', label: '🔴 Saída', color: 'bg-red-500' }
 ];
 

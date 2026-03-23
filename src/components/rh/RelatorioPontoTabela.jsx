@@ -13,8 +13,8 @@ export default function RelatorioPontoTabela({ dias, funcNome, mesLabel }) {
             <th className="px-3 py-2 font-medium">Data</th>
             <th className="px-3 py-2 font-medium">Dia</th>
             <th className="px-3 py-2 font-medium text-center">Entrada</th>
-            <th className="px-3 py-2 font-medium text-center">Saída Almoço</th>
-            <th className="px-3 py-2 font-medium text-center">Volta Almoço</th>
+            <th className="px-3 py-2 font-medium text-center">Saída Intervalo</th>
+            <th className="px-3 py-2 font-medium text-center">Volta Intervalo</th>
             <th className="px-3 py-2 font-medium text-center">Saída</th>
             <th className="px-3 py-2 font-medium text-center">Total</th>
             <th className="px-3 py-2 font-medium text-center text-purple-600">Noturno</th>
