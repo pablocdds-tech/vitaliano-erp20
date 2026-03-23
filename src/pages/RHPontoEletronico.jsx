@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 import { format } from 'date-fns';
 import PontoRegistroCard from '@/components/rh/PontoRegistroCard';
 import PontoHistorico from '@/components/rh/PontoHistorico';
+import RelatorioPonto from '@/components/rh/RelatorioPonto';
 
 const TIPOS_PONTO = [
   { value: 'entrada', label: '🟢 Entrada', color: 'bg-emerald-500' },
@@ -33,6 +34,7 @@ export default function RHPontoEletronico() {
         <TabsList className="mb-4">
           <TabsTrigger value="registrar">Registrar Ponto</TabsTrigger>
           <TabsTrigger value="historico">Histórico / Auditoria</TabsTrigger>
+          <TabsTrigger value="relatorio">Relatório Mensal</TabsTrigger>
         </TabsList>
 
         <TabsContent value="registrar">
@@ -41,6 +43,10 @@ export default function RHPontoEletronico() {
 
         <TabsContent value="historico">
           <PontoHistorico />
+        </TabsContent>
+
+        <TabsContent value="relatorio">
+          <RelatorioPonto />
         </TabsContent>
       </Tabs>
     </div>
