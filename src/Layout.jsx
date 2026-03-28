@@ -50,11 +50,8 @@ export default function Layout({ children, currentPageName }) {
         }
         
         @media (max-width: 1023px) {
-          aside {
-            transform: translateX(-100%);
-          }
-          aside.open {
-            transform: translateX(0);
+          .safe-area-bottom {
+            padding-bottom: env(safe-area-inset-bottom, 0px);
           }
         }
       `}</style>

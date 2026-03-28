@@ -165,61 +165,71 @@ export default function Sidebar({ collapsed, onToggle }) {
   };
 
   return (
-    <aside className={cn(
-      'fixed left-0 top-0 h-full w-[260px] bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 z-40 transition-transform duration-300 lg:transform-none',
-      collapsed && window.innerWidth < 1024 ? '-translate-x-full' : 'translate-x-0'
-    )}>
-      <div className="h-16 flex items-center justify-between px-4 border-b border-slate-200 dark:border-slate-800">
-        <Logo size="sm" showText={true} />
-      </div>
+    <>
+      {/* Overlay mobile */}
+      {!collapsed && (
+        <div
+          className="fixed inset-0 bg-black/50 z-30 lg:hidden"
+          onClick={onToggle}
+        />
+      )}
+      <aside className={cn(
+        'fixed left-0 top-0 h-full w-[260px] bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 z-40 transition-transform duration-300 lg:translate-x-0',
+        collapsed ? '-translate-x-full' : 'translate-x-0'
+      )}>
+        <div className="h-16 flex items-center justify-between px-4 border-b border-slate-200 dark:border-slate-800">
+          <Logo size="sm" showText={true} />
+        </div>
 
-      <nav className="p-3 h-[calc(100vh-64px)] overflow-y-auto scrollbar-thin">
-        {menuGroups.map((group) => {
-          const visibleItems = filterItems(group.items);
-          if (visibleItems.length === 0) return null;
-          return (
-            <div key={group.label} className="mb-4">
-            <button
-              onClick={() => toggleGroup(group.label)}
-              className="w-full flex items-center justify-between px-2 py-1.5 text-xs font-semibold text-slate-400 uppercase tracking-wider hover:text-slate-600 dark:hover:text-slate-300"
-            >
-              {group.label}
-              <ChevronDown className={cn(
-                'w-3.5 h-3.5 transition-transform',
-                expandedGroups[group.label] ? 'rotate-180' : ''
-              )} />
-            </button>
-            
-            <div className={cn(
-              'space-y-0.5 mt-1',
-              expandedGroups[group.label] && 'hidden'
-            )}>
-              {visibleItems.map((item) => (
-                <Link
-                  key={item.href}
-                  to={createPageUrl(item.href)}
-                  className={cn(
-                    'flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 group',
-                    isActive(item.href)
-                      ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400'
-                      : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'
-                  )}
-                >
-                  <item.icon className={cn(
-                    'w-5 h-5 flex-shrink-0',
-                    isActive(item.href) ? '' : 'group-hover:scale-110 transition-transform'
-                  )} />
-                  <span className="text-sm font-medium truncate">{item.label}</span>
-                  {isActive(item.href) && (
-                    <div className="absolute left-0 w-1 h-6 bg-emerald-500 rounded-r-full" />
-                  )}
-                </Link>
-              ))}
-            </div>
-            </div>
-          );
-        })}
-      </nav>
-    </aside>
+        <nav className="p-3 h-[calc(100vh-64px)] overflow-y-auto scrollbar-thin">
+          {menuGroups.map((group) => {
+            const visibleItems = filterItems(group.items);
+            if (visibleItems.length === 0) return null;
+            return (
+              <div key={group.label} className="mb-4">
+              <button
+                onClick={() => toggleGroup(group.label)}
+                className="w-full flex items-center justify-between px-2 py-1.5 text-xs font-semibold text-slate-400 uppercase tracking-wider hover:text-slate-600 dark:hover:text-slate-300"
+              >
+                {group.label}
+                <ChevronDown className={cn(
+                  'w-3.5 h-3.5 transition-transform',
+                  expandedGroups[group.label] ? 'rotate-180' : ''
+                )} />
+              </button>
+              
+              <div className={cn(
+                'space-y-0.5 mt-1',
+                expandedGroups[group.label] && 'hidden'
+              )}>
+                {visibleItems.map((item) => (
+                  <Link
+                    key={item.href}
+                    to={createPageUrl(item.href)}
+                    onClick={() => { if (window.innerWidth < 1024) onToggle(); }}
+                    className={cn(
+                      'flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 group',
+                      isActive(item.href)
+                        ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400'
+                        : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'
+                    )}
+                  >
+                    <item.icon className={cn(
+                      'w-5 h-5 flex-shrink-0',
+                      isActive(item.href) ? '' : 'group-hover:scale-110 transition-transform'
+                    )} />
+                    <span className="text-sm font-medium truncate">{item.label}</span>
+                    {isActive(item.href) && (
+                      <div className="absolute left-0 w-1 h-6 bg-emerald-500 rounded-r-full" />
+                    )}
+                  </Link>
+                ))}
+              </div>
+              </div>
+            );
+          })}
+        </nav>
+      </aside>
+    </>
   );
 }

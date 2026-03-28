@@ -97,9 +97,9 @@ export default function TopBar({ collapsed, onToggle }) {
           {/* Seletor de Loja */}
           {lojas.length > 0 && (
             <Select value={lojaSelecionada} onValueChange={setLojaSelecionada}>
-              <SelectTrigger className="w-[180px] bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700">
-                <Store className="w-4 h-4 mr-2 text-slate-500" />
-                <SelectValue placeholder="Selecione a loja" />
+              <SelectTrigger className="w-[140px] sm:w-[180px] bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700">
+                <Store className="w-4 h-4 mr-2 text-slate-500 hidden sm:block" />
+                <SelectValue placeholder="Loja" />
               </SelectTrigger>
               <SelectContent>
                 {lojas.map((loja) => (
@@ -146,7 +146,7 @@ export default function TopBar({ collapsed, onToggle }) {
             variant="ghost" 
             size="icon"
             onClick={toggleDarkMode}
-            className="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-white"
+            className="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-white hidden sm:flex"
           >
             {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
           </Button>
@@ -154,8 +154,8 @@ export default function TopBar({ collapsed, onToggle }) {
           {/* User Menu */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="flex items-center gap-2 px-2">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white font-medium">
+              <Button variant="ghost" className="flex items-center gap-2 px-1 sm:px-2">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white font-medium text-sm">
                   {user?.full_name?.charAt(0) || 'U'}
                 </div>
                 <div className="hidden md:block text-left">
@@ -164,7 +164,7 @@ export default function TopBar({ collapsed, onToggle }) {
                   </p>
                   <p className="text-xs text-slate-500">{user?.role || 'user'}</p>
                 </div>
-                <ChevronDown className="w-4 h-4 text-slate-400" />
+                <ChevronDown className="w-4 h-4 text-slate-400 hidden sm:block" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">

@@ -43,7 +43,7 @@ export default function MobileInstallBanner() {
   );
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 shadow-lg z-40 animate-in slide-in-from-bottom-5">
+    <div className="fixed bottom-16 left-0 right-0 lg:bottom-0 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 shadow-lg z-40 animate-in slide-in-from-bottom-5">
       <div className="max-w-md mx-auto p-4 space-y-3">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
