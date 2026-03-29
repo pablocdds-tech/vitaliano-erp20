@@ -20,6 +20,7 @@ export default function PontoKiosk() {
   const [confirmData, setConfirmData] = useState(null);
   const [idle, setIdle] = useState(false);
   const [faceStatus, setFaceStatus] = useState('');
+  const statusRef = useRef('aguardando');
   
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -117,7 +118,7 @@ export default function PontoKiosk() {
   const startDetection = () => {
     if (detectionRef.current) return;
     detectionRef.current = setInterval(async () => {
-      if (status !== 'aguardando' || !videoRef.current || videoRef.current.readyState < 2) return;
+      if (statusRef.current !== 'aguardando' || !videoRef.current || videoRef.current.readyState < 2) return;
       
       const faceapi = window.faceapi;
       if (!faceapi) return;
@@ -141,7 +142,8 @@ export default function PontoKiosk() {
 
   const matchFace = async (descriptor) => {
     const faceapi = window.faceapi;
-    const cadastrados = funcPontos.filter(fp => fp.face_cadastro_completo && fp.face_descriptors?.length > 0);
+    // Accept any employee with at least 1 descriptor
+    const cadastrados = funcPontos.filter(fp => fp.face_descriptors?.length > 0);
     if (cadastrados.length === 0) { setFaceStatus('Nenhum cadastro facial encontrado.'); return; }
 
     try {
@@ -150,10 +152,11 @@ export default function PontoKiosk() {
         return new faceapi.LabeledFaceDescriptors(fp.funcionario_id, descs);
       });
 
-      const matcher = new faceapi.FaceMatcher(labeled, 0.5);
+      // Threshold 0.6 is more forgiving (0.5 was too strict, rejecting valid matches)
+      const matcher = new faceapi.FaceMatcher(labeled, 0.6);
       const result = matcher.findBestMatch(descriptor);
 
-      if (result.label !== 'unknown' && result.distance < 0.5) {
+      if (result.label !== 'unknown' && result.distance < 0.6) {
         const funcId = result.label;
         // Cooldown check
         if (cooldownMap.current[funcId] && Date.now() - cooldownMap.current[funcId] < COOLDOWN_MS) {
@@ -170,6 +173,7 @@ export default function PontoKiosk() {
 
   const registrarPonto = async (funcId, metodo, confianca) => {
     setStatus('reconhecendo');
+    statusRef.current = 'reconhecendo';
     stopDetection();
 
     const fp = funcPontos.find(f => f.funcionario_id === funcId);
@@ -223,10 +227,13 @@ export default function PontoKiosk() {
       mensagem: getMensagemConfirmacao(tipo, func?.nome),
     });
     setStatus('confirmando');
+    statusRef.current = 'confirmando';
 
     setTimeout(() => {
       setStatus('aguardando');
+      statusRef.current = 'aguardando';
       setConfirmData(null);
+      setFaceStatus('');
       startDetection();
     }, 4000);
   };
@@ -270,7 +277,7 @@ export default function PontoKiosk() {
             funcPontos={funcPontos}
             funcionarios={funcionarios}
             onSuccess={handlePinSuccess}
-            onCancel={() => setStatus('aguardando')}
+            onCancel={() => { setStatus('aguardando'); statusRef.current = 'aguardando'; }}
           />
         ) : (
           <div className="w-full max-w-xl">
