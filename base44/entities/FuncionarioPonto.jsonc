@@ -1,0 +1,67 @@
+{
+  "name": "FuncionarioPonto",
+  "type": "object",
+  "description": "Dados de reconhecimento facial e controle de jornada do funcion\u00e1rio",
+  "properties": {
+    "funcionario_id": {
+      "type": "string",
+      "description": "ID do Funcionario (rela\u00e7\u00e3o)"
+    },
+    "loja_id": {
+      "type": "string",
+      "description": "ID da Loja"
+    },
+    "face_descriptors": {
+      "type": "array",
+      "description": "Array de descritores faciais para reconhecimento",
+      "items": {
+        "type": "object",
+        "properties": {
+          "descriptor": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "angulo": {
+            "type": "string"
+          },
+          "capturado_em": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      }
+    },
+    "face_cadastro_completo": {
+      "type": "boolean",
+      "default": false,
+      "description": "True quando tiver m\u00ednimo 3 \u00e2ngulos cadastrados"
+    },
+    "foto_perfil_url": {
+      "type": "string",
+      "description": "Foto principal para exibi\u00e7\u00e3o"
+    },
+    "pin_backup": {
+      "type": "string",
+      "description": "PIN de 4 d\u00edgitos para fallback"
+    },
+    "status_atual": {
+      "type": "string",
+      "enum": [
+        "fora",
+        "trabalhando",
+        "descanso"
+      ],
+      "default": "fora",
+      "description": "Estado em tempo real"
+    },
+    "ultima_marcacao": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "funcionario_id"
+  ]
+}

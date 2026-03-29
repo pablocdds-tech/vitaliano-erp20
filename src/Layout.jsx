@@ -10,7 +10,7 @@ export default function Layout({ children, currentPageName }) {
   const [isMobile, setIsMobile] = useState(false);
 
   // Página pública do funcionário: sem sidebar/topbar
-  if (currentPageName === 'ContagemTarefa' || currentPageName === 'RHAssinarContrato') {
+  if (currentPageName === 'ContagemTarefa' || currentPageName === 'RHAssinarContrato' || currentPageName === 'PontoKiosk') {
     return <>{children}</>;
   }
 

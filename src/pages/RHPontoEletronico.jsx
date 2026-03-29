@@ -1,53 +1,37 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
+import React from 'react';
 import PageHeader from '@/components/ui-custom/PageHeader';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Clock, Camera, MapPin, CheckCircle2, Loader2, Eye } from 'lucide-react';
-import { toast } from 'sonner';
-import { format } from 'date-fns';
-import PontoRegistroCard from '@/components/rh/PontoRegistroCard';
-import PontoHistorico from '@/components/rh/PontoHistorico';
-import RelatorioPonto from '@/components/rh/RelatorioPonto';
-
-const TIPOS_PONTO = [
-  { value: 'entrada', label: '🟢 Entrada', color: 'bg-emerald-500' },
-  { value: 'saida_almoco', label: '🟡 Saída Intervalo', color: 'bg-amber-500' },
-  { value: 'volta_almoco', label: '🔵 Volta Intervalo', color: 'bg-blue-500' },
-  { value: 'saida', label: '🔴 Saída', color: 'bg-red-500' }
-];
+import { Clock } from 'lucide-react';
+import PontoQuiosqueAoVivo from '@/components/ponto/PontoQuiosqueAoVivo';
+import CadastroFacial from '@/components/ponto/CadastroFacial';
+import PontoRegistros from '@/components/ponto/PontoRegistros';
+import PontoRelatorio from '@/components/ponto/PontoRelatorio';
+import PontoAjustes from '@/components/ponto/PontoAjustes';
 
 export default function RHPontoEletronico() {
   return (
     <div>
       <PageHeader
         title="Ponto Eletrônico"
-        subtitle="Registro de ponto com foto e geolocalização"
+        subtitle="Controle de jornada com reconhecimento facial"
         icon={Clock}
         breadcrumbs={[{ label: 'RH', href: '/RHFuncionarios' }, { label: 'Ponto Eletrônico' }]}
       />
 
-      <Tabs defaultValue="registrar">
-        <TabsList className="mb-4">
-          <TabsTrigger value="registrar">Registrar Ponto</TabsTrigger>
-          <TabsTrigger value="historico">Histórico / Auditoria</TabsTrigger>
-          <TabsTrigger value="relatorio">Relatório Mensal</TabsTrigger>
+      <Tabs defaultValue="ao-vivo">
+        <TabsList className="mb-4 flex-wrap">
+          <TabsTrigger value="ao-vivo">Quiosque ao Vivo</TabsTrigger>
+          <TabsTrigger value="cadastro">Cadastro Facial</TabsTrigger>
+          <TabsTrigger value="registros">Registros</TabsTrigger>
+          <TabsTrigger value="relatorio">Relatório</TabsTrigger>
+          <TabsTrigger value="ajustes">Ajustes</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="registrar">
-          <PontoRegistroCard tiposPonto={TIPOS_PONTO} />
-        </TabsContent>
-
-        <TabsContent value="historico">
-          <PontoHistorico />
-        </TabsContent>
-
-        <TabsContent value="relatorio">
-          <RelatorioPonto />
-        </TabsContent>
+        <TabsContent value="ao-vivo"><PontoQuiosqueAoVivo /></TabsContent>
+        <TabsContent value="cadastro"><CadastroFacial /></TabsContent>
+        <TabsContent value="registros"><PontoRegistros /></TabsContent>
+        <TabsContent value="relatorio"><PontoRelatorio /></TabsContent>
+        <TabsContent value="ajustes"><PontoAjustes /></TabsContent>
       </Tabs>
     </div>
   );

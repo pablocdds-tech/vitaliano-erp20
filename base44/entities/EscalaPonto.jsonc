@@ -1,0 +1,50 @@
+{
+  "name": "EscalaPonto",
+  "type": "object",
+  "description": "Escalas de trabalho para c\u00e1lculo de jornada",
+  "properties": {
+    "funcionario_id": {
+      "type": "string",
+      "description": "ID do Funcionario"
+    },
+    "loja_id": {
+      "type": "string"
+    },
+    "dia_semana": {
+      "type": "string",
+      "enum": [
+        "seg",
+        "ter",
+        "qua",
+        "qui",
+        "sex",
+        "sab",
+        "dom"
+      ],
+      "description": "Dia da semana"
+    },
+    "hora_entrada_prevista": {
+      "type": "string",
+      "description": "HH:MM"
+    },
+    "hora_saida_prevista": {
+      "type": "string",
+      "description": "HH:MM"
+    },
+    "carga_horaria_minutos": {
+      "type": "number",
+      "description": "Carga hor\u00e1ria em minutos"
+    },
+    "intervalo_minutos": {
+      "type": "number",
+      "default": 60,
+      "description": "Tempo de intervalo em minutos"
+    }
+  },
+  "required": [
+    "funcionario_id",
+    "dia_semana",
+    "hora_entrada_prevista",
+    "hora_saida_prevista"
+  ]
+}
