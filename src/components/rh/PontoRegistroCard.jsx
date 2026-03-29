@@ -18,6 +18,8 @@ export default function PontoRegistroCard({ tiposPonto }) {
   const [locLoading, setLocLoading] = useState(false);
   const [cameraActive, setCameraActive] = useState(false);
   const [time, setTime] = useState(new Date());
+  const [isIdentifying, setIsIdentifying] = useState(false);
+  const [uploadedFotoUrl, setUploadedFotoUrl] = useState(null);
   
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -106,13 +108,35 @@ export default function PontoRegistroCard({ tiposPonto }) {
     ctx.font = 'bold 14px Arial';
     ctx.fillText(`Tipo: ${tipoLabel}`, 10, canvas.height - 8);
 
-    canvas.toBlob(blob => {
+    canvas.toBlob(async blob => {
       setFoto(blob);
       setFotoPreview(canvas.toDataURL('image/jpeg'));
-    }, 'image/jpeg', 0.85);
+      
+      if (streamRef.current) streamRef.current.getTracks().forEach(t => t.stop());
+      setCameraActive(false);
 
-    if (streamRef.current) streamRef.current.getTracks().forEach(t => t.stop());
-    setCameraActive(false);
+      setIsIdentifying(true);
+      try {
+        const file = new File([blob], `ponto_${Date.now()}.jpg`, { type: 'image/jpeg' });
+        const { file_url } = await base44.integrations.Core.UploadFile({ file });
+        setUploadedFotoUrl(file_url);
+
+        toast.loading('Analisando rosto...', { id: 'face-id' });
+        const res = await base44.functions.invoke('identificarFuncionario', { fotoUrl: file_url });
+        
+        if (res.data && res.data.funcionario_id) {
+          setFuncId(res.data.funcionario_id);
+          toast.success('Rosto reconhecido!', { id: 'face-id' });
+        } else {
+          toast.error('Rosto não reconhecido. Selecione manualmente.', { id: 'face-id' });
+        }
+      } catch (err) {
+        console.error(err);
+        toast.error('Erro no reconhecimento. Selecione manualmente.', { id: 'face-id' });
+      } finally {
+        setIsIdentifying(false);
+      }
+    }, 'image/jpeg', 0.85);
   };
 
   const getLocation = () => {
@@ -129,18 +153,22 @@ export default function PontoRegistroCard({ tiposPonto }) {
   const registrarMut = useMutation({
     mutationFn: async () => {
       if (!funcId) { toast.error('Selecione o funcionário'); throw new Error('funcId'); }
-      if (!foto) { toast.error('Capture a foto primeiro'); throw new Error('foto'); }
+      if (!foto && !uploadedFotoUrl) { toast.error('Capture a foto primeiro'); throw new Error('foto'); }
       if (!location) { toast.error('Aguardando localização...'); throw new Error('location'); }
       
-      const file = new File([foto], `ponto_${Date.now()}.jpg`, { type: 'image/jpeg' });
-      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      let finalUrl = uploadedFotoUrl;
+      if (!finalUrl) {
+        const file = new File([foto], `ponto_${Date.now()}.jpg`, { type: 'image/jpeg' });
+        const { file_url } = await base44.integrations.Core.UploadFile({ file });
+        finalUrl = file_url;
+      }
       
       await base44.entities.RegistroPonto.create({
         funcionario_id: funcId,
         data: hoje,
         tipo,
         horario: new Date().toISOString(),
-        foto_url: file_url,
+        foto_url: finalUrl,
         latitude: location.latitude,
         longitude: location.longitude,
         dispositivo: navigator.userAgent
@@ -150,6 +178,8 @@ export default function PontoRegistroCard({ tiposPonto }) {
       qc.invalidateQueries({ queryKey: ['pontos-hoje'] });
       setFoto(null); 
       setFotoPreview(null);
+      setUploadedFotoUrl(null);
+      setFuncId('');
       toast.success('Ponto registrado com sucesso!', {
         description: `Horário: ${format(new Date(), 'HH:mm:ss')} - ${tiposPonto.find(t=>t.value === tipo)?.label}`
       });
@@ -240,7 +270,16 @@ export default function PontoRegistroCard({ tiposPonto }) {
                     </div>
                   </>
                 ) : fotoPreview ? (
-                  <img src={fotoPreview} className="w-full h-full object-cover" alt="Foto capturada" />
+                  <>
+                    <img src={fotoPreview} className="w-full h-full object-cover" alt="Foto capturada" />
+                    {isIdentifying && (
+                      <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-sm flex flex-col items-center justify-center z-20">
+                        <ScanFace className="w-16 h-16 text-blue-400 animate-pulse mb-4" />
+                        <p className="text-white font-medium text-lg">Reconhecendo Rosto...</p>
+                        <p className="text-slate-300 text-sm mt-2">Buscando na base de dados</p>
+                      </div>
+                    )}
+                  </>
                 ) : (
                   <div className="text-center text-slate-400 p-6 flex flex-col items-center">
                     <ScanFace className="w-16 h-16 mb-4 opacity-50" />
@@ -264,7 +303,7 @@ export default function PontoRegistroCard({ tiposPonto }) {
                   </Button>
                 )}
                 {fotoPreview && (
-                  <Button variant="outline" onClick={() => { setFoto(null); setFotoPreview(null); startCamera(); }} className="w-full h-12 text-base gap-2">
+                  <Button variant="outline" onClick={() => { setFoto(null); setFotoPreview(null); setUploadedFotoUrl(null); setFuncId(''); startCamera(); }} className="w-full h-12 text-base gap-2">
                     <Camera className="w-5 h-5" /> Capturar Novamente
                   </Button>
                 )}
