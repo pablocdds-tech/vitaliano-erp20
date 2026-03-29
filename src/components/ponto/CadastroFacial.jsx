@@ -13,10 +13,8 @@ import { estimateFaceAngle, classifyAngle, getAngleProximity } from './faceAngle
 
 const ANGULOS = [
   { key: 'frontal', label: 'Frontal', instrucao: 'Olhe para a câmera', emoji: '😐' },
-  { key: 'diagonal_esq', label: 'Esquerda', instrucao: 'Vire para a esquerda', emoji: '👈' },
-  { key: 'diagonal_dir', label: 'Direita', instrucao: 'Vire para a direita', emoji: '👉' },
-  { key: 'levemente_acima', label: 'Acima', instrucao: 'Levante o queixo', emoji: '👆' },
-  { key: 'levemente_abaixo', label: 'Abaixo', instrucao: 'Abaixe o queixo', emoji: '👇' },
+  { key: 'diagonal_esq', label: 'Esquerda', instrucao: 'Vire o rosto para a esquerda', emoji: '👈' },
+  { key: 'diagonal_dir', label: 'Direita', instrucao: 'Vire o rosto para a direita', emoji: '👉' },
 ];
 
 export default function CadastroFacial() {
@@ -149,7 +147,7 @@ export default function CadastroFacial() {
             if (!savingRef.current && !cooldownRef.current && !capturedRef.current.has(detectedAngle)) {
               captureAngle(detectedAngle, detection.descriptor);
             }
-          }, 800);
+          }, 600);
         }
       } else {
         setCurrentDetectedAngle(null);
@@ -216,12 +214,12 @@ export default function CadastroFacial() {
 
     const allCaptured = ANGULOS.every(a => newCaptured.has(a.key));
     if (allCaptured) {
-      toast.success('Cadastro completo! Todos os 5 ângulos capturados.');
+      toast.success('Cadastro completo! Todos os ângulos capturados.');
       stopCamera();
       return;
     }
     
-    toast.success(`✓ ${ANGULOS.find(a => a.key === angleKey)?.label} capturado (${newCaptured.size}/5)`);
+    toast.success(`✓ ${ANGULOS.find(a => a.key === angleKey)?.label} capturado (${newCaptured.size}/${ANGULOS.length})`);
 
     // Cooldown: pause detection for 1.5s so user can reposition
     savingRef.current = false;
@@ -410,7 +408,7 @@ function CadastroPanel({ selectedFunc, capturedAngles, progressPercent, nextAngl
           <div className="mb-4">
             <div className="flex justify-between items-center mb-1.5">
               <p className="text-xs text-muted-foreground">Progresso</p>
-              <p className="text-xs font-medium">{capturedAngles.size}/5 {capturedAngles.size >= 3 && <span className="text-emerald-600">✓ Funcional</span>}</p>
+              <p className="text-xs font-medium">{capturedAngles.size}/{ANGULOS.length} {capturedAngles.size >= ANGULOS.length && <span className="text-emerald-600">✓ Completo</span>}</p>
             </div>
             <div className="h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
               <div className="h-full bg-emerald-500 rounded-full transition-all duration-500" style={{ width: `${progressPercent}%` }} />
@@ -418,7 +416,7 @@ function CadastroPanel({ selectedFunc, capturedAngles, progressPercent, nextAngl
           </div>
 
           {/* Angles grid — responsive */}
-          <div className="grid grid-cols-5 gap-1.5 sm:gap-2">
+          <div className="grid grid-cols-3 gap-2 sm:gap-3">
             {ANGULOS.map(ang => {
               const captured = capturedAngles.has(ang.key);
               return (
@@ -540,7 +538,7 @@ function CaptureFullscreen({ videoRef, canvasRef, faceDetected, currentDetectedA
 
         {/* Progress */}
         <div className="h-1.5 bg-white/10 rounded-full overflow-hidden mx-8">
-          <div className="h-full bg-emerald-500 rounded-full transition-all duration-500" style={{ width: `${(capturedAngles.size / 5) * 100}%` }} />
+          <div className="h-full bg-emerald-500 rounded-full transition-all duration-500" style={{ width: `${(capturedAngles.size / ANGULOS.length) * 100}%` }} />
         </div>
       </div>
     </div>
