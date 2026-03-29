@@ -128,11 +128,19 @@ export default function PontoRegistroCard({ tiposPonto }) {
           setFuncId(res.data.funcionario_id);
           toast.success('Rosto reconhecido!', { id: 'face-id' });
         } else {
-          toast.error('Rosto não reconhecido. Selecione manualmente.', { id: 'face-id' });
+          toast.error('Rosto não reconhecido. Certifique-se de ter foto no cadastro e tente novamente.', { id: 'face-id' });
+          setFoto(null);
+          setFotoPreview(null);
+          setUploadedFotoUrl(null);
+          startCamera();
         }
       } catch (err) {
         console.error(err);
-        toast.error('Erro no reconhecimento. Selecione manualmente.', { id: 'face-id' });
+        toast.error('Erro no reconhecimento. Tente novamente.', { id: 'face-id' });
+        setFoto(null);
+        setFotoPreview(null);
+        setUploadedFotoUrl(null);
+        startCamera();
       } finally {
         setIsIdentifying(false);
       }
@@ -214,23 +222,19 @@ export default function PontoRegistroCard({ tiposPonto }) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Colaborador</label>
-                <Select value={funcId} onValueChange={(val) => { setFuncId(val); setFoto(null); setFotoPreview(null); }}>
-                  <SelectTrigger className="h-12 text-base bg-slate-50 dark:bg-slate-900">
-                    <SelectValue placeholder="Selecione para iniciar..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {funcionarios.map(f => (
-                      <SelectItem key={f.id} value={f.id}>
-                        <div className="flex items-center gap-2">
-                          <div className="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xs font-bold">
-                            {f.nome.charAt(0)}
-                          </div>
-                          {f.nome} <span className="text-muted-foreground ml-1 text-xs">({f.cargo})</span>
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <div className="h-12 flex items-center px-3 bg-slate-50 dark:bg-slate-900 border border-input rounded-md text-slate-500 text-sm">
+                  {funcId && selectedFunc ? (
+                    <div className="flex items-center gap-2 text-slate-900 dark:text-slate-100">
+                      <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 flex items-center justify-center text-xs font-bold">
+                        {selectedFunc.nome.charAt(0)}
+                      </div>
+                      <span className="font-medium">{selectedFunc.nome}</span>
+                      <span className="text-muted-foreground ml-1 text-xs">({selectedFunc.cargo})</span>
+                    </div>
+                  ) : (
+                    <span className="flex items-center gap-2"><ScanFace className="w-4 h-4" /> Aguardando reconhecimento facial...</span>
+                  )}
+                </div>
               </div>
 
               <div className="space-y-2">
@@ -337,10 +341,10 @@ export default function PontoRegistroCard({ tiposPonto }) {
             {!funcId ? (
               <div className="p-8 text-center text-slate-500">
                 <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mx-auto mb-3">
-                  <User className="w-6 h-6 text-slate-400" />
+                  <ScanFace className="w-6 h-6 text-slate-400 animate-pulse" />
                 </div>
-                <p className="font-medium text-sm">Selecione seu perfil</p>
-                <p className="text-xs mt-1">Para visualizar seus registros de hoje</p>
+                <p className="font-medium text-sm">Identificação Pendente</p>
+                <p className="text-xs mt-1">Posicione-se em frente à câmera e capture seu rosto para visualizar seus registros</p>
               </div>
             ) : (
               <div className="p-4 space-y-4">
