@@ -292,39 +292,48 @@ export default function PontoKiosk() {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex items-center justify-center p-6">
-        {status === 'confirmando' && confirmData ? (
-          <KioskConfirmation data={confirmData} tipoIcon={tipoIcon} />
-        ) : status === 'pin' ? (
-          <KioskPinPad
-            funcPontos={funcPontos}
-            funcionarios={funcionarios}
-            onSuccess={handlePinSuccess}
-            onCancel={() => { setStatus('aguardando'); statusRef.current = 'aguardando'; }}
-          />
-        ) : (
-          <div className="w-full max-w-xl">
-            <div className={`relative rounded-2xl overflow-hidden border-4 transition-colors duration-300 ${
-              faceStatus.includes('identificando') ? 'border-emerald-500 shadow-lg shadow-emerald-500/30' : 'border-slate-700'
-            }`}>
-              <video ref={videoRef} className="w-full aspect-square object-cover transform -scale-x-100" autoPlay playsInline muted />
-              {/* Face guide overlay */}
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <div className={`w-56 h-72 rounded-[120px] border-4 border-dashed transition-colors duration-300 ${
-                  faceStatus.includes('identificando') ? 'border-emerald-400' : 'border-white/20'
-                }`} />
-              </div>
-              <canvas ref={canvasRef} className="hidden" />
+      <div className="flex-1 flex items-center justify-center p-6 relative overflow-hidden">
+        {/* Camera View - Always mounted to keep stream alive */}
+        <div className={`w-full max-w-xl transition-all duration-300 ${status === 'aguardando' || status === 'reconhecendo' ? 'opacity-100 z-10 relative' : 'opacity-0 absolute pointer-events-none scale-95'}`}>
+          <div className={`relative rounded-2xl overflow-hidden border-4 transition-colors duration-300 ${
+            faceStatus.includes('identificando') ? 'border-emerald-500 shadow-lg shadow-emerald-500/30' : 'border-slate-700'
+          }`}>
+            <video ref={videoRef} className="w-full aspect-square object-cover transform -scale-x-100" autoPlay playsInline muted />
+            {/* Face guide overlay */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <div className={`w-56 h-72 rounded-[120px] border-4 border-dashed transition-colors duration-300 ${
+                faceStatus.includes('identificando') ? 'border-emerald-400' : 'border-white/20'
+              }`} />
             </div>
+            <canvas ref={canvasRef} className="hidden" />
+          </div>
 
-            {/* Status text */}
-            <div className="mt-6 text-center">
-              {faceStatus ? (
-                <p className="text-lg font-medium text-emerald-400 animate-pulse">{faceStatus}</p>
-              ) : (
-                <p className="text-lg text-slate-400">Posicione seu rosto para registrar o ponto</p>
-              )}
-            </div>
+          {/* Status text */}
+          <div className="mt-6 text-center">
+            {faceStatus ? (
+              <p className="text-lg font-medium text-emerald-400 animate-pulse">{faceStatus}</p>
+            ) : (
+              <p className="text-lg text-slate-400">Posicione seu rosto para registrar o ponto</p>
+            )}
+          </div>
+        </div>
+
+        {/* Confirmation Screen */}
+        {status === 'confirmando' && confirmData && (
+          <div className="absolute z-20 w-full max-w-xl animate-in fade-in zoom-in duration-300">
+            <KioskConfirmation data={confirmData} tipoIcon={tipoIcon} />
+          </div>
+        )}
+
+        {/* PIN Pad Screen */}
+        {status === 'pin' && (
+          <div className="absolute z-20 w-full max-w-xl animate-in fade-in zoom-in duration-300">
+            <KioskPinPad
+              funcPontos={funcPontos}
+              funcionarios={funcionarios}
+              onSuccess={handlePinSuccess}
+              onCancel={() => { setStatus('aguardando'); statusRef.current = 'aguardando'; }}
+            />
           </div>
         )}
       </div>
