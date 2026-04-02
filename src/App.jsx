@@ -9,6 +9,10 @@ import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import PontoKiosk from './pages/PontoKiosk';
 import CRMCustomers from './pages/CRMCustomers';
+import CRMTemplates from './pages/CRMTemplates';
+import CRMCampaigns from './pages/CRMCampaigns';
+import CRMDashboard from './pages/CRMDashboard';
+import CRMJourneys from './pages/CRMJourneys';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -61,9 +65,29 @@ const AuthenticatedApp = () => {
         />
       ))}
       <Route path="/ponto-kiosk" element={<PontoKiosk />} />
+      <Route path="/crm-dashboard" element={
+        <LayoutWrapper currentPageName="crm-dashboard">
+          <CRMDashboard />
+        </LayoutWrapper>
+      } />
       <Route path="/crm-clientes" element={
         <LayoutWrapper currentPageName="crm-clientes">
           <CRMCustomers />
+        </LayoutWrapper>
+      } />
+      <Route path="/crm-templates" element={
+        <LayoutWrapper currentPageName="crm-templates">
+          <CRMTemplates />
+        </LayoutWrapper>
+      } />
+      <Route path="/crm-campanhas" element={
+        <LayoutWrapper currentPageName="crm-campanhas">
+          <CRMCampaigns />
+        </LayoutWrapper>
+      } />
+      <Route path="/crm-jornadas" element={
+        <LayoutWrapper currentPageName="crm-jornadas">
+          <CRMJourneys />
         </LayoutWrapper>
       } />
       <Route path="*" element={<PageNotFound />} />

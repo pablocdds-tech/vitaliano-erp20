@@ -42,7 +42,11 @@ import {
   CircleUser,
   FileCheck2,
   CalendarClock,
-  CalendarDays
+  CalendarDays,
+  Megaphone,
+  Workflow,
+  MessageSquare,
+  Activity
 } from 'lucide-react';
 
 const menuGroups = [
@@ -104,7 +108,11 @@ const menuGroups = [
   {
     label: 'Marketing & CRM',
     items: [
-      { icon: Users, label: 'Clientes (CRM)', href: 'crm-clientes' }
+      { icon: Activity, label: 'Dashboard CRM', href: 'crm-dashboard' },
+      { icon: Users, label: 'Clientes (Segmentos)', href: 'crm-clientes' },
+      { icon: Megaphone, label: 'Campanhas', href: 'crm-campanhas' },
+      { icon: Workflow, label: 'Jornadas Auto', href: 'crm-jornadas' },
+      { icon: MessageSquare, label: 'Templates Meta', href: 'crm-templates' }
     ]
   },
   {
