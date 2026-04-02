@@ -8,10 +8,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Plus, Pencil, Trash2, AlertTriangle } from 'lucide-react';
+import { Plus, Trash2, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { getTipoLabel, getNovoStatus } from './pontoUtils';
+import { pontoSectionText, pontoSectionTitle, pontoSurface } from './pontoStyles';
 
 export default function PontoAjustes() {
   const [addOpen, setAddOpen] = useState(false);
@@ -91,15 +92,18 @@ export default function PontoAjustes() {
   const ajustesManuais = registros.filter(r => r.editado_por || r.metodo_autenticacao === 'manual_gestor');
 
   return (
-    <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <p className="text-sm text-muted-foreground">Ajustes manuais feitos pelo gestor ficam registrados com log completo.</p>
-        <Button onClick={() => setAddOpen(true)} className="gap-2"><Plus className="w-4 h-4" /> Adicionar Marcação</Button>
+    <div className="space-y-5">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+        <div className="space-y-1">
+          <h2 className={pontoSectionTitle}>Ajustes e Correções</h2>
+          <p className={pontoSectionText}>Registre inclusões e exclusões com histórico claro, visual executivo e boa usabilidade em telas menores.</p>
+        </div>
+        <Button onClick={() => setAddOpen(true)} className="h-11 gap-2 rounded-xl px-4 self-start lg:self-auto"><Plus className="w-4 h-4" /> Adicionar Marcação</Button>
       </div>
 
-      <Card>
+      <Card className={pontoSurface}>
         <CardHeader className="pb-3">
-          <CardTitle className="text-sm">Últimos Registros (com prioridade a ajustes manuais)</CardTitle>
+          <CardTitle className="text-sm font-semibold text-slate-900 dark:text-slate-100">Últimos Registros e Ajustes</CardTitle>
         </CardHeader>
         <CardContent className="p-0">
           <div className="divide-y divide-slate-100 dark:divide-slate-800">

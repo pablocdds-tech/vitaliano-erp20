@@ -8,11 +8,7 @@ import MobileBottomNav from './components/mobile/MobileBottomNav';
 export default function Layout({ children, currentPageName }) {
   const [collapsed, setCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-
-  // Página pública do funcionário: sem sidebar/topbar
-  if (currentPageName === 'ContagemTarefa' || currentPageName === 'RHAssinarContrato' || currentPageName === 'PontoKiosk') {
-    return <>{children}</>;
-  }
+  const isPublicPage = currentPageName === 'ContagemTarefa' || currentPageName === 'RHAssinarContrato' || currentPageName === 'PontoKiosk';
 
   useEffect(() => {
     const checkMobile = () => {
@@ -27,6 +23,10 @@ export default function Layout({ children, currentPageName }) {
   }, []);
 
   const toggleSidebar = () => setCollapsed(!collapsed);
+
+  if (isPublicPage) {
+    return <>{children}</>;
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">

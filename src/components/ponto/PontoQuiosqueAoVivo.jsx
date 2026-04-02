@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Users, Coffee, AlertTriangle, ExternalLink, Clock } from 'lucide-react';
 import { format } from 'date-fns';
 import { calcularMinutosTrabalhados, formatarMinutos } from './pontoUtils';
+import { pontoSectionText, pontoSectionTitle, pontoStatCardClasses, pontoSurface } from './pontoStyles';
 
 export default function PontoQuiosqueAoVivo() {
   const hoje = format(new Date(), 'yyyy-MM-dd');
@@ -43,49 +44,52 @@ export default function PontoQuiosqueAoVivo() {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Contadores */}
-      <div className="grid grid-cols-3 gap-4">
-        <Card className="border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950">
-          <CardContent className="p-4 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-emerald-500 text-white flex items-center justify-center"><Users className="w-5 h-5" /></div>
-            <div>
-              <p className="text-2xl font-bold text-emerald-700 dark:text-emerald-400">{trabalhando.length}</p>
-              <p className="text-xs text-emerald-600">Trabalhando</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950">
-          <CardContent className="p-4 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-amber-500 text-white flex items-center justify-center"><Coffee className="w-5 h-5" /></div>
-            <div>
-              <p className="text-2xl font-bold text-amber-700 dark:text-amber-400">{descanso.length}</p>
-              <p className="text-xs text-amber-600">Descanso</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950">
-          <CardContent className="p-4 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-slate-400 text-white flex items-center justify-center"><AlertTriangle className="w-5 h-5" /></div>
-            <div>
-              <p className="text-2xl font-bold text-slate-700 dark:text-slate-400">{fora.length}</p>
-              <p className="text-xs text-slate-600">Ausentes</p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="flex justify-end">
-        <Button variant="outline" onClick={() => window.open('/ponto-kiosk', '_blank')} className="gap-2">
+    <div className="space-y-5">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+        <div className="space-y-1">
+          <h2 className={pontoSectionTitle}>Monitoramento do Quiosque</h2>
+          <p className={pontoSectionText}>Acompanhe a operação do ponto em tempo real com leitura clara no desktop e navegação simples no celular.</p>
+        </div>
+        <Button variant="outline" onClick={() => window.open('/ponto-kiosk', '_blank')} className="h-11 gap-2 rounded-xl px-4 self-start lg:self-auto">
           <ExternalLink className="w-4 h-4" /> Abrir Quiosque
         </Button>
       </div>
 
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <Card className={pontoStatCardClasses('emerald')}>
+          <CardContent className="flex items-center gap-3 p-4 sm:p-5">
+            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-600 text-white"><Users className="w-5 h-5" /></div>
+            <div>
+              <p className="text-2xl font-semibold tabular-nums text-slate-900 dark:text-slate-100">{trabalhando.length}</p>
+              <p className="text-sm text-slate-600 dark:text-slate-400">Em atividade</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className={pontoStatCardClasses('amber')}>
+          <CardContent className="flex items-center gap-3 p-4 sm:p-5">
+            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-amber-500 text-white"><Coffee className="w-5 h-5" /></div>
+            <div>
+              <p className="text-2xl font-semibold tabular-nums text-slate-900 dark:text-slate-100">{descanso.length}</p>
+              <p className="text-sm text-slate-600 dark:text-slate-400">Em pausa</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className={pontoStatCardClasses('slate')}>
+          <CardContent className="flex items-center gap-3 p-4 sm:p-5">
+            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-slate-500 text-white"><AlertTriangle className="w-5 h-5" /></div>
+            <div>
+              <p className="text-2xl font-semibold tabular-nums text-slate-900 dark:text-slate-100">{fora.length}</p>
+              <p className="text-sm text-slate-600 dark:text-slate-400">Fora do turno</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
       {/* Trabalhando */}
       {trabalhando.length > 0 && (
-        <Card>
+        <Card className={pontoSurface}>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" /> Trabalhando Agora</CardTitle>
+            <CardTitle className="flex items-center gap-2 text-sm font-semibold text-slate-900 dark:text-slate-100"><div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" /> Trabalhando Agora</CardTitle>
           </CardHeader>
           <CardContent className="p-0">
             <div className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -111,9 +115,9 @@ export default function PontoQuiosqueAoVivo() {
 
       {/* Descanso */}
       {descanso.length > 0 && (
-        <Card>
+        <Card className={pontoSurface}>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm flex items-center gap-2"><Coffee className="w-4 h-4 text-amber-500" /> Em Descanso</CardTitle>
+            <CardTitle className="flex items-center gap-2 text-sm font-semibold text-slate-900 dark:text-slate-100"><Coffee className="w-4 h-4 text-amber-500" /> Em Descanso</CardTitle>
           </CardHeader>
           <CardContent className="p-0">
             <div className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -135,9 +139,9 @@ export default function PontoQuiosqueAoVivo() {
 
       {/* Ausentes */}
       {fora.length > 0 && (
-        <Card>
+        <Card className={pontoSurface}>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm flex items-center gap-2 text-slate-500"><Clock className="w-4 h-4" /> Ainda não chegaram</CardTitle>
+            <CardTitle className="flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-300"><Clock className="w-4 h-4" /> Ainda não chegaram</CardTitle>
           </CardHeader>
           <CardContent className="p-0">
             <div className="divide-y divide-slate-100 dark:divide-slate-800">

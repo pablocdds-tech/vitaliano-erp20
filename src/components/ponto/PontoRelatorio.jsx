@@ -7,7 +7,8 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { Printer, ChevronDown, TrendingUp, TrendingDown, Clock } from 'lucide-react';
+import { Printer, ChevronDown } from 'lucide-react';
+import { pontoInputLabel, pontoSectionText, pontoSectionTitle, pontoStatCardClasses, pontoSurface, pontoToolbar } from './pontoStyles';
 import { format, eachDayOfInterval, parseISO, startOfMonth, endOfMonth } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { calcularMinutosTrabalhados, formatarMinutos, getTipoLabel } from './pontoUtils';
@@ -104,22 +105,26 @@ export default function PontoRelatorio() {
   }
 
   return (
-    <div className="space-y-4">
-      <Card>
-        <CardContent className="p-4">
-          <div className="flex flex-wrap gap-3 items-end">
+    <div className="space-y-5">
+      <div className="space-y-1">
+        <h2 className={pontoSectionTitle}>Relatório de Jornada</h2>
+        <p className={pontoSectionText}>Visual corporativo mais limpo para acompanhamento de horas, desvios e detalhe diário, com boa leitura também no celular.</p>
+      </div>
+      <Card className={pontoSurface}>
+        <CardContent className="p-4 sm:p-5">
+          <div className={pontoToolbar}>
             <div>
-              <label className="text-xs font-medium text-muted-foreground">Funcionário</label>
+              <label className={pontoInputLabel}>Funcionário</label>
               <Select value={funcId} onValueChange={setFuncId}>
                 <SelectTrigger className="w-56"><SelectValue placeholder="Selecione" /></SelectTrigger>
                 <SelectContent>{funcionarios.map(f => <SelectItem key={f.id} value={f.id}>{f.nome}</SelectItem>)}</SelectContent>
               </Select>
             </div>
             <div>
-              <label className="text-xs font-medium text-muted-foreground">Mês</label>
+              <label className={pontoInputLabel}>Competência</label>
               <Input type="month" value={mesAno} onChange={e => setMesAno(e.target.value)} className="w-44" />
             </div>
-            <Button variant="outline" size="sm" className="gap-2 ml-auto" onClick={() => window.print()}>
+            <Button variant="outline" size="sm" className="ml-auto h-11 gap-2 rounded-xl px-4" onClick={() => window.print()}>
               <Printer className="w-4 h-4" /> Imprimir
             </Button>
           </div>
@@ -129,32 +134,32 @@ export default function PontoRelatorio() {
       {relatorio && (
         <>
           {/* Resumo */}
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-            <Card><CardContent className="p-4 text-center">
-              <p className="text-2xl font-bold">{formatarMinutos(relatorio.totalTrabalhado)}</p>
-              <p className="text-xs text-muted-foreground">Trabalhadas</p>
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
+            <Card className={pontoStatCardClasses('slate')}><CardContent className="p-4 text-center sm:p-5">
+              <p className="text-2xl font-semibold tabular-nums text-slate-900 dark:text-slate-100">{formatarMinutos(relatorio.totalTrabalhado)}</p>
+              <p className="text-sm text-slate-600 dark:text-slate-400">Horas Trabalhadas</p>
             </CardContent></Card>
-            <Card><CardContent className="p-4 text-center">
-              <p className="text-2xl font-bold">{formatarMinutos(relatorio.totalPrevisto)}</p>
-              <p className="text-xs text-muted-foreground">Previstas</p>
+            <Card className={pontoStatCardClasses('slate')}><CardContent className="p-4 text-center sm:p-5">
+              <p className="text-2xl font-semibold tabular-nums text-slate-900 dark:text-slate-100">{formatarMinutos(relatorio.totalPrevisto)}</p>
+              <p className="text-sm text-slate-600 dark:text-slate-400">Horas Previstas</p>
             </CardContent></Card>
-            <Card><CardContent className="p-4 text-center">
-              <p className={`text-2xl font-bold ${relatorio.saldo >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>{formatarMinutos(relatorio.saldo)}</p>
-              <p className="text-xs text-muted-foreground">Saldo</p>
+            <Card className={pontoStatCardClasses(relatorio.saldo >= 0 ? 'emerald' : 'red')}><CardContent className="p-4 text-center sm:p-5">
+              <p className={`text-2xl font-semibold tabular-nums ${relatorio.saldo >= 0 ? 'text-emerald-700 dark:text-emerald-400' : 'text-red-700 dark:text-red-400'}`}>{formatarMinutos(relatorio.saldo)}</p>
+              <p className="text-sm text-slate-600 dark:text-slate-400">Saldo do Período</p>
             </CardContent></Card>
-            <Card><CardContent className="p-4 text-center">
-              <p className="text-2xl font-bold text-amber-600">{relatorio.atrasos}</p>
-              <p className="text-xs text-muted-foreground">Atrasos</p>
+            <Card className={pontoStatCardClasses('amber')}><CardContent className="p-4 text-center sm:p-5">
+              <p className="text-2xl font-semibold tabular-nums text-amber-700 dark:text-amber-400">{relatorio.atrasos}</p>
+              <p className="text-sm text-slate-600 dark:text-slate-400">Atrasos</p>
             </CardContent></Card>
-            <Card><CardContent className="p-4 text-center">
-              <p className="text-2xl font-bold text-blue-600">{formatarMinutos(relatorio.horasExtras)}</p>
-              <p className="text-xs text-muted-foreground">Horas Extras</p>
+            <Card className={pontoStatCardClasses('blue')}><CardContent className="p-4 text-center sm:p-5">
+              <p className="text-2xl font-semibold tabular-nums text-blue-700 dark:text-blue-400">{formatarMinutos(relatorio.horasExtras)}</p>
+              <p className="text-sm text-slate-600 dark:text-slate-400">Horas Extras</p>
             </CardContent></Card>
           </div>
 
           {/* Detalhe Diário */}
-          <Card>
-            <CardHeader className="pb-3"><CardTitle className="text-sm">Detalhamento Diário</CardTitle></CardHeader>
+          <Card className={pontoSurface}>
+            <CardHeader className="pb-3"><CardTitle className="text-sm font-semibold text-slate-900 dark:text-slate-100">Detalhamento Diário</CardTitle></CardHeader>
             <CardContent className="p-0">
               <div className="divide-y divide-slate-100 dark:divide-slate-800">
                 {relatorio.detalheDias.map(d => (

@@ -8,9 +8,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Download, Image as ImageIcon, Filter } from 'lucide-react';
+import { Download } from 'lucide-react';
 import { format } from 'date-fns';
 import { getTipoLabel } from './pontoUtils';
+import { pontoInputLabel, pontoSectionText, pontoSectionTitle, pontoSurface, pontoToolbar } from './pontoStyles';
 
 export default function PontoRegistros() {
   const [filtroFunc, setFiltroFunc] = useState('');
@@ -73,12 +74,16 @@ export default function PontoRegistros() {
   };
 
   return (
-    <div className="space-y-4">
-      <Card>
-        <CardContent className="p-4">
-          <div className="flex flex-wrap gap-3 items-end">
+    <div className="space-y-5">
+      <div className="space-y-1">
+        <h2 className={pontoSectionTitle}>Registros do Ponto</h2>
+        <p className={pontoSectionText}>Consulte, filtre e exporte as marcações com leitura mais limpa em telas grandes e controles confortáveis no celular.</p>
+      </div>
+      <Card className={pontoSurface}>
+        <CardContent className="p-4 sm:p-5">
+          <div className={pontoToolbar}>
             <div>
-              <label className="text-xs font-medium text-muted-foreground">Funcionário</label>
+              <label className={pontoInputLabel}>Funcionário</label>
               <Select value={filtroFunc} onValueChange={setFiltroFunc}>
                 <SelectTrigger className="w-48"><SelectValue placeholder="Todos" /></SelectTrigger>
                 <SelectContent>
@@ -88,15 +93,15 @@ export default function PontoRegistros() {
               </Select>
             </div>
             <div>
-              <label className="text-xs font-medium text-muted-foreground">Data Início</label>
+              <label className={pontoInputLabel}>Data Inicial</label>
               <Input type="date" value={dataInicio} onChange={e => setDataInicio(e.target.value)} className="w-40" />
             </div>
             <div>
-              <label className="text-xs font-medium text-muted-foreground">Data Fim</label>
+              <label className={pontoInputLabel}>Data Final</label>
               <Input type="date" value={dataFim} onChange={e => setDataFim(e.target.value)} className="w-40" />
             </div>
             <div>
-              <label className="text-xs font-medium text-muted-foreground">Tipo</label>
+              <label className={pontoInputLabel}>Tipo</label>
               <Select value={filtroTipo} onValueChange={setFiltroTipo}>
                 <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
                 <SelectContent>
@@ -109,7 +114,7 @@ export default function PontoRegistros() {
               </Select>
             </div>
             <div>
-              <label className="text-xs font-medium text-muted-foreground">Método</label>
+              <label className={pontoInputLabel}>Método</label>
               <Select value={filtroMetodo} onValueChange={setFiltroMetodo}>
                 <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
                 <SelectContent>
@@ -120,15 +125,15 @@ export default function PontoRegistros() {
                 </SelectContent>
               </Select>
             </div>
-            <Button variant="outline" size="sm" onClick={exportCSV} className="gap-2 ml-auto">
-              <Download className="w-4 h-4" /> CSV
+            <Button variant="outline" size="sm" onClick={exportCSV} className="ml-auto h-11 gap-2 rounded-xl px-4">
+              <Download className="w-4 h-4" /> Exportar CSV
             </Button>
           </div>
         </CardContent>
       </Card>
 
-      <Card>
-        <CardContent className="p-0">
+      <Card className={pontoSurface}>
+        <CardContent className="overflow-hidden p-0">
           <Table>
             <TableHeader>
               <TableRow>
