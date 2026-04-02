@@ -257,6 +257,9 @@ export default function PontoKiosk() {
       statusRef.current = 'aguardando';
       setConfirmData(null);
       setFaceStatus('');
+      if (videoRef.current) {
+        videoRef.current.play().catch(() => {});
+      }
       startDetection();
     }, 4000);
   };
@@ -294,7 +297,7 @@ export default function PontoKiosk() {
       {/* Main Content */}
       <div className="flex-1 flex items-center justify-center p-6 relative overflow-hidden">
         {/* Camera View - Always mounted to keep stream alive */}
-        <div className={`w-full max-w-xl transition-all duration-300 ${status === 'aguardando' || status === 'reconhecendo' ? 'opacity-100 z-10 relative' : 'opacity-0 absolute pointer-events-none scale-95'}`}>
+        <div className="w-full max-w-xl relative z-10">
           <div className={`relative rounded-2xl overflow-hidden border-4 transition-colors duration-300 ${
             faceStatus.includes('identificando') ? 'border-emerald-500 shadow-lg shadow-emerald-500/30' : 'border-slate-700'
           }`}>
@@ -320,20 +323,30 @@ export default function PontoKiosk() {
 
         {/* Confirmation Screen */}
         {status === 'confirmando' && confirmData && (
-          <div className="absolute z-20 w-full max-w-xl animate-in fade-in zoom-in duration-300">
-            <KioskConfirmation data={confirmData} tipoIcon={tipoIcon} />
+          <div className="absolute inset-0 z-20 bg-slate-900 flex items-center justify-center animate-in fade-in duration-300">
+            <div className="w-full max-w-xl p-6">
+              <KioskConfirmation data={confirmData} tipoIcon={tipoIcon} />
+            </div>
           </div>
         )}
 
         {/* PIN Pad Screen */}
         {status === 'pin' && (
-          <div className="absolute z-20 w-full max-w-xl animate-in fade-in zoom-in duration-300">
-            <KioskPinPad
-              funcPontos={funcPontos}
-              funcionarios={funcionarios}
-              onSuccess={handlePinSuccess}
-              onCancel={() => { setStatus('aguardando'); statusRef.current = 'aguardando'; }}
-            />
+          <div className="absolute inset-0 z-20 bg-slate-900 flex items-center justify-center animate-in fade-in duration-300">
+            <div className="w-full max-w-xl p-6">
+              <KioskPinPad
+                funcPontos={funcPontos}
+                funcionarios={funcionarios}
+                onSuccess={handlePinSuccess}
+                onCancel={() => { 
+                  setStatus('aguardando'); 
+                  statusRef.current = 'aguardando'; 
+                  if (videoRef.current) {
+                    videoRef.current.play().catch(() => {});
+                  }
+                }}
+              />
+            </div>
           </div>
         )}
       </div>
