@@ -1,0 +1,79 @@
+{
+  "name": "CRMMessageLog",
+  "type": "object",
+  "properties": {
+    "campaign_id": {
+      "type": "string"
+    },
+    "journey_execution_id": {
+      "type": "string"
+    },
+    "customer_id": {
+      "type": "string"
+    },
+    "channel": {
+      "type": "string"
+    },
+    "external_message_id": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "queued",
+        "sent",
+        "delivered",
+        "read",
+        "failed",
+        "replied"
+      ]
+    },
+    "sent_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "delivered_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "read_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "replied_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "reply_content": {
+      "type": "string"
+    },
+    "error_code": {
+      "type": "string"
+    },
+    "error_message": {
+      "type": "string"
+    },
+    "template_variables": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "converted": {
+      "type": "boolean",
+      "default": false
+    },
+    "conversion_order_id": {
+      "type": "string"
+    },
+    "conversion_value": {
+      "type": "number"
+    },
+    "conversion_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "customer_id",
+    "channel"
+  ]
+}

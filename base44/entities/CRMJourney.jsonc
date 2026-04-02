@@ -1,0 +1,65 @@
+{
+  "name": "CRMJourney",
+  "type": "object",
+  "properties": {
+    "loja_id": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "active",
+        "paused",
+        "archived"
+      ],
+      "default": "draft"
+    },
+    "trigger_type": {
+      "type": "string"
+    },
+    "trigger_config": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "nodes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "enrolled_count": {
+      "type": "number",
+      "default": 0
+    },
+    "completed_count": {
+      "type": "number",
+      "default": 0
+    },
+    "converted_count": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "loja_id",
+    "name",
+    "trigger_type",
+    "nodes",
+    "edges"
+  ]
+}

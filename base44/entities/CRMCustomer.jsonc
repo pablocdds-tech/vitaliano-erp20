@@ -1,0 +1,120 @@
+{
+  "name": "CRMCustomer",
+  "type": "object",
+  "properties": {
+    "loja_id": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string"
+    },
+    "source": {
+      "type": "string",
+      "enum": [
+        "ifood",
+        "whatsapp",
+        "manual",
+        "pos"
+      ]
+    },
+    "total_orders": {
+      "type": "number",
+      "default": 0
+    },
+    "total_spent": {
+      "type": "number",
+      "default": 0
+    },
+    "last_order_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "first_order_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "avg_ticket": {
+      "type": "number"
+    },
+    "favorite_items": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "address": {
+      "type": "object",
+      "properties": {
+        "street": {
+          "type": "string"
+        },
+        "neighborhood": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        },
+        "zip": {
+          "type": "string"
+        }
+      }
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "whatsapp_opted_in": {
+      "type": "boolean",
+      "default": false
+    },
+    "whatsapp_opted_in_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "rfv_recency_score": {
+      "type": "number"
+    },
+    "rfv_frequency_score": {
+      "type": "number"
+    },
+    "rfv_value_score": {
+      "type": "number"
+    },
+    "rfv_segment": {
+      "type": "string",
+      "enum": [
+        "champion",
+        "loyal",
+        "at_risk",
+        "lost",
+        "new",
+        "promising",
+        "none"
+      ],
+      "default": "none"
+    },
+    "rfv_updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  },
+  "required": [
+    "loja_id",
+    "phone"
+  ]
+}

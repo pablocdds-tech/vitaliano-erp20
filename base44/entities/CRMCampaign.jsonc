@@ -1,0 +1,130 @@
+{
+  "name": "CRMCampaign",
+  "type": "object",
+  "properties": {
+    "loja_id": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "one_time",
+        "automated",
+        "journey"
+      ]
+    },
+    "channel": {
+      "type": "string",
+      "enum": [
+        "whatsapp",
+        "sms",
+        "email",
+        "multi"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "scheduled",
+        "running",
+        "paused",
+        "completed",
+        "cancelled"
+      ],
+      "default": "draft"
+    },
+    "segment_filter": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "message_template_id": {
+      "type": "string"
+    },
+    "schedule_type": {
+      "type": "string",
+      "enum": [
+        "now",
+        "scheduled",
+        "recurring"
+      ]
+    },
+    "scheduled_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "cron_expression": {
+      "type": "string"
+    },
+    "target_count": {
+      "type": "number",
+      "default": 0
+    },
+    "sent_count": {
+      "type": "number",
+      "default": 0
+    },
+    "delivered_count": {
+      "type": "number",
+      "default": 0
+    },
+    "read_count": {
+      "type": "number",
+      "default": 0
+    },
+    "click_count": {
+      "type": "number",
+      "default": 0
+    },
+    "conversion_count": {
+      "type": "number",
+      "default": 0
+    },
+    "revenue_generated": {
+      "type": "number",
+      "default": 0
+    },
+    "cost_estimate": {
+      "type": "number",
+      "default": 0
+    },
+    "roi": {
+      "type": "number"
+    },
+    "coupon_code": {
+      "type": "string"
+    },
+    "coupon_discount_type": {
+      "type": "string",
+      "enum": [
+        "percent",
+        "fixed"
+      ]
+    },
+    "coupon_discount_value": {
+      "type": "number"
+    },
+    "ab_test_enabled": {
+      "type": "boolean",
+      "default": false
+    },
+    "ab_variants": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "completed_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "loja_id",
+    "name",
+    "type",
+    "channel",
+    "segment_filter"
+  ]
+}

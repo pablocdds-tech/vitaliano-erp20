@@ -1,0 +1,98 @@
+{
+  "name": "CRMMessageTemplate",
+  "type": "object",
+  "properties": {
+    "loja_id": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "channel": {
+      "type": "string",
+      "enum": [
+        "whatsapp",
+        "sms",
+        "email"
+      ]
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "marketing",
+        "utility",
+        "authentication"
+      ]
+    },
+    "meta_template_name": {
+      "type": "string"
+    },
+    "meta_template_status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "approved",
+        "rejected"
+      ]
+    },
+    "meta_template_id": {
+      "type": "string"
+    },
+    "header_type": {
+      "type": "string",
+      "enum": [
+        "text",
+        "image",
+        "video",
+        "document",
+        "none"
+      ],
+      "default": "none"
+    },
+    "header_content": {
+      "type": "string"
+    },
+    "body": {
+      "type": "string"
+    },
+    "footer": {
+      "type": "string"
+    },
+    "buttons": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "variables": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "preview_url": {
+      "type": "string"
+    },
+    "language": {
+      "type": "string",
+      "default": "pt_BR"
+    },
+    "times_used": {
+      "type": "number",
+      "default": 0
+    },
+    "avg_open_rate": {
+      "type": "number"
+    },
+    "avg_conversion_rate": {
+      "type": "number"
+    }
+  },
+  "required": [
+    "loja_id",
+    "name",
+    "channel",
+    "body"
+  ]
+}
