@@ -147,16 +147,29 @@ export default function PontoKiosk() {
     if (cadastrados.length === 0) { setFaceStatus('Nenhum cadastro facial encontrado.'); return; }
 
     try {
-      const labeled = cadastrados.map(fp => {
-        const descs = fp.face_descriptors.map(d => new Float32Array(d.descriptor));
-        return new faceapi.LabeledFaceDescriptors(fp.funcionario_id, descs);
+      // Group all descriptors by funcionario_id (handles multiple FuncionarioPonto records per person)
+      const grouped = {};
+      cadastrados.forEach(fp => {
+        const fid = fp.funcionario_id;
+        if (!grouped[fid]) grouped[fid] = [];
+        fp.face_descriptors.forEach(d => {
+          if (d.descriptor?.length > 0) {
+            grouped[fid].push(new Float32Array(d.descriptor));
+          }
+        });
       });
 
-      // Threshold 0.6 is more forgiving (0.5 was too strict, rejecting valid matches)
-      const matcher = new faceapi.FaceMatcher(labeled, 0.6);
+      const labeled = Object.entries(grouped)
+        .filter(([, descs]) => descs.length > 0)
+        .map(([fid, descs]) => new faceapi.LabeledFaceDescriptors(fid, descs));
+
+      if (labeled.length === 0) { setFaceStatus('Nenhum cadastro facial válido.'); return; }
+
+      // Threshold 0.65 — more permissive to avoid false rejections
+      const matcher = new faceapi.FaceMatcher(labeled, 0.65);
       const result = matcher.findBestMatch(descriptor);
 
-      if (result.label !== 'unknown' && result.distance < 0.6) {
+      if (result.label !== 'unknown') {
         const funcId = result.label;
         // Cooldown check
         if (cooldownMap.current[funcId] && Date.now() - cooldownMap.current[funcId] < COOLDOWN_MS) {
@@ -165,6 +178,8 @@ export default function PontoKiosk() {
         }
         const confianca = 1 - result.distance;
         await registrarPonto(funcId, 'facial', confianca);
+      } else {
+        setFaceStatus('Rosto não reconhecido. Tente novamente.');
       }
     } catch (err) {
       console.error('Match error:', err);
