@@ -102,6 +102,12 @@ const menuGroups = [
     ]
   },
   {
+    label: 'Marketing & CRM',
+    items: [
+      { icon: Users, label: 'Clientes (CRM)', href: 'crm-clientes' }
+    ]
+  },
+  {
     label: 'Recursos Humanos',
     items: [
       { icon: CircleUser, label: 'Funcionários', href: 'RHFuncionarios' },

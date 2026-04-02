@@ -8,6 +8,7 @@ import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import PontoKiosk from './pages/PontoKiosk';
+import CRMCustomers from './pages/CRMCustomers';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -60,6 +61,11 @@ const AuthenticatedApp = () => {
         />
       ))}
       <Route path="/ponto-kiosk" element={<PontoKiosk />} />
+      <Route path="/crm-clientes" element={
+        <LayoutWrapper currentPageName="crm-clientes">
+          <CRMCustomers />
+        </LayoutWrapper>
+      } />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
