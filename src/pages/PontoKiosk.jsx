@@ -55,6 +55,14 @@ export default function PontoKiosk() {
     queryFn: () => base44.entities.Loja.filter({ status: 'ativo' }),
   });
 
+  // Refs to always have latest data inside setInterval closures
+  const funcPontosRef = useRef([]);
+  const funcionariosRef = useRef([]);
+  const pontosHojeRef = useRef([]);
+  useEffect(() => { funcPontosRef.current = funcPontos; }, [funcPontos]);
+  useEffect(() => { funcionariosRef.current = funcionarios; }, [funcionarios]);
+  useEffect(() => { pontosHojeRef.current = pontosHoje; }, [pontosHoje]);
+
   // Clock
   useEffect(() => {
     const t = setInterval(() => setTime(new Date()), 1000);
@@ -143,7 +151,7 @@ export default function PontoKiosk() {
   const matchFace = async (descriptor) => {
     const faceapi = window.faceapi;
     // Accept any employee with at least 1 descriptor
-    const cadastrados = funcPontos.filter(fp => fp.face_descriptors?.length > 0);
+    const cadastrados = funcPontosRef.current.filter(fp => fp.face_descriptors?.length > 0);
     if (cadastrados.length === 0) { setFaceStatus('Nenhum cadastro facial encontrado.'); return; }
 
     try {
@@ -191,9 +199,9 @@ export default function PontoKiosk() {
     statusRef.current = 'reconhecendo';
     stopDetection();
 
-    const fp = funcPontos.find(f => f.funcionario_id === funcId);
-    const func = funcionarios.find(f => f.id === funcId);
-    const pontosFunc = pontosHoje.filter(p => p.funcionario_id === funcId);
+    const fp = funcPontosRef.current.find(f => f.funcionario_id === funcId);
+    const func = funcionariosRef.current.find(f => f.id === funcId);
+    const pontosFunc = pontosHojeRef.current.filter(p => p.funcionario_id === funcId);
     const tipo = getProximoTipoPorStatus(fp?.status_atual, pontosFunc);
     const novoStatus = getNovoStatus(tipo);
 
