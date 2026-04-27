@@ -1,0 +1,39 @@
+{
+  "name": "Cofre",
+  "type": "object",
+  "description": "Cofre da loja ou central",
+  "properties": {
+    "nome": {
+      "type": "string"
+    },
+    "tipo": {
+      "type": "string",
+      "enum": [
+        "loja",
+        "central"
+      ],
+      "default": "loja"
+    },
+    "loja_id": {
+      "type": "string",
+      "description": "ID da loja (somente se tipo=loja)"
+    },
+    "saldo_inicial": {
+      "type": "number",
+      "default": 0,
+      "description": "Saldo inicial do cofre"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "ativo",
+        "inativo"
+      ],
+      "default": "ativo"
+    }
+  },
+  "required": [
+    "nome",
+    "tipo"
+  ]
+}

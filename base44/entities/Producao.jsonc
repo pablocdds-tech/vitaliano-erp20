@@ -1,0 +1,96 @@
+{
+  "name": "Producao",
+  "type": "object",
+  "description": "Ordens de produ\u00e7\u00e3o",
+  "properties": {
+    "empresa_id": {
+      "type": "string",
+      "description": "ID da empresa (tenant)"
+    },
+    "loja_id": {
+      "type": "string",
+      "description": "ID da loja/CD"
+    },
+    "numero": {
+      "type": "string",
+      "description": "N\u00famero da ordem"
+    },
+    "produto_id": {
+      "type": "string",
+      "description": "Produto a ser produzido"
+    },
+    "ficha_tecnica_id": {
+      "type": "string",
+      "description": "Ficha t\u00e9cnica utilizada"
+    },
+    "quantidade_planejada": {
+      "type": "number"
+    },
+    "quantidade_produzida": {
+      "type": "number",
+      "default": 0
+    },
+    "quantidade_perda": {
+      "type": "number",
+      "default": 0
+    },
+    "data_planejada": {
+      "type": "string",
+      "format": "date"
+    },
+    "data_inicio": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "data_fim": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "custo_total": {
+      "type": "number",
+      "default": 0
+    },
+    "insumos_utilizados": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "produto_id": {
+            "type": "string"
+          },
+          "quantidade_prevista": {
+            "type": "number"
+          },
+          "quantidade_utilizada": {
+            "type": "number"
+          },
+          "custo_unitario": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    "responsavel": {
+      "type": "string"
+    },
+    "observacoes": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "planejada",
+        "em_andamento",
+        "concluida",
+        "cancelada"
+      ],
+      "default": "planejada"
+    }
+  },
+  "required": [
+    "empresa_id",
+    "loja_id",
+    "produto_id",
+    "quantidade_planejada"
+  ]
+}

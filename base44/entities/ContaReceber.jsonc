@@ -1,0 +1,112 @@
+{
+  "name": "ContaReceber",
+  "type": "object",
+  "description": "Contas a receber",
+  "properties": {
+    "empresa_id": {
+      "type": "string",
+      "description": "ID da empresa (tenant)"
+    },
+    "loja_id": {
+      "type": "string",
+      "description": "ID da loja"
+    },
+    "cliente_nome": {
+      "type": "string",
+      "description": "Nome do cliente / operadora"
+    },
+    "categoria_dre_id": {
+      "type": "string",
+      "description": "Categoria para DRE"
+    },
+    "descricao": {
+      "type": "string",
+      "description": "Descri\u00e7\u00e3o"
+    },
+    "origem": {
+      "type": "string",
+      "enum": [
+        "venda",
+        "servico",
+        "aluguel",
+        "outros"
+      ],
+      "default": "venda"
+    },
+    "documento_numero": {
+      "type": "string"
+    },
+    "fechamento_id": {
+      "type": "string",
+      "description": "ID do fechamento de caixa que gerou este receb\u00edvel"
+    },
+    "forma_pagamento_id": {
+      "type": "string",
+      "description": "ID da forma de pagamento"
+    },
+    "valor_bruto": {
+      "type": "number",
+      "default": 0
+    },
+    "valor_taxa": {
+      "type": "number",
+      "default": 0
+    },
+    "data_emissao": {
+      "type": "string",
+      "format": "date"
+    },
+    "data_vencimento": {
+      "type": "string",
+      "format": "date"
+    },
+    "data_recebimento": {
+      "type": "string",
+      "format": "date"
+    },
+    "valor_original": {
+      "type": "number"
+    },
+    "valor_desconto": {
+      "type": "number",
+      "default": 0
+    },
+    "valor_juros": {
+      "type": "number",
+      "default": 0
+    },
+    "valor_recebido": {
+      "type": "number"
+    },
+    "forma_recebimento": {
+      "type": "string",
+      "enum": [
+        "dinheiro",
+        "pix",
+        "cartao_credito",
+        "cartao_debito",
+        "transferencia",
+        "boleto"
+      ],
+      "default": "dinheiro"
+    },
+    "observacoes": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pendente",
+        "recebido",
+        "vencido",
+        "cancelado"
+      ],
+      "default": "pendente"
+    }
+  },
+  "required": [
+    "descricao",
+    "data_vencimento",
+    "valor_original"
+  ]
+}

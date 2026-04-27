@@ -1,0 +1,71 @@
+{
+  "name": "TransacaoBancaria",
+  "type": "object",
+  "description": "Transa\u00e7\u00f5es importadas via OFX ou lan\u00e7adas manualmente",
+  "properties": {
+    "conta_bancaria_id": {
+      "type": "string"
+    },
+    "fit_id": {
+      "type": "string",
+      "description": "ID \u00fanico do OFX (para idempot\u00eancia)"
+    },
+    "data": {
+      "type": "string",
+      "format": "date"
+    },
+    "valor": {
+      "type": "number",
+      "description": "Positivo=cr\u00e9dito, negativo=d\u00e9bito"
+    },
+    "descricao": {
+      "type": "string"
+    },
+    "memo": {
+      "type": "string",
+      "description": "Texto original do OFX"
+    },
+    "tipo": {
+      "type": "string",
+      "enum": [
+        "credito",
+        "debito"
+      ],
+      "default": "credito"
+    },
+    "conciliado_com_tipo": {
+      "type": "string",
+      "enum": [
+        "conta_receber",
+        "conta_pagar",
+        "cofre",
+        "manual"
+      ]
+    },
+    "conciliado_com_id": {
+      "type": "string"
+    },
+    "conciliado_em": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "conciliado_por": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pendente",
+        "conciliado",
+        "ignorado"
+      ],
+      "default": "pendente"
+    }
+  },
+  "required": [
+    "conta_bancaria_id",
+    "data",
+    "valor",
+    "descricao"
+  ]
+}

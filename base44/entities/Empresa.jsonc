@@ -1,0 +1,93 @@
+{
+  "name": "Empresa",
+  "type": "object",
+  "description": "Tenant raiz do sistema multi-empresa",
+  "properties": {
+    "nome": {
+      "type": "string",
+      "description": "Nome da empresa"
+    },
+    "razao_social": {
+      "type": "string",
+      "description": "Raz\u00e3o social"
+    },
+    "cnpj": {
+      "type": "string",
+      "description": "CNPJ da empresa"
+    },
+    "logo_url": {
+      "type": "string",
+      "description": "URL do logo"
+    },
+    "endereco": {
+      "type": "object",
+      "properties": {
+        "logradouro": {
+          "type": "string"
+        },
+        "numero": {
+          "type": "string"
+        },
+        "complemento": {
+          "type": "string"
+        },
+        "bairro": {
+          "type": "string"
+        },
+        "cidade": {
+          "type": "string"
+        },
+        "estado": {
+          "type": "string"
+        },
+        "cep": {
+          "type": "string"
+        }
+      }
+    },
+    "configuracoes": {
+      "type": "object",
+      "properties": {
+        "moeda": {
+          "type": "string",
+          "default": "BRL"
+        },
+        "fuso_horario": {
+          "type": "string",
+          "default": "America/Sao_Paulo"
+        },
+        "tema": {
+          "type": "string",
+          "enum": [
+            "light",
+            "dark",
+            "system"
+          ],
+          "default": "system"
+        }
+      }
+    },
+    "plano": {
+      "type": "string",
+      "enum": [
+        "starter",
+        "professional",
+        "enterprise"
+      ],
+      "default": "starter"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "ativo",
+        "suspenso",
+        "cancelado"
+      ],
+      "default": "ativo"
+    }
+  },
+  "required": [
+    "nome",
+    "cnpj"
+  ]
+}

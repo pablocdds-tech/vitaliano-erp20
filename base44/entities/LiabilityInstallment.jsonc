@@ -1,0 +1,47 @@
+{
+  "name": "LiabilityInstallment",
+  "type": "object",
+  "description": "Parcelas de passivos financeiros",
+  "properties": {
+    "liability_id": {
+      "type": "string",
+      "description": "ID do passivo financeiro"
+    },
+    "installment_number": {
+      "type": "number",
+      "description": "N\u00famero da parcela"
+    },
+    "due_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Data de vencimento"
+    },
+    "amount": {
+      "type": "number",
+      "description": "Valor da parcela"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pendente",
+        "pago"
+      ],
+      "default": "pendente"
+    },
+    "linked_ap_id": {
+      "type": "string",
+      "description": "ID do registro em Contas a Pagar"
+    },
+    "paid_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Data de pagamento"
+    }
+  },
+  "required": [
+    "liability_id",
+    "installment_number",
+    "due_date",
+    "amount"
+  ]
+}

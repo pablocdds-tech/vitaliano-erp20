@@ -1,0 +1,99 @@
+{
+  "name": "Ativo",
+  "type": "object",
+  "description": "Ativos e equipamentos",
+  "properties": {
+    "empresa_id": {
+      "type": "string",
+      "description": "ID da empresa (tenant)"
+    },
+    "loja_id": {
+      "type": "string",
+      "description": "ID da loja"
+    },
+    "nome": {
+      "type": "string",
+      "description": "Nome do ativo"
+    },
+    "codigo": {
+      "type": "string",
+      "description": "C\u00f3digo patrimonial"
+    },
+    "categoria": {
+      "type": "string",
+      "enum": [
+        "refrigeracao",
+        "cozinha",
+        "salao",
+        "escritorio",
+        "ti",
+        "veiculo",
+        "outros"
+      ],
+      "default": "outros"
+    },
+    "marca": {
+      "type": "string"
+    },
+    "modelo": {
+      "type": "string"
+    },
+    "numero_serie": {
+      "type": "string"
+    },
+    "data_aquisicao": {
+      "type": "string",
+      "format": "date"
+    },
+    "valor_aquisicao": {
+      "type": "number"
+    },
+    "valor_atual": {
+      "type": "number"
+    },
+    "vida_util_meses": {
+      "type": "number"
+    },
+    "garantia_ate": {
+      "type": "string",
+      "format": "date"
+    },
+    "fornecedor_id": {
+      "type": "string"
+    },
+    "localizacao": {
+      "type": "string"
+    },
+    "foto_url": {
+      "type": "string"
+    },
+    "manual_url": {
+      "type": "string"
+    },
+    "proxima_manutencao": {
+      "type": "string",
+      "format": "date"
+    },
+    "frequencia_manutencao_dias": {
+      "type": "number"
+    },
+    "observacoes": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "ativo",
+        "em_manutencao",
+        "inativo",
+        "baixado"
+      ],
+      "default": "ativo"
+    }
+  },
+  "required": [
+    "empresa_id",
+    "loja_id",
+    "nome"
+  ]
+}

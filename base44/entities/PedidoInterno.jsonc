@@ -1,0 +1,81 @@
+{
+  "name": "PedidoInterno",
+  "type": "object",
+  "description": "Venda interna do CD para as lojas (PDV interno)",
+  "properties": {
+    "empresa_id": {
+      "type": "string"
+    },
+    "cd_id": {
+      "type": "string",
+      "description": "ID do CD de origem"
+    },
+    "loja_destino_id": {
+      "type": "string",
+      "description": "ID da loja destino"
+    },
+    "data": {
+      "type": "string",
+      "format": "date"
+    },
+    "itens": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "produto_id": {
+            "type": "string"
+          },
+          "produto_nome": {
+            "type": "string"
+          },
+          "quantidade": {
+            "type": "number"
+          },
+          "preco_unitario": {
+            "type": "number"
+          },
+          "subtotal": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    "total_itens": {
+      "type": "number",
+      "default": 0
+    },
+    "valor_total": {
+      "type": "number",
+      "default": 0
+    },
+    "observacoes": {
+      "type": "string"
+    },
+    "confirmado_por": {
+      "type": "string"
+    },
+    "data_confirmacao": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "banco_virtual_id": {
+      "type": "string",
+      "description": "ID da mov. no banco virtual gerada na confirma\u00e7\u00e3o"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "confirmado",
+        "cancelado"
+      ],
+      "default": "draft"
+    }
+  },
+  "required": [
+    "cd_id",
+    "loja_destino_id",
+    "data"
+  ]
+}

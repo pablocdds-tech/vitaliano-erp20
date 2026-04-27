@@ -1,0 +1,57 @@
+{
+  "name": "ItemContagem",
+  "type": "object",
+  "description": "Itens de uma contagem",
+  "properties": {
+    "empresa_id": {
+      "type": "string",
+      "description": "ID da empresa (tenant)"
+    },
+    "contagem_id": {
+      "type": "string",
+      "description": "ID da contagem"
+    },
+    "produto_id": {
+      "type": "string",
+      "description": "ID do produto"
+    },
+    "quantidade_sistema": {
+      "type": "number",
+      "description": "Quantidade no sistema"
+    },
+    "quantidade_contada": {
+      "type": "number",
+      "description": "Quantidade contada"
+    },
+    "quantidade_recontagem": {
+      "type": "number",
+      "description": "Segunda contagem (se houver)"
+    },
+    "diferenca": {
+      "type": "number",
+      "description": "Diferen\u00e7a (contada - sistema)"
+    },
+    "custo_unitario": {
+      "type": "number"
+    },
+    "valor_diferenca": {
+      "type": "number"
+    },
+    "justificativa": {
+      "type": "string"
+    },
+    "foto_url": {
+      "type": "string",
+      "description": "Foto como evid\u00eancia"
+    },
+    "ajustado": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": [
+    "empresa_id",
+    "contagem_id",
+    "produto_id"
+  ]
+}

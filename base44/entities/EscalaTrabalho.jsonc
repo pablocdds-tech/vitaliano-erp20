@@ -1,0 +1,87 @@
+{
+  "name": "EscalaTrabalho",
+  "type": "object",
+  "description": "Escalas e programa\u00e7\u00e3o de trabalho",
+  "properties": {
+    "empresa_id": {
+      "type": "string"
+    },
+    "loja_id": {
+      "type": "string"
+    },
+    "funcionario_id": {
+      "type": "string"
+    },
+    "nome_funcionario": {
+      "type": "string"
+    },
+    "tipo_funcionario": {
+      "type": "string",
+      "enum": [
+        "fixo",
+        "freelancer"
+      ],
+      "default": "fixo"
+    },
+    "funcao": {
+      "type": "string",
+      "description": "Fun\u00e7\u00e3o exercida (freelancer)"
+    },
+    "data": {
+      "type": "string",
+      "format": "date"
+    },
+    "turno": {
+      "type": "string",
+      "enum": [
+        "manha",
+        "tarde",
+        "noite",
+        "integral"
+      ],
+      "default": "integral"
+    },
+    "hora_inicio": {
+      "type": "string",
+      "description": "HH:MM"
+    },
+    "hora_fim": {
+      "type": "string",
+      "description": "HH:MM"
+    },
+    "tipo_dia": {
+      "type": "string",
+      "enum": [
+        "trabalho",
+        "folga",
+        "feriado",
+        "ferias",
+        "atestado",
+        "falta"
+      ],
+      "default": "trabalho"
+    },
+    "valor_diaria": {
+      "type": "number",
+      "description": "Valor da di\u00e1ria (freelancer)"
+    },
+    "observacao": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "programada",
+        "confirmada",
+        "cancelada"
+      ],
+      "default": "programada"
+    }
+  },
+  "required": [
+    "loja_id",
+    "funcionario_id",
+    "data",
+    "tipo_dia"
+  ]
+}

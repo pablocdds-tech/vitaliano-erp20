@@ -1,0 +1,96 @@
+{
+  "name": "FichaTecnica",
+  "type": "object",
+  "description": "Fichas t\u00e9cnicas / Receitas",
+  "properties": {
+    "empresa_id": {
+      "type": "string",
+      "description": "ID da empresa (tenant)"
+    },
+    "produto_id": {
+      "type": "string",
+      "description": "Produto final"
+    },
+    "nome": {
+      "type": "string",
+      "description": "Nome da receita"
+    },
+    "codigo": {
+      "type": "string"
+    },
+    "rendimento": {
+      "type": "number",
+      "description": "Quantidade que rende"
+    },
+    "unidade_rendimento": {
+      "type": "string",
+      "description": "Unidade do rendimento"
+    },
+    "tempo_preparo_minutos": {
+      "type": "number"
+    },
+    "ingredientes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "produto_id": {
+            "type": "string"
+          },
+          "quantidade": {
+            "type": "number"
+          },
+          "unidade": {
+            "type": "string"
+          },
+          "custo_unitario": {
+            "type": "number"
+          },
+          "observacao": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "modo_preparo": {
+      "type": "string",
+      "description": "Instru\u00e7\u00f5es de preparo"
+    },
+    "custo_total": {
+      "type": "number",
+      "default": 0
+    },
+    "custo_unitario": {
+      "type": "number",
+      "default": 0
+    },
+    "margem_sugerida": {
+      "type": "number",
+      "description": "Margem de lucro sugerida %"
+    },
+    "preco_sugerido": {
+      "type": "number"
+    },
+    "imagem_url": {
+      "type": "string"
+    },
+    "versao": {
+      "type": "number",
+      "default": 1
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "rascunho",
+        "ativo",
+        "inativo"
+      ],
+      "default": "rascunho"
+    }
+  },
+  "required": [
+    "empresa_id",
+    "nome",
+    "rendimento"
+  ]
+}

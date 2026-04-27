@@ -1,0 +1,129 @@
+{
+  "name": "Funcionario",
+  "type": "object",
+  "description": "Dossi\u00ea completo do funcion\u00e1rio",
+  "properties": {
+    "empresa_id": {
+      "type": "string",
+      "description": "ID da empresa"
+    },
+    "loja_id": {
+      "type": "string",
+      "description": "ID da loja"
+    },
+    "nome": {
+      "type": "string",
+      "description": "Nome completo"
+    },
+    "cpf": {
+      "type": "string",
+      "description": "CPF"
+    },
+    "rg": {
+      "type": "string"
+    },
+    "data_nascimento": {
+      "type": "string",
+      "format": "date"
+    },
+    "telefone": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string"
+    },
+    "endereco": {
+      "type": "object",
+      "properties": {
+        "logradouro": {
+          "type": "string"
+        },
+        "numero": {
+          "type": "string"
+        },
+        "complemento": {
+          "type": "string"
+        },
+        "bairro": {
+          "type": "string"
+        },
+        "cidade": {
+          "type": "string"
+        },
+        "estado": {
+          "type": "string"
+        },
+        "cep": {
+          "type": "string"
+        }
+      }
+    },
+    "cargo": {
+      "type": "string"
+    },
+    "departamento": {
+      "type": "string"
+    },
+    "tipo": {
+      "type": "string",
+      "enum": [
+        "clt",
+        "pj",
+        "freelancer",
+        "estagiario",
+        "temporario"
+      ],
+      "default": "clt"
+    },
+    "data_admissao": {
+      "type": "string",
+      "format": "date"
+    },
+    "data_demissao": {
+      "type": "string",
+      "format": "date"
+    },
+    "salario": {
+      "type": "number"
+    },
+    "pix": {
+      "type": "string"
+    },
+    "banco": {
+      "type": "string"
+    },
+    "agencia": {
+      "type": "string"
+    },
+    "conta": {
+      "type": "string"
+    },
+    "foto_url": {
+      "type": "string"
+    },
+    "documentos_urls": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "URLs de documentos digitalizados"
+    },
+    "observacoes": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "ativo",
+        "ferias",
+        "afastado",
+        "desligado"
+      ],
+      "default": "ativo"
+    }
+  },
+  "required": [
+    "nome",
+    "cargo"
+  ]
+}

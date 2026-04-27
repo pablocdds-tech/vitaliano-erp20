@@ -1,0 +1,51 @@
+{
+  "name": "Estoque",
+  "type": "object",
+  "description": "Saldo de estoque por loja/produto",
+  "properties": {
+    "empresa_id": {
+      "type": "string",
+      "description": "ID da empresa (tenant)"
+    },
+    "loja_id": {
+      "type": "string",
+      "description": "ID da loja"
+    },
+    "produto_id": {
+      "type": "string",
+      "description": "ID do produto"
+    },
+    "quantidade": {
+      "type": "number",
+      "default": 0,
+      "description": "Quantidade em estoque"
+    },
+    "quantidade_reservada": {
+      "type": "number",
+      "default": 0,
+      "description": "Quantidade reservada para pedidos"
+    },
+    "custo_medio": {
+      "type": "number",
+      "default": 0,
+      "description": "Custo m\u00e9dio atual"
+    },
+    "ultima_entrada": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "ultima_saida": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "ultima_contagem": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "empresa_id",
+    "loja_id",
+    "produto_id"
+  ]
+}

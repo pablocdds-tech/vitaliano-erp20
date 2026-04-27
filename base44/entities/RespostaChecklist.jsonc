@@ -1,0 +1,96 @@
+{
+  "name": "RespostaChecklist",
+  "type": "object",
+  "description": "Respostas de checklists preenchidos",
+  "properties": {
+    "empresa_id": {
+      "type": "string",
+      "description": "ID da empresa (tenant)"
+    },
+    "loja_id": {
+      "type": "string",
+      "description": "ID da loja"
+    },
+    "checklist_id": {
+      "type": "string",
+      "description": "ID do template de checklist"
+    },
+    "data": {
+      "type": "string",
+      "format": "date"
+    },
+    "hora_inicio": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "hora_fim": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "responsavel": {
+      "type": "string"
+    },
+    "respostas": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "item_ordem": {
+            "type": "number"
+          },
+          "pergunta": {
+            "type": "string"
+          },
+          "resposta": {
+            "type": "string"
+          },
+          "valor_numerico": {
+            "type": "number"
+          },
+          "conforme": {
+            "type": "boolean"
+          },
+          "foto_url": {
+            "type": "string"
+          },
+          "observacao": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "pontuacao_total": {
+      "type": "number"
+    },
+    "pontuacao_maxima": {
+      "type": "number"
+    },
+    "percentual_conformidade": {
+      "type": "number"
+    },
+    "aprovado": {
+      "type": "boolean"
+    },
+    "observacoes_gerais": {
+      "type": "string"
+    },
+    "assinatura_url": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "em_andamento",
+        "concluido",
+        "pendente_revisao"
+      ],
+      "default": "em_andamento"
+    }
+  },
+  "required": [
+    "empresa_id",
+    "loja_id",
+    "checklist_id",
+    "data"
+  ]
+}

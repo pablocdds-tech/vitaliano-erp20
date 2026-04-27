@@ -1,0 +1,54 @@
+{
+  "name": "FormaPagamento",
+  "type": "object",
+  "description": "Formas de pagamento com regras de recebimento",
+  "properties": {
+    "nome": {
+      "type": "string",
+      "description": "Nome da forma de pagamento (ex: Cr\u00e9dito Visa, PIX, iFood)"
+    },
+    "taxa_percentual": {
+      "type": "number",
+      "default": 0,
+      "description": "Taxa cobrada pela operadora (%)"
+    },
+    "regra_recebimento": {
+      "type": "string",
+      "enum": [
+        "D0",
+        "D1",
+        "D1_util",
+        "semanal",
+        "D30",
+        "D2",
+        "D15"
+      ],
+      "default": "D1",
+      "description": "Prazo de recebimento"
+    },
+    "dia_semana_pagamento": {
+      "type": "number",
+      "description": "Dia da semana para recebimento semanal (0=Dom, 1=Seg...6=Sab)"
+    },
+    "agrupa_semana": {
+      "type": "boolean",
+      "default": false,
+      "description": "Agrupar vendas da semana em um \u00fanico receb\u00edvel (ex: iFood)"
+    },
+    "conta_bancaria": {
+      "type": "string",
+      "description": "Conta banc\u00e1ria destino do recebimento"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "ativo",
+        "inativo"
+      ],
+      "default": "ativo"
+    }
+  },
+  "required": [
+    "nome"
+  ]
+}

@@ -1,0 +1,57 @@
+{
+  "name": "AssinaturaEmpresa",
+  "type": "object",
+  "description": "Controle de assinatura por empresa no SaaS",
+  "properties": {
+    "empresa_id": {
+      "type": "string",
+      "description": "ID da Empresa"
+    },
+    "plano_id": {
+      "type": "string",
+      "description": "ID do PlanoAssinatura"
+    },
+    "plano_codigo": {
+      "type": "string",
+      "description": "C\u00f3digo do plano (cache para performance)"
+    },
+    "status_assinatura": {
+      "type": "string",
+      "enum": [
+        "trial",
+        "ativa",
+        "vencida",
+        "bloqueada"
+      ],
+      "default": "trial"
+    },
+    "data_inicio": {
+      "type": "string",
+      "format": "date"
+    },
+    "data_vencimento": {
+      "type": "string",
+      "format": "date"
+    },
+    "data_bloqueio": {
+      "type": "string",
+      "format": "date"
+    },
+    "motivo_bloqueio": {
+      "type": "string"
+    },
+    "observacoes": {
+      "type": "string"
+    },
+    "alterado_por": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "empresa_id",
+    "plano_id",
+    "status_assinatura",
+    "data_inicio",
+    "data_vencimento"
+  ]
+}

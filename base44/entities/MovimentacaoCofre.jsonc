@@ -1,0 +1,54 @@
+{
+  "name": "MovimentacaoCofre",
+  "type": "object",
+  "description": "Ledger de movimenta\u00e7\u00f5es de cofre (imut\u00e1vel)",
+  "properties": {
+    "cofre_id": {
+      "type": "string",
+      "description": "ID do cofre origem"
+    },
+    "cofre_destino_id": {
+      "type": "string",
+      "description": "ID do cofre destino (para transfer\u00eancias)"
+    },
+    "data": {
+      "type": "string",
+      "format": "date"
+    },
+    "tipo": {
+      "type": "string",
+      "enum": [
+        "entrada",
+        "saida",
+        "transferencia"
+      ]
+    },
+    "valor": {
+      "type": "number"
+    },
+    "motivo": {
+      "type": "string"
+    },
+    "referencia_tipo": {
+      "type": "string",
+      "enum": [
+        "auditoria",
+        "banco",
+        "manual",
+        "outro"
+      ]
+    },
+    "referencia_id": {
+      "type": "string"
+    },
+    "criado_por": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "cofre_id",
+    "data",
+    "tipo",
+    "valor"
+  ]
+}

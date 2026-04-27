@@ -1,0 +1,54 @@
+{
+  "name": "PlanoAssinatura",
+  "type": "object",
+  "description": "Planos de assinatura do SaaS Vitaliano ERP",
+  "properties": {
+    "nome": {
+      "type": "string",
+      "description": "Nome do plano"
+    },
+    "codigo": {
+      "type": "string",
+      "description": "C\u00f3digo \u00fanico: trial, starter, professional, enterprise"
+    },
+    "limite_lojas": {
+      "type": "number",
+      "default": 1
+    },
+    "limite_usuarios": {
+      "type": "number",
+      "default": 3
+    },
+    "acesso_ia": {
+      "type": "boolean",
+      "default": false
+    },
+    "acesso_cd": {
+      "type": "boolean",
+      "default": false
+    },
+    "acesso_relatorios_avancados": {
+      "type": "boolean",
+      "default": false
+    },
+    "dias_trial": {
+      "type": "number",
+      "default": 14
+    },
+    "preco_mensal": {
+      "type": "number",
+      "default": 0
+    },
+    "ativo": {
+      "type": "boolean",
+      "default": true
+    },
+    "descricao": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "nome",
+    "codigo"
+  ]
+}

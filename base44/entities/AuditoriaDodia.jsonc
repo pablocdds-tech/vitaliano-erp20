@@ -1,0 +1,98 @@
+{
+  "name": "AuditoriaDodia",
+  "type": "object",
+  "description": "Confer\u00eancia/Auditoria do dia por loja",
+  "properties": {
+    "loja_id": {
+      "type": "string",
+      "description": "ID da loja"
+    },
+    "data": {
+      "type": "string",
+      "format": "date",
+      "description": "Data da auditoria"
+    },
+    "fechamento_id": {
+      "type": "string",
+      "description": "ID do fechamento de caixa do dia"
+    },
+    "total_entradas_bruto": {
+      "type": "number",
+      "default": 0
+    },
+    "total_entradas_liquido": {
+      "type": "number",
+      "default": 0
+    },
+    "total_saidas": {
+      "type": "number",
+      "default": 0
+    },
+    "saldo_fisico_esperado": {
+      "type": "number",
+      "default": 0
+    },
+    "saidas": {
+      "type": "array",
+      "description": "Sa\u00eddas do dia",
+      "items": {
+        "type": "object",
+        "properties": {
+          "descricao": {
+            "type": "string"
+          },
+          "valor": {
+            "type": "number"
+          },
+          "categoria_id": {
+            "type": "string"
+          },
+          "categoria_nome": {
+            "type": "string"
+          },
+          "origem_dinheiro": {
+            "type": "string",
+            "enum": [
+              "caixa_loja",
+              "cofre_loja",
+              "cofre_central"
+            ],
+            "description": "caixa_loja=durante expediente, cofre_loja=ap\u00f3s fechar, cofre_central=central"
+          },
+          "forma": {
+            "type": "string",
+            "enum": [
+              "dinheiro",
+              "pix",
+              "transferencia",
+              "cartao",
+              "outros"
+            ]
+          },
+          "observacao": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "papel_faturamento_obs": {
+      "type": "string",
+      "description": "Observa\u00e7\u00f5es do papel do faturamento"
+    },
+    "conferido_por": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "conferido"
+      ],
+      "default": "draft"
+    }
+  },
+  "required": [
+    "loja_id",
+    "data"
+  ]
+}

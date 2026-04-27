@@ -1,0 +1,116 @@
+{
+  "name": "Produto",
+  "type": "object",
+  "description": "Produtos e insumos cadastrados",
+  "properties": {
+    "empresa_id": {
+      "type": "string",
+      "description": "ID da empresa (tenant)"
+    },
+    "nome": {
+      "type": "string",
+      "description": "Nome do produto"
+    },
+    "codigo": {
+      "type": "string",
+      "description": "C\u00f3digo SKU"
+    },
+    "codigo_barras": {
+      "type": "string",
+      "description": "C\u00f3digo de barras EAN"
+    },
+    "categoria_id": {
+      "type": "string",
+      "description": "ID da categoria"
+    },
+    "unidade_medida": {
+      "type": "string",
+      "enum": [
+        "un",
+        "kg",
+        "g",
+        "l",
+        "ml",
+        "cx",
+        "pc",
+        "fd"
+      ],
+      "default": "un"
+    },
+    "tipo": {
+      "type": "string",
+      "enum": [
+        "insumo",
+        "produto_final",
+        "embalagem",
+        "outros"
+      ],
+      "default": "insumo"
+    },
+    "controla_estoque": {
+      "type": "boolean",
+      "default": true
+    },
+    "estoque_minimo": {
+      "type": "number",
+      "default": 0
+    },
+    "estoque_maximo": {
+      "type": "number"
+    },
+    "ponto_reposicao": {
+      "type": "number"
+    },
+    "custo_medio": {
+      "type": "number",
+      "default": 0
+    },
+    "preco_venda": {
+      "type": "number"
+    },
+    "ncm": {
+      "type": "string",
+      "description": "C\u00f3digo NCM fiscal"
+    },
+    "cest": {
+      "type": "string",
+      "description": "C\u00f3digo CEST"
+    },
+    "origem": {
+      "type": "string",
+      "enum": [
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8"
+      ],
+      "default": "0"
+    },
+    "imagem_url": {
+      "type": "string"
+    },
+    "fornecedor_principal_id": {
+      "type": "string"
+    },
+    "observacoes": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "ativo",
+        "inativo",
+        "descontinuado"
+      ],
+      "default": "ativo"
+    }
+  },
+  "required": [
+    "nome"
+  ]
+}

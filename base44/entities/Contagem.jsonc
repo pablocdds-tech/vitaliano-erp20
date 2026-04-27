@@ -1,0 +1,82 @@
+{
+  "name": "Contagem",
+  "type": "object",
+  "description": "Contagens de invent\u00e1rio",
+  "properties": {
+    "empresa_id": {
+      "type": "string",
+      "description": "ID da empresa (tenant)"
+    },
+    "loja_id": {
+      "type": "string",
+      "description": "ID da loja"
+    },
+    "tipo": {
+      "type": "string",
+      "enum": [
+        "completa",
+        "parcial",
+        "ciclica",
+        "auditoria"
+      ],
+      "default": "parcial"
+    },
+    "data_abertura": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "data_fechamento": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "responsavel": {
+      "type": "string"
+    },
+    "conferente": {
+      "type": "string"
+    },
+    "categorias_filtro": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Categorias inclu\u00eddas (se parcial)"
+    },
+    "total_itens": {
+      "type": "number",
+      "default": 0
+    },
+    "itens_contados": {
+      "type": "number",
+      "default": 0
+    },
+    "itens_divergentes": {
+      "type": "number",
+      "default": 0
+    },
+    "valor_divergencia": {
+      "type": "number",
+      "default": 0
+    },
+    "observacoes": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "aberta",
+        "em_contagem",
+        "aguardando_conferencia",
+        "aprovada",
+        "ajustada",
+        "cancelada"
+      ],
+      "default": "aberta"
+    }
+  },
+  "required": [
+    "empresa_id",
+    "loja_id",
+    "tipo"
+  ]
+}

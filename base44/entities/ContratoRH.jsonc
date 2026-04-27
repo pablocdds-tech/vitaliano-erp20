@@ -1,0 +1,118 @@
+{
+  "name": "ContratoRH",
+  "type": "object",
+  "description": "Contratos de trabalho com assinatura digital",
+  "properties": {
+    "empresa_id": {
+      "type": "string"
+    },
+    "funcionario_id": {
+      "type": "string"
+    },
+    "titulo": {
+      "type": "string",
+      "description": "T\u00edtulo do contrato"
+    },
+    "tipo": {
+      "type": "string",
+      "enum": [
+        "admissao",
+        "experiencia",
+        "aditivo",
+        "rescisao",
+        "confidencialidade",
+        "outro"
+      ],
+      "default": "admissao"
+    },
+    "conteudo_html": {
+      "type": "string",
+      "description": "Conte\u00fado do contrato em HTML"
+    },
+    "documento_url": {
+      "type": "string",
+      "description": "PDF do contrato"
+    },
+    "data_inicio": {
+      "type": "string",
+      "format": "date"
+    },
+    "data_fim": {
+      "type": "string",
+      "format": "date"
+    },
+    "enviado_email": {
+      "type": "string",
+      "description": "Email para onde foi enviado"
+    },
+    "data_envio": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "assinatura_funcionario": {
+      "type": "object",
+      "properties": {
+        "assinado": {
+          "type": "boolean",
+          "default": false
+        },
+        "data": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "ip": {
+          "type": "string"
+        },
+        "user_agent": {
+          "type": "string"
+        },
+        "hash_documento": {
+          "type": "string"
+        },
+        "aceite_termos": {
+          "type": "boolean"
+        }
+      }
+    },
+    "assinatura_empresa": {
+      "type": "object",
+      "properties": {
+        "assinado": {
+          "type": "boolean",
+          "default": false
+        },
+        "data": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "assinado_por": {
+          "type": "string"
+        }
+      }
+    },
+    "token_assinatura": {
+      "type": "string",
+      "description": "Token \u00fanico para link de assinatura"
+    },
+    "observacoes": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "rascunho",
+        "enviado",
+        "assinado_funcionario",
+        "assinado_ambos",
+        "cancelado",
+        "expirado"
+      ],
+      "default": "rascunho"
+    }
+  },
+  "required": [
+    "funcionario_id",
+    "titulo",
+    "tipo"
+  ]
+}

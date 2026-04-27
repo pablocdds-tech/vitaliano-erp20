@@ -1,0 +1,117 @@
+{
+  "name": "Checklist",
+  "type": "object",
+  "description": "Templates de checklist operacional",
+  "properties": {
+    "empresa_id": {
+      "type": "string",
+      "description": "ID da empresa (tenant)"
+    },
+    "nome": {
+      "type": "string",
+      "description": "Nome do checklist"
+    },
+    "descricao": {
+      "type": "string"
+    },
+    "categoria": {
+      "type": "string",
+      "enum": [
+        "abertura",
+        "fechamento",
+        "limpeza",
+        "qualidade",
+        "seguranca",
+        "manutencao",
+        "outro"
+      ],
+      "default": "outro"
+    },
+    "frequencia": {
+      "type": "string",
+      "enum": [
+        "diario",
+        "semanal",
+        "quinzenal",
+        "mensal",
+        "sob_demanda"
+      ],
+      "default": "diario"
+    },
+    "hora_limite": {
+      "type": "string",
+      "description": "Hora limite para conclus\u00e3o"
+    },
+    "lojas_aplicaveis": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "IDs das lojas onde se aplica"
+    },
+    "itens": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "ordem": {
+            "type": "number"
+          },
+          "pergunta": {
+            "type": "string"
+          },
+          "tipo_resposta": {
+            "type": "string",
+            "enum": [
+              "sim_nao",
+              "nota_1_5",
+              "texto",
+              "numero",
+              "foto",
+              "temperatura"
+            ]
+          },
+          "obrigatorio": {
+            "type": "boolean",
+            "default": true
+          },
+          "exige_foto": {
+            "type": "boolean",
+            "default": false
+          },
+          "exige_observacao_se_nao": {
+            "type": "boolean",
+            "default": false
+          },
+          "valor_minimo": {
+            "type": "number"
+          },
+          "valor_maximo": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    "pontuacao_minima": {
+      "type": "number",
+      "description": "Pontua\u00e7\u00e3o m\u00ednima para aprova\u00e7\u00e3o"
+    },
+    "notificar_falha": {
+      "type": "boolean",
+      "default": true
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "ativo",
+        "inativo"
+      ],
+      "default": "ativo"
+    }
+  },
+  "required": [
+    "empresa_id",
+    "nome",
+    "categoria"
+  ]
+}

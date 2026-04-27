@@ -1,0 +1,67 @@
+{
+  "name": "CategoriaDRE",
+  "type": "object",
+  "description": "Categorias para DRE gerencial",
+  "properties": {
+    "empresa_id": {
+      "type": "string",
+      "description": "ID da empresa (tenant)"
+    },
+    "nome": {
+      "type": "string",
+      "description": "Nome da categoria"
+    },
+    "codigo": {
+      "type": "string",
+      "description": "C\u00f3digo cont\u00e1bil"
+    },
+    "tipo": {
+      "type": "string",
+      "enum": [
+        "receita",
+        "custo",
+        "despesa_fixa",
+        "despesa_variavel",
+        "investimento"
+      ],
+      "description": "Tipo da categoria"
+    },
+    "grupo": {
+      "type": "string",
+      "enum": [
+        "receita_operacional",
+        "cmv",
+        "despesas_operacionais",
+        "despesas_administrativas",
+        "despesas_financeiras",
+        "outros"
+      ],
+      "description": "Grupo no DRE"
+    },
+    "categoria_pai_id": {
+      "type": "string",
+      "description": "Categoria pai para hierarquia"
+    },
+    "ordem": {
+      "type": "number",
+      "default": 0
+    },
+    "cor": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "ativo",
+        "inativo"
+      ],
+      "default": "ativo"
+    }
+  },
+  "required": [
+    "empresa_id",
+    "nome",
+    "tipo",
+    "grupo"
+  ]
+}

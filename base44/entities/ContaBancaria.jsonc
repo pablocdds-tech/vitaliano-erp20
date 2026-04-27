@@ -1,0 +1,51 @@
+{
+  "name": "ContaBancaria",
+  "type": "object",
+  "description": "Contas banc\u00e1rias reais",
+  "properties": {
+    "nome": {
+      "type": "string",
+      "description": "Nome/apelido da conta"
+    },
+    "banco": {
+      "type": "string",
+      "description": "Nome do banco"
+    },
+    "agencia": {
+      "type": "string"
+    },
+    "conta": {
+      "type": "string"
+    },
+    "loja_id": {
+      "type": "string",
+      "description": "Loja a que pertence"
+    },
+    "tipo": {
+      "type": "string",
+      "enum": [
+        "corrente",
+        "poupanca",
+        "investimento"
+      ],
+      "default": "corrente"
+    },
+    "saldo_inicial": {
+      "type": "number",
+      "default": 0,
+      "description": "Saldo inicial (base para c\u00e1lculo)"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "ativo",
+        "inativo"
+      ],
+      "default": "ativo"
+    }
+  },
+  "required": [
+    "nome",
+    "banco"
+  ]
+}

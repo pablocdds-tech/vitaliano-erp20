@@ -1,0 +1,54 @@
+{
+  "name": "Categoria",
+  "type": "object",
+  "description": "Categorias de produtos",
+  "properties": {
+    "empresa_id": {
+      "type": "string",
+      "description": "ID da empresa (tenant)"
+    },
+    "nome": {
+      "type": "string",
+      "description": "Nome da categoria"
+    },
+    "codigo": {
+      "type": "string",
+      "description": "C\u00f3digo da categoria"
+    },
+    "categoria_pai_id": {
+      "type": "string",
+      "description": "ID da categoria pai (para subcategorias)"
+    },
+    "tipo": {
+      "type": "string",
+      "enum": [
+        "insumo",
+        "produto_final",
+        "embalagem",
+        "limpeza",
+        "outros"
+      ],
+      "default": "insumo"
+    },
+    "cor": {
+      "type": "string",
+      "description": "Cor para identifica\u00e7\u00e3o visual"
+    },
+    "ordem": {
+      "type": "number",
+      "default": 0,
+      "description": "Ordem de exibi\u00e7\u00e3o"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "ativo",
+        "inativo"
+      ],
+      "default": "ativo"
+    }
+  },
+  "required": [
+    "nome"
+  ]
+}

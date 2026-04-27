@@ -1,0 +1,120 @@
+{
+  "name": "Venda",
+  "type": "object",
+  "description": "Fechamento de caixa di\u00e1rio por loja",
+  "properties": {
+    "empresa_id": {
+      "type": "string",
+      "description": "ID da empresa (tenant)"
+    },
+    "loja_id": {
+      "type": "string",
+      "description": "ID da loja"
+    },
+    "data": {
+      "type": "string",
+      "format": "date",
+      "description": "Data do fechamento"
+    },
+    "canal": {
+      "type": "string",
+      "enum": [
+        "balcao",
+        "delivery",
+        "ifood",
+        "rappi",
+        "uber_eats",
+        "outros"
+      ],
+      "default": "balcao"
+    },
+    "valor_bruto": {
+      "type": "number",
+      "default": 0
+    },
+    "valor_desconto": {
+      "type": "number",
+      "default": 0
+    },
+    "valor_taxa_entrega": {
+      "type": "number",
+      "default": 0
+    },
+    "valor_comissao_plataforma": {
+      "type": "number",
+      "default": 0
+    },
+    "valor_liquido": {
+      "type": "number",
+      "default": 0
+    },
+    "quantidade_pedidos": {
+      "type": "number",
+      "default": 0
+    },
+    "ticket_medio": {
+      "type": "number",
+      "default": 0
+    },
+    "linhas_fechamento": {
+      "type": "array",
+      "description": "Linhas de fechamento por forma de pagamento",
+      "items": {
+        "type": "object",
+        "properties": {
+          "forma_pagamento_id": {
+            "type": "string"
+          },
+          "forma_pagamento_nome": {
+            "type": "string"
+          },
+          "valor_bruto": {
+            "type": "number"
+          },
+          "taxa_percentual": {
+            "type": "number"
+          },
+          "valor_taxa": {
+            "type": "number"
+          },
+          "valor_liquido": {
+            "type": "number"
+          },
+          "data_prevista_recebimento": {
+            "type": "string",
+            "format": "date"
+          },
+          "conta_receber_id": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "formas_pagamento": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "forma": {
+            "type": "string"
+          },
+          "valor": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    "observacoes": {
+      "type": "string"
+    },
+    "importado_de": {
+      "type": "string",
+      "description": "Sistema de origem (ifood, etc)"
+    }
+  },
+  "required": [
+    "loja_id",
+    "data",
+    "valor_bruto"
+  ]
+}

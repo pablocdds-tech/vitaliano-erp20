@@ -1,0 +1,92 @@
+{
+  "name": "Fornecedor",
+  "type": "object",
+  "description": "Fornecedores cadastrados",
+  "properties": {
+    "empresa_id": {
+      "type": "string",
+      "description": "ID da empresa (tenant)"
+    },
+    "razao_social": {
+      "type": "string",
+      "description": "Raz\u00e3o social"
+    },
+    "nome_fantasia": {
+      "type": "string",
+      "description": "Nome fantasia"
+    },
+    "cnpj": {
+      "type": "string",
+      "description": "CNPJ"
+    },
+    "inscricao_estadual": {
+      "type": "string"
+    },
+    "endereco": {
+      "type": "object",
+      "properties": {
+        "logradouro": {
+          "type": "string"
+        },
+        "numero": {
+          "type": "string"
+        },
+        "complemento": {
+          "type": "string"
+        },
+        "bairro": {
+          "type": "string"
+        },
+        "cidade": {
+          "type": "string"
+        },
+        "estado": {
+          "type": "string"
+        },
+        "cep": {
+          "type": "string"
+        }
+      }
+    },
+    "contato": {
+      "type": "object",
+      "properties": {
+        "telefone": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "responsavel": {
+          "type": "string"
+        }
+      }
+    },
+    "categorias": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Categorias de produtos que fornece"
+    },
+    "condicoes_pagamento": {
+      "type": "string",
+      "description": "Condi\u00e7\u00f5es padr\u00e3o de pagamento"
+    },
+    "observacoes": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "ativo",
+        "inativo",
+        "bloqueado"
+      ],
+      "default": "ativo"
+    }
+  },
+  "required": [
+    "razao_social"
+  ]
+}

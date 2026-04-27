@@ -1,0 +1,81 @@
+{
+  "name": "TarefaContagem",
+  "type": "object",
+  "description": "Tarefa individual de contagem atribu\u00edda a um respons\u00e1vel",
+  "properties": {
+    "empresa_id": {
+      "type": "string"
+    },
+    "contagem_id": {
+      "type": "string",
+      "description": "ID da Contagem geral"
+    },
+    "loja_id": {
+      "type": "string"
+    },
+    "responsavel_nome": {
+      "type": "string"
+    },
+    "grupo": {
+      "type": "string",
+      "description": "Ex: Insumos, Embalagens"
+    },
+    "token": {
+      "type": "string",
+      "description": "Token \u00fanico para acesso p\u00fablico"
+    },
+    "itens": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "produto_id": {
+            "type": "string"
+          },
+          "produto_nome": {
+            "type": "string"
+          },
+          "unidade_medida": {
+            "type": "string"
+          },
+          "quantidade_sistema": {
+            "type": "number"
+          },
+          "quantidade_contada": {
+            "type": "number"
+          },
+          "observacao": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "total_itens": {
+      "type": "number",
+      "default": 0
+    },
+    "itens_preenchidos": {
+      "type": "number",
+      "default": 0
+    },
+    "finalizado_em": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pendente",
+        "em_andamento",
+        "finalizado"
+      ],
+      "default": "pendente"
+    }
+  },
+  "required": [
+    "contagem_id",
+    "loja_id",
+    "responsavel_nome",
+    "token"
+  ]
+}

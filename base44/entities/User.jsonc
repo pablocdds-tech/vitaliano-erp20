@@ -1,0 +1,24 @@
+{
+  "name": "User",
+  "type": "object",
+  "properties": {
+    "role": {
+      "type": "string",
+      "enum": [
+        "admin",
+        "user"
+      ],
+      "default": "user"
+    },
+    "paginas_permitidas": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Lista de p\u00e1ginas que o usu\u00e1rio tem acesso. Vazio = sem restri\u00e7\u00e3o (admin)."
+    }
+  },
+  "required": [
+    "paginas_permitidas"
+  ]
+}

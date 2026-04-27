@@ -1,0 +1,74 @@
+{
+  "name": "BancoVirtual",
+  "type": "object",
+  "description": "Transfer\u00eancias do banco virtual CD <-> Lojas",
+  "properties": {
+    "empresa_id": {
+      "type": "string",
+      "description": "ID da empresa (tenant)"
+    },
+    "loja_origem_id": {
+      "type": "string",
+      "description": "Loja que envia"
+    },
+    "loja_destino_id": {
+      "type": "string",
+      "description": "Loja que recebe"
+    },
+    "tipo": {
+      "type": "string",
+      "enum": [
+        "deposito",
+        "saque",
+        "transferencia",
+        "ajuste"
+      ],
+      "description": "Tipo de opera\u00e7\u00e3o"
+    },
+    "valor": {
+      "type": "number",
+      "description": "Valor da opera\u00e7\u00e3o"
+    },
+    "descricao": {
+      "type": "string"
+    },
+    "documento_referencia": {
+      "type": "string",
+      "description": "Documento de refer\u00eancia (conta_pagar_id, pedido_id, etc)"
+    },
+    "saldo_origem_anterior": {
+      "type": "number"
+    },
+    "saldo_origem_posterior": {
+      "type": "number"
+    },
+    "saldo_destino_anterior": {
+      "type": "number"
+    },
+    "saldo_destino_posterior": {
+      "type": "number"
+    },
+    "aprovado_por": {
+      "type": "string"
+    },
+    "data_aprovacao": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pendente",
+        "aprovado",
+        "rejeitado",
+        "cancelado"
+      ],
+      "default": "pendente"
+    }
+  },
+  "required": [
+    "empresa_id",
+    "tipo",
+    "valor"
+  ]
+}

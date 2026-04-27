@@ -1,0 +1,106 @@
+{
+  "name": "AcaoIA",
+  "type": "object",
+  "description": "A\u00e7\u00f5es interpretadas e executadas pela IA com log de auditoria",
+  "properties": {
+    "empresa_id": {
+      "type": "string"
+    },
+    "loja_id": {
+      "type": "string"
+    },
+    "tipo_acao": {
+      "type": "string",
+      "enum": [
+        "processar_nf",
+        "criar_lancamento",
+        "atualizar_estoque",
+        "gerar_relatorio",
+        "enviar_notificacao",
+        "criar_pedido",
+        "outro"
+      ],
+      "description": "Tipo de a\u00e7\u00e3o"
+    },
+    "descricao": {
+      "type": "string",
+      "description": "Descri\u00e7\u00e3o leg\u00edvel da a\u00e7\u00e3o sugerida pela IA"
+    },
+    "comando_original": {
+      "type": "string",
+      "description": "Prompt original do usu\u00e1rio"
+    },
+    "payload": {
+      "type": "object",
+      "description": "Par\u00e2metros estruturados para execu\u00e7\u00e3o da a\u00e7\u00e3o"
+    },
+    "entrada": {
+      "type": "object",
+      "description": "Dados de entrada (prompt, arquivo, etc)"
+    },
+    "saida": {
+      "type": "object",
+      "description": "Resultado da execu\u00e7\u00e3o"
+    },
+    "entidades_afetadas": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "entidade": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "acao": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "solicitado_por": {
+      "type": "string"
+    },
+    "aprovado_por": {
+      "type": "string"
+    },
+    "confirmado_em": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "executado_em": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "tempo_execucao_ms": {
+      "type": "number"
+    },
+    "custo_tokens": {
+      "type": "number"
+    },
+    "erro": {
+      "type": "string"
+    },
+    "requer_confirmacao": {
+      "type": "boolean",
+      "default": true
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pendente",
+        "aguardando_confirmacao",
+        "em_execucao",
+        "concluida",
+        "falha",
+        "cancelada"
+      ],
+      "default": "pendente"
+    }
+  },
+  "required": [
+    "tipo_acao",
+    "descricao"
+  ]
+}

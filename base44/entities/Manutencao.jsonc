@@ -1,0 +1,136 @@
+{
+  "name": "Manutencao",
+  "type": "object",
+  "description": "Ordens de manuten\u00e7\u00e3o",
+  "properties": {
+    "empresa_id": {
+      "type": "string",
+      "description": "ID da empresa (tenant)"
+    },
+    "loja_id": {
+      "type": "string",
+      "description": "ID da loja"
+    },
+    "ativo_id": {
+      "type": "string",
+      "description": "ID do ativo"
+    },
+    "numero": {
+      "type": "string",
+      "description": "N\u00famero da OS"
+    },
+    "tipo": {
+      "type": "string",
+      "enum": [
+        "preventiva",
+        "corretiva",
+        "preditiva",
+        "emergencial"
+      ],
+      "default": "corretiva"
+    },
+    "prioridade": {
+      "type": "string",
+      "enum": [
+        "baixa",
+        "media",
+        "alta",
+        "critica"
+      ],
+      "default": "media"
+    },
+    "descricao_problema": {
+      "type": "string"
+    },
+    "solicitante": {
+      "type": "string"
+    },
+    "data_abertura": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "data_prevista": {
+      "type": "string",
+      "format": "date"
+    },
+    "data_inicio": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "data_conclusao": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "tecnico": {
+      "type": "string"
+    },
+    "fornecedor_servico_id": {
+      "type": "string"
+    },
+    "descricao_servico": {
+      "type": "string"
+    },
+    "pecas_utilizadas": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "descricao": {
+            "type": "string"
+          },
+          "quantidade": {
+            "type": "number"
+          },
+          "valor_unitario": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    "custo_mao_obra": {
+      "type": "number",
+      "default": 0
+    },
+    "custo_pecas": {
+      "type": "number",
+      "default": 0
+    },
+    "custo_total": {
+      "type": "number",
+      "default": 0
+    },
+    "fotos_antes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "fotos_depois": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "observacoes": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "aberta",
+        "em_analise",
+        "aguardando_pecas",
+        "em_execucao",
+        "concluida",
+        "cancelada"
+      ],
+      "default": "aberta"
+    }
+  },
+  "required": [
+    "empresa_id",
+    "loja_id",
+    "tipo",
+    "descricao_problema"
+  ]
+}
